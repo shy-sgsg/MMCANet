@@ -1,0 +1,95 @@
+# ====================================
+# 1. 编译器与构建产物 (C++/CUDA)
+# ====================================
+*.o
+*.obj
+*.so
+*.a
+*.lib
+*.dll
+*.exe
+*.out
+*.app
+*.exp
+*.pdb
+*.ilk
+
+# CMake 构建目录
+[Bb]uild/
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+cmake_install.cmake
+install/
+CTestTestfile.cmake
+
+# ====================================
+# 2. Python 与 深度学习 (PyTorch/Diffusion)
+# ====================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# 权重文件与数据集 (建议将大文件放在专门目录并排除)
+*.pth
+*.pt
+*.ckpt
+*.onnx
+*.weights
+*.h5
+# 如果有专门存放模型或数据的文件夹，取消下面两行的注释
+checkpoints/
+data/
+
+# ====================================
+# 3. MATLAB 仿真
+# ====================================
+*.asv
+*.m~
+*.mex*
+*.slxc
+*.mat
+!/data/*.mat  # 如果某些 .mat 是必要的测试数据，可以用 ! 排除过滤
+
+# ====================================
+# 4. 编辑器与 IDE (VS Code, Cursor, Trae)
+# ====================================
+.vscode/
+!.vscode/extensions.json
+.history/
+*.log
+*.suo
+*.user
+*.userosscache
+*.sln
+*.vcxproj
+*.filters
+
+# AI 编辑器生成的缓存
+.cursor/
+.trae/
+
+# ====================================
+# 5. 系统文件与日志
+# ====================================
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log
+*.tmp
+*.bak
+
+# ====================================
+# 6. 敏感信息与环境变量
+# ====================================
+.env
+.env.local
+config.json
+secrets.txt
