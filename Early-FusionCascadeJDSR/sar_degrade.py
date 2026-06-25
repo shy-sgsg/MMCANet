@@ -97,6 +97,7 @@ def downsample_sar(sar: torch.Tensor, target_h: int, target_w: int) -> torch.Ten
 def build_sar_lr_from_physical_degradation(
     sar_mr: torch.Tensor,
     input_downsample_size: int = 64,
+    downsample_factor: int = 2,
     use_freq_truncation: bool = True,
     use_anisotropic_blur: bool = False,
     use_speckle: bool = True,
@@ -117,6 +118,14 @@ def build_sar_lr_from_physical_degradation(
         keep_h = min(max(1, int(input_downsample_size)), h)
         keep_w = min(max(1, int(input_downsample_size)), w)
 
+    if input_downsample_size > 0:
+        target_h = min(int(input_downsample_size), h)
+        target_w = min(int(input_downsample_size), w)
+    else:
+        factor = max(1, int(downsample_factor))
+        target_h = max(1, h // factor)
+        target_w = max(1, w // factor)
+
     sar_lr = sar_mr.clone()
 
     if use_freq_truncation:
@@ -130,8 +139,8 @@ def build_sar_lr_from_physical_degradation(
             angle_deg=blur_angle_deg,
         )
 
-    if input_downsample_size > 0 and (h != input_downsample_size or w != input_downsample_size):
-        sar_lr = downsample_sar(sar_lr, target_h=input_downsample_size, target_w=input_downsample_size)
+    if target_h != h or target_w != w:
+        sar_lr = downsample_sar(sar_lr, target_h=target_h, target_w=target_w)
 
     if use_speckle:
         sar_lr = gamma_speckle_noise(sar_lr, looks=speckle_looks)
@@ -144,12 +153,12 @@ def build_sar_lr_from_physical_degradation(
 def normalize_sar_log_clip(
     sar: torch.Tensor,
     log_scale: float = 20.0,
-    clip_low: float = 1.0,
-    clip_high: float = 99.0,
+    clip_low: float = 0.1,
+    clip_high: float = 99.9,
     clamp_max: Optional[float] = None,
     eps: float = 1e-6,
 ) -> torch.Tensor:
-    """Normalize SAR dynamic range using log1p + percentile clipping to [0, 1]."""
+    """Normalize SAR dynamic range using log1p + soft percentile stretching."""
     if clamp_max is None:
         sar = torch.clamp(sar, min=0.0)
     else:
@@ -161,14 +170,14 @@ def normalize_sar_log_clip(
     q_low = max(0.0, min(float(clip_low), 100.0)) / 100.0
     q_high = max(0.0, min(float(clip_high), 100.0)) / 100.0
     if q_high <= q_low:
-        q_low, q_high = 0.01, 0.99
+        q_low, q_high = 0.001, 0.999
 
     flat = sar.reshape(-1)
     lo = torch.quantile(flat, q_low)
     hi = torch.quantile(flat, q_high)
 
-    sar = torch.clamp(sar, min=lo, max=hi)
-    return (sar - lo) / (hi - lo + eps)
+    sar = (sar - lo) / (hi - lo + eps)
+    return sar
 
 
 # def to_3ch(gray: torch.Tensor) -> torch.Tensor:

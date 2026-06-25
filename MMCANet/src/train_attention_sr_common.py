@@ -15,11 +15,14 @@ def preprocess_sar_tensor(
     sar: torch.Tensor,
     norm_mode: str = "log_clip",
     log_scale: float = 20.0,
-    clip_low: float = 1.0,
-    clip_high: float = 99.0,
+    clip_low: float = 0.1,
+    clip_high: float = 99.9,
     eps: float = 1e-6,
 ) -> torch.Tensor:
-    """Normalize SAR dynamic range with either linear pass-through or log+percentile clipping."""
+    """Normalize SAR dynamic range with soft log+percentile (preserves extreme values).
+    
+    Changed from hard clip at 1%-99% to soft 0.1%-99.9% to preserve sharp scatterers.
+    """
     sar = torch.clamp(sar, 0.0, 1.0)
 
     if norm_mode == "linear":
@@ -27,20 +30,23 @@ def preprocess_sar_tensor(
     if norm_mode != "log_clip":
         raise ValueError(f"Unsupported SAR normalization mode: {norm_mode}")
 
+    # Soft log transform: converts multiplicative speckle to additive
     scale = max(float(log_scale), eps)
     sar = torch.log1p(scale * sar) / torch.log1p(sar.new_tensor(scale))
 
+    # Very soft percentile clipping (0.1%-99.9%) to preserve extreme scatterers
     q_low = max(0.0, min(float(clip_low), 100.0)) / 100.0
     q_high = max(0.0, min(float(clip_high), 100.0)) / 100.0
     if q_high <= q_low:
-        q_low, q_high = 0.01, 0.99
+        q_low, q_high = 0.001, 0.999
 
     flat = sar.reshape(-1)
     lo = torch.quantile(flat, q_low)
     hi = torch.quantile(flat, q_high)
 
-    sar = torch.clamp(sar, min=lo, max=hi)
-    return (sar - lo) / (hi - lo + eps)
+    # Normalize but allow values to exceed 1.0 (rare extremes are preserved)
+    sar = (sar - lo) / (hi - lo + eps)
+    return sar
 
 
 def build_sar_lr_from_mr(sar_mr: torch.Tensor, input_downsample_size: int = 64) -> torch.Tensor:
@@ -134,9 +140,25 @@ def gamma_speckle_noise(sar: torch.Tensor, looks: float = 1.0) -> torch.Tensor:
     return sar * noise
 
 
+def downsample_sar(sar: torch.Tensor, target_h: int, target_w: int) -> torch.Tensor:
+    """Downsample SAR amplitude to the target spatial size."""
+    if sar.ndim != 3 or sar.shape[0] != 1:
+        raise ValueError(f"Expected SAR tensor shape [1, H, W], got {tuple(sar.shape)}")
+    if target_h <= 0 or target_w <= 0:
+        raise ValueError("Target size must be positive.")
+    sar_lr = F.interpolate(
+        sar.unsqueeze(0),
+        size=(int(target_h), int(target_w)),
+        mode="bilinear",
+        align_corners=False,
+    )
+    return sar_lr.squeeze(0)
+
+
 def build_sar_lr_from_physical_degradation(
     sar_mr: torch.Tensor,
     input_downsample_size: int = 64,
+    downsample_factor: int = 2,
     use_freq_truncation: bool = True,
     use_anisotropic_blur: bool = False,
     use_speckle: bool = True,
@@ -148,7 +170,7 @@ def build_sar_lr_from_physical_degradation(
     speckle_looks: float = 1.0,
     clamp_output: bool = True,
 ) -> torch.Tensor:
-    """Serial physical pipeline: frequency truncation -> optional anisotropic blur -> multiplicative speckle."""
+    """Serial physical pipeline: frequency truncation -> blur -> downsample -> multiplicative speckle."""
     h, w = sar_mr.shape[-2:]
     if freq_window_size > 0:
         keep_h = min(int(freq_window_size), h)
@@ -156,6 +178,14 @@ def build_sar_lr_from_physical_degradation(
     else:
         keep_h = min(max(1, int(input_downsample_size)), h)
         keep_w = min(max(1, int(input_downsample_size)), w)
+
+    if input_downsample_size > 0:
+        target_h = min(int(input_downsample_size), h)
+        target_w = min(int(input_downsample_size), w)
+    else:
+        factor = max(1, int(downsample_factor))
+        target_h = max(1, h // factor)
+        target_w = max(1, w // factor)
 
     sar_lr = sar_mr.clone()
 
@@ -169,6 +199,8 @@ def build_sar_lr_from_physical_degradation(
             sigma_range=blur_sigma_range,
             angle_deg=blur_angle_deg,
         )
+    if target_h != h or target_w != w:
+        sar_lr = downsample_sar(sar_lr, target_h=target_h, target_w=target_w)
     if use_speckle:
         sar_lr = gamma_speckle_noise(sar_lr, looks=speckle_looks)
 
@@ -182,7 +214,8 @@ class SAROptDataset(Dataset):
         self,
         sar_dir: str,
         opt_dir: str,
-        input_downsample_size: int = 64,
+        input_downsample_size: int = 0,
+        downsample_factor: int = 2,
         augment: bool = True,
         sar_norm_mode: str = "log_clip",
         sar_log_scale: float = 20.0,
@@ -203,6 +236,7 @@ class SAROptDataset(Dataset):
         self.sar_dir = sar_dir
         self.opt_dir = opt_dir
         self.input_downsample_size = input_downsample_size
+        self.downsample_factor = downsample_factor
         self.augment = augment
         self.sar_norm_mode = sar_norm_mode
         self.sar_log_scale = sar_log_scale
@@ -265,6 +299,7 @@ class SAROptDataset(Dataset):
             sar_lr = build_sar_lr_from_physical_degradation(
                 sar_mr=sar_mr,
                 input_downsample_size=self.input_downsample_size,
+                downsample_factor=self.downsample_factor,
                 use_freq_truncation=self.degrade_freq_truncation,
                 use_anisotropic_blur=self.degrade_anisotropic_blur,
                 use_speckle=self.degrade_speckle,
@@ -277,7 +312,12 @@ class SAROptDataset(Dataset):
                 clamp_output=self.degrade_clamp_output,
             )
         else:
-            sar_lr = build_sar_lr_from_mr(sar_mr=sar_mr, input_downsample_size=self.input_downsample_size)
+            if self.input_downsample_size > 0:
+                target_size = self.input_downsample_size
+            else:
+                factor = max(1, int(self.downsample_factor))
+                target_size = max(1, sar_mr.shape[-1] // factor)
+            sar_lr = build_sar_lr_from_mr(sar_mr=sar_mr, input_downsample_size=target_size)
 
         return sar_lr, opt_hr, sar_mr
 
@@ -379,8 +419,9 @@ class Encoder(nn.Module):
 
 
 class TwoStreamFrequencyGuidedUNet(nn.Module):
-    def __init__(self, base_channels: int = 32):
+    def __init__(self, base_channels: int = 32, upscale: int = 2):
         super().__init__()
+        self.upscale = max(1, int(upscale))
         self.sar_encoder = Encoder(in_channels=1, base_channels=base_channels)
         self.opt_encoder = Encoder(in_channels=3, base_channels=base_channels)
 
@@ -399,6 +440,14 @@ class TwoStreamFrequencyGuidedUNet(nn.Module):
         self.dec1 = ConvBlock(base_channels * 2, base_channels)
 
         self.shallow_fusion = ShallowGuideFusion(in_channels=base_channels)
+        if self.upscale == 1:
+            self.sr_upsample = nn.Identity()
+        else:
+            self.sr_upsample = nn.Sequential(
+                nn.Conv2d(base_channels, base_channels * self.upscale * self.upscale, kernel_size=3, padding=1),
+                nn.PixelShuffle(self.upscale),
+                nn.ReLU(inplace=True),
+            )
         self.out_conv = nn.Conv2d(base_channels, 1, kernel_size=1)
 
     def forward(self, sar_input: torch.Tensor, opt_input: torch.Tensor) -> torch.Tensor:
@@ -420,6 +469,7 @@ class TwoStreamFrequencyGuidedUNet(nn.Module):
         d1 = self.dec1(torch.cat([d1, sar_skips[0]], dim=1))
 
         d1 = self.shallow_fusion(d1, opt_skips[0])
+        d1 = self.sr_upsample(d1)
         return torch.sigmoid(self.out_conv(d1))
 
 
@@ -490,13 +540,40 @@ def normalize_map(x: torch.Tensor, eps: float = 1e-6) -> torch.Tensor:
     return (x - x_min) / (x_max - x_min + eps)
 
 
-def low_frequency_l1_loss(sar_out: torch.Tensor, sar_mr: torch.Tensor, down_factor: int = 4) -> torch.Tensor:
+def low_frequency_l1_loss(sar_out: torch.Tensor, sar_mr: torch.Tensor, down_factor: int = 4, eps: float = 1e-3) -> torch.Tensor:
+    """Low-frequency loss using Charbonnier (smooth L1) for consistency with main loss."""
     if down_factor <= 1:
-        return F.l1_loss(sar_out, sar_mr)
+        return charbonnier_loss(sar_out, sar_mr, eps=eps)
 
     sar_out_low = F.avg_pool2d(sar_out, kernel_size=down_factor, stride=down_factor)
     sar_mr_low = F.avg_pool2d(sar_mr, kernel_size=down_factor, stride=down_factor)
-    return F.l1_loss(sar_out_low, sar_mr_low)
+    return charbonnier_loss(sar_out_low, sar_mr_low, eps=eps)
+
+
+def high_frequency_extraction(x: torch.Tensor, kernel_size: int = 5) -> torch.Tensor:
+    """Extract high-frequency components via Laplacian or LoG.
+    
+    Used to isolate optical edges for injection into SAR features.
+    Removes low-frequency color/shadow artifacts before fusion.
+    """
+    # Simple Laplacian kernel for high-pass filtering
+    laplacian = x.new_tensor(
+        [[0.0, -1.0, 0.0],
+         [-1.0, 4.0, -1.0],
+         [0.0, -1.0, 0.0]],
+        dtype=x.dtype
+    ).view(1, 1, 3, 3)
+    
+    # Apply to each channel independently
+    b, c, h, w = x.shape
+    x_flat = x.view(b * c, 1, h, w)
+    hf = F.conv2d(x_flat, laplacian, padding=1)
+    hf = hf.view(b, c, h, w)
+    
+    # Normalize to prevent extreme gradients
+    hf_std = hf.std(dim=(2, 3), keepdim=True) + 1e-6
+    hf = hf / (hf_std * 2.0 + 1e-6)
+    return hf
 
 
 def noise_signal_decorrelation_loss(signal: torch.Tensor, noisy_observation: torch.Tensor, eps: float = 1e-6) -> torch.Tensor:
@@ -517,3 +594,13 @@ def total_variation_loss(x: torch.Tensor) -> torch.Tensor:
     grad_x = torch.abs(x[:, :, :, 1:] - x[:, :, :, :-1])
     grad_y = torch.abs(x[:, :, 1:, :] - x[:, :, :-1, :])
     return grad_x.mean() + grad_y.mean()
+
+
+def charbonnier_loss(pred: torch.Tensor, target: torch.Tensor, eps: float = 1e-3) -> torch.Tensor:
+    """Charbonnier loss (smooth L1) for smoother gradients and sharper edges.
+    
+    Transitions from L1 (for large errors, robust to outliers) to L2 (for small errors,
+    smooth convergence). Eliminates blockiness and oscillation near convergence.
+    """
+    diff = pred - target
+    return torch.mean(torch.sqrt(diff * diff + eps * eps))

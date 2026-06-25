@@ -16,6 +16,9 @@ from sar_degrade import (
     to_3ch,
 )
 
+# Suppress numpy.core deprecation warning for older checkpoint compatibility
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning, message=".*numpy.core.*")
 torch.serialization.add_safe_globals([np.core.multiarray.scalar])
 
 
@@ -43,37 +46,38 @@ from train_attention_sr_common import preprocess_sar_tensor  # noqa: E402
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Cascade SAR2SAR denoising + SwinIR super-resolution")
-    parser.add_argument("--sar-dir", default="../data/sar", help="Directory with SAR images")
-    parser.add_argument("--opt-dir", default="../data/opt", help="Directory with optical images (for pairing)")
-    parser.add_argument("--output-dir", default="./outputs/cascade", help="Output directory")
-    parser.add_argument("--swinir-weights", required=True, help="Path to SwinIR weights (.pth)")
+    parser.add_argument("--sar-dir", default="data/sar_mini", help="Directory with SAR images")
+    parser.add_argument("--opt-dir", default="data/opt_mini", help="Directory with optical images (for pairing)")
+    parser.add_argument("--output-dir", default="outputs/cascade_baseline_infer", help="Output directory")
+    parser.add_argument("--swinir-weights", default="weights/001_classicalSR_DIV2K_s48w8_SwinIR-M_x2.pth", help="Path to SwinIR weights (.pth)")
     parser.add_argument("--mode", choices=["infer", "finetune"], default="infer")
-    parser.add_argument("--scale", type=int, default=4, help="SR upscale factor")
+    parser.add_argument("--scale", type=int, default=2, help="SR upscale factor")
     parser.add_argument("--patch-size", type=int, default=64, help="SwinIR img_size")
     parser.add_argument("--window-size", type=int, default=8, help="SwinIR window size")
     parser.add_argument("--device", default="auto", choices=["auto", "cpu", "cuda"], help="Device preference")
     parser.add_argument("--limit", type=int, default=0, help="Limit number of images (0 = all)")
     parser.add_argument("--save-intermediate", action="store_true", help="Save LR and denoised intermediates")
 
-    parser.add_argument("--input-downsample-size", type=int, default=64, help="Frequency truncation window size")
+    parser.add_argument("--input-downsample-size", type=int, default=128, help="Target LR size (set 0 to use downsample factor)")
+    parser.add_argument("--downsample-factor", type=int, default=2, help="Used when input-downsample-size is 0")
     parser.add_argument("--degrade-freq-truncation", action="store_true", default=True)
     parser.add_argument("--degrade-anisotropic-blur", action="store_true", default=False)
     parser.add_argument("--degrade-speckle", action="store_true", default=True)
-    parser.add_argument("--degrade-freq-window-size", type=int, default=0)
+    parser.add_argument("--degrade-freq-window-size", type=int, default=64)
     parser.add_argument("--degrade-blur-kernel-size", type=int, default=9)
     parser.add_argument("--degrade-blur-sigma-azimuth", type=float, default=2.0)
     parser.add_argument("--degrade-blur-sigma-range", type=float, default=0.8)
     parser.add_argument("--degrade-blur-angle-deg", type=float, default=0.0)
-    parser.add_argument("--degrade-speckle-looks", type=float, default=1.0)
+    parser.add_argument("--degrade-speckle-looks", type=float, default=2.0)
     parser.add_argument("--degrade-clamp-output", action="store_true", default=True)
 
     parser.add_argument("--sar2sar-input-gain", type=float, default=1.0, help="Scale noisy SAR before SAR2SAR")
-    parser.add_argument("--sar2sar-weights", default="", help="Path to SAR2SAR weights (.pth)")
+    parser.add_argument("--sar2sar-weights", default="weights/sar2sar.pth", help="Path to SAR2SAR weights (.pth)")
     parser.add_argument("--sar2sar-patch-size", type=int, default=256)
     parser.add_argument("--sar2sar-stride-size", type=int, default=254)
     parser.add_argument("--sr-log-scale", type=float, default=20.0)
-    parser.add_argument("--sr-clip-low", type=float, default=1.0)
-    parser.add_argument("--sr-clip-high", type=float, default=99.0)
+    parser.add_argument("--sr-clip-low", type=float, default=0.1)
+    parser.add_argument("--sr-clip-high", type=float, default=99.9)
     parser.add_argument("--output-16bit", action="store_true", default=True, help="Save SR output as 16-bit PNG")
 
     parser.add_argument("--finetune-epochs", type=int, default=10)
@@ -81,7 +85,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--finetune-batch-size", type=int, default=1)
     parser.add_argument("--finetune-num-workers", type=int, default=2)
     parser.add_argument("--finetune-lambda-ssim", type=float, default=0.0)
-    parser.add_argument("--finetune-save-dir", default="./checkpoints")
+    parser.add_argument("--finetune-save-dir", default="./checkpoints/cascade_finetune", help="Directory to save finetuned model checkpoints")
     parser.add_argument("--finetune-save-every", type=int, default=5)
     parser.add_argument("--finetune-resume", default="")
     parser.add_argument("--finetune-amp", action="store_true", default=False)
@@ -122,6 +126,7 @@ class SarOptDataset(torch.utils.data.Dataset):
         sar_dir: str,
         opt_dir: str,
         input_downsample_size: int,
+        downsample_factor: int,
         sar_log_scale: float,
         sar_clip_low: float,
         sar_clip_high: float,
@@ -139,6 +144,7 @@ class SarOptDataset(torch.utils.data.Dataset):
         self.sar_dir = sar_dir
         self.opt_dir = opt_dir
         self.input_downsample_size = input_downsample_size
+        self.downsample_factor = downsample_factor
         self.sar_log_scale = sar_log_scale
         self.sar_clip_low = sar_clip_low
         self.sar_clip_high = sar_clip_high
@@ -182,6 +188,7 @@ class SarOptDataset(torch.utils.data.Dataset):
         sar_lr = build_sar_lr_from_physical_degradation(
             sar_mr=sar_mr,
             input_downsample_size=self.input_downsample_size,
+            downsample_factor=self.downsample_factor,
             use_freq_truncation=self.degrade_freq_truncation,
             use_anisotropic_blur=self.degrade_anisotropic_blur,
             use_speckle=self.degrade_speckle,
@@ -259,7 +266,7 @@ def build_swinir(scale: int, patch_size: int, window_size: int, weights: str, de
         upsampler="pixelshuffle",
         resi_connection="1conv",
     )
-    loadnet = torch.load(weights, map_location="cpu")
+    loadnet = torch.load(weights, map_location="cpu", weights_only=False)
     if isinstance(loadnet, dict) and "params_ema" in loadnet:
         state_dict = loadnet["params_ema"]
     elif isinstance(loadnet, dict) and "params" in loadnet:
@@ -268,7 +275,21 @@ def build_swinir(scale: int, patch_size: int, window_size: int, weights: str, de
         state_dict = loadnet
     else:
         raise ValueError("Unsupported SwinIR checkpoint format.")
-    model.load_state_dict(state_dict, strict=True)
+    # Remove conflicting attn_mask buffers (different across SwinIR versions)
+    keys_to_remove = [k for k in state_dict.keys() if 'attn_mask' in k]
+    for k in keys_to_remove:
+        del state_dict[k]
+    if keys_to_remove:
+        print(f"  Removed {len(keys_to_remove)} conflicting attn_mask buffer(s) from checkpoint")
+    
+    # Load with strict=False to handle other version mismatches
+    res = model.load_state_dict(state_dict, strict=False)
+    if res.missing_keys:
+        print(f"  Missing keys (will use random init): {len(res.missing_keys)} keys")
+    if res.unexpected_keys:
+        print(f"  Unexpected keys (will be ignored): {len(res.unexpected_keys)} keys")
+        if len(res.unexpected_keys) <= 5:
+            print(f"    {res.unexpected_keys}")
     model.eval()
     return model.to(device)
 
@@ -279,7 +300,7 @@ def normalize_sar2sar_weights(weights_path: str, output_dir: str) -> str:
     if not os.path.isfile(weights_path):
         raise FileNotFoundError(f"SAR2SAR weights not found: {weights_path}")
 
-    ckpt = torch.load(weights_path, map_location="cpu")
+    ckpt = torch.load(weights_path, map_location="cpu", weights_only=False)
     if isinstance(ckpt, dict) and "model_state_dict" in ckpt:
         return weights_path
 
@@ -346,6 +367,7 @@ def build_finetune_loader(args: argparse.Namespace) -> torch.utils.data.DataLoad
         sar_dir=args.sar_dir,
         opt_dir=args.opt_dir,
         input_downsample_size=args.input_downsample_size,
+        downsample_factor=args.downsample_factor,
         sar_log_scale=args.sr_log_scale,
         sar_clip_low=args.sr_clip_low,
         sar_clip_high=args.sr_clip_high,
@@ -384,7 +406,7 @@ def finetune_swinir(args: argparse.Namespace) -> None:
     model.train()
 
     if args.finetune_resume and os.path.isfile(args.finetune_resume):
-        model.load_state_dict(torch.load(args.finetune_resume, map_location="cpu"))
+        model.load_state_dict(torch.load(args.finetune_resume, map_location="cpu", weights_only=False))
 
     if args.finetune_freeze_transformer:
         for name, param in model.named_parameters():

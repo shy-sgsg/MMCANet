@@ -128,7 +128,8 @@ def parse_args():
     parser.add_argument("--lr-patience", type=int, default=5, help="Patience epochs used by ReduceLROnPlateau")
     parser.add_argument("--num-workers", type=int, default=2)
     parser.add_argument("--base-channels", type=int, default=32)
-    parser.add_argument("--input-downsample-size", type=int, default=64)
+    parser.add_argument("--input-downsample-size", type=int, default=0)
+    parser.add_argument("--downsample-factor", type=int, default=2)
     parser.add_argument(
         "--lr-degradation-mode",
         choices=["legacy", "physical"],
@@ -268,6 +269,7 @@ def main():
         sar_dir=args.sar_dir,
         opt_dir=args.opt_dir,
         input_downsample_size=args.input_downsample_size,
+        downsample_factor=args.downsample_factor,
         augment=not args.no_augment,
         sar_norm_mode=args.sar_norm_mode,
         sar_log_scale=args.sar_log_scale,
