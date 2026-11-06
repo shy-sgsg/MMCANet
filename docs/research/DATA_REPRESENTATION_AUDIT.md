@@ -1,41 +1,41 @@
-# Data representation audit — Phase C1
+# 数据表示审计——C1 阶段
 
-**Date:** 2026-10-28  
-**Scope:** authenticated `sen12_scene_dev1800_v2` train/development cohort only; 1,600 train and 200 development pairs. No test directory, image, or measurement was accessed.  
-**Status:** source identity verified for this cohort; local numeric 2k subset remains unmapped.
+**日期：** 2026-10-28
+**范围：** 仅限已认证的 `sen12_scene_dev1800_v2` 训练/开发集子集，共 1,600 组训练配对和 200 组开发配对。未访问测试目录、图像或测量值。
+**状态：** 已核实该子集的来源身份；本地以数值命名的 2,000 组子集仍未完成来源映射。
 
-## Source-backed representation
+## 有来源证据支持的表示信息
 
-The official SEN1-2 supporting document describes SAR as 8-bit, single-channel images representing sigma-nought backscatter on a dB scale, and optical as 8-bit color images from bands 4/3/2. The official-source audit matched all 1,800 selected SAR/optical pairs to their source paths at decoded-pixel level. This verifies the selected files and their encoding description; it does not provide the byte-to-dB quantization table, source-product calibration metadata, or raw linear power values.
+SEN1-2 官方补充文档说明：SAR 为 8 位单通道图像，表示以 dB 标度记录的后向散射系数 σ⁰（sigma-nought）；光学图像为由 4/3/2 波段构成的 8 位彩色图像。官方来源审计已将选取的 1,800 组 SAR/光学配对逐一匹配至来源路径，并在解码像素层面一致。该结果核实了所选文件及其编码说明，但没有提供字节值到 dB 的量化查找表、来源产品的定标元数据或原始线性功率值。
 
-The current B1 v2 loader divides byte values by 255 and applies `log1p(20x)/log(21)` to SAR. Without a documented inverse from PNG DN to sigma-nought dB and then to linear power, this is an additional nonlinear transform of the encoded representation. It must not be described as converting SAR to calibrated intensity or as a physically correct log transform. Optical RGB is divided by 255 without per-image stretching; the channel-to-band assignment follows the official dataset description.
+当前 B1 v2 加载器将字节值除以 255，并对 SAR 应用 `log1p(20x)/log(21)`。由于缺少从 PNG DN 到 σ⁰ dB、再到线性功率的有据可查逆变换，此操作是在已编码表示上额外施加的非线性变换。不得将其描述为把 SAR 转成定标强度，也不得称为物理正确的对数变换。光学 RGB 仅除以 255，没有逐图拉伸；通道与波段的对应关系依据官方数据集说明。
 
-## Pixel profile of the verified cohort
+## 已核验子集的像素分布
 
-The read-only profile reopened only the 1,800 frozen `train`/`val` composite PNGs from the sibling SOTANet cache. It checked the composite-file SHA-256 and both decoded panel hashes against the retained official-source verification record before updating counts. It read no test path. The resulting [`summary.json`](../../experiments/data_audits/mmcanet_phase_c1_representation_profile_20261028_v1/summary.json) reports 117,964,800 pixels per SAR channel and per optical channel.
+本次只读分布检查仅重新打开了 SOTANet 同级缓存中的 1,800 张冻结 `train`/`val` 拼接 PNG。检查先核对拼接文件 SHA-256 和两个解码面板的哈希，再与保留的官方来源验证记录进行比较后更新计数；未读取任何 test 路径。生成的 [`summary.json`](../../experiments/data_audits/mmcanet_phase_c1_representation_profile_20261028_v1/summary.json) 报告 SAR 与各光学通道均包含 117,964,800 个像素。
 
-| Channel | Mean DN | Population SD | DN=0 | DN=255 | 1st / 50th / 99th percentile |
+| 通道 | DN 均值 | 总体标准差 | DN=0 | DN=255 | 第 1/50/99 百分位数 |
 |---|---:|---:|---:|---:|---|
 | SAR | 143.756 | 53.846 | 0.673% | 2.609% | 10 / 146 / 255 |
-| Optical R | 89.561 | 58.084 | 0.663% | 1.586% | 3 / 82 / 255 |
-| Optical G | 91.649 | 54.078 | 0.682% | 1.609% | 4 / 84 / 255 |
-| Optical B | 83.468 | 54.571 | 0.680% | 1.615% | 3 / 73 / 255 |
+| 光学 R | 89.561 | 58.084 | 0.663% | 1.586% | 3 / 82 / 255 |
+| 光学 G | 91.649 | 54.078 | 0.682% | 1.609% | 4 / 84 / 255 |
+| 光学 B | 83.468 | 54.571 | 0.680% | 1.615% | 3 / 73 / 255 |
 
-All 256 integer codes occurred in every channel. The endpoint counts are descriptive DN frequencies; the available transfer documentation does not establish whether DN=255 means sensor saturation, an encoding ceiling, or naturally mapped high values. The train and development subsets also have different aggregate SAR means (145.026 versus 133.592 DN); this is a cohort description, not an independent distribution test. Pixel counts are spatially correlated and must not be treated as independent sample counts.
+每个通道都出现了全部 256 个整数编码。端点计数仅描述 DN 频数；现有传递文档无法判定 DN=255 表示传感器饱和、编码上限，还是自然映射的高值。训练集与开发集的 SAR 汇总均值也不同（分别为 145.026 和 133.592 DN）；这是对子集的描述，不是独立分布检验。像素计数存在空间相关性，不得视为相互独立的样本数。
 
-## Evidence limits and next action
+## 证据边界与下一步
 
-- These statistics belong to the official-source-verified 1,800-pair cohort, not the separate numeric-name `data/sar` / `data/opt` 2,000-pair subset.
-- The model representation is a normalized transform of 8-bit source codes. No absolute radiometry, linear intensity, calibrated power, or physical ENL can be inferred from these values.
-- Keep synthetic training conclusions in the representation domain. A real-SAR evaluation needs source product metadata, a defined physical-domain conversion, and a justified reference or independent measurement.
-- Do not use these descriptive statistics to select a model or tune a threshold. No model was run and no gate changed.
+- 以上统计属于经官方来源核验的 1,800 组子集，不属于独立的数值文件名 `data/sar` / `data/opt` 2,000 组子集。
+- 模型输入表示是对 8 位源编码进行归一化变换的结果。不能由这些数值推断绝对辐射量、线性强度、定标功率或物理 ENL。
+- 合成训练结论应限定在表示域。真实 SAR 评价需要来源产品元数据、明确的物理域转换，以及有依据的参考或独立测量。
+- 不得使用这些描述性统计选择模型或调节阈值。本次未运行模型，也未改变任何阶段门槛。
 
-## Sources
+## 来源
 
-- Official SEN1-2 supporting document: [`SupportingDocument.txt`](../../experiments/data_audits/sen1_2_upstream_hash_crosswalk_20261019_v1/SupportingDocument.txt).
-- Official dataset paper: Schmitt, Hughes, and Zhu, [SEN1-2 dataset paper](https://doi.org/10.5194/isprs-annals-IV-1-141-2018).
-- Source/pair verification: [`sen12_scene_dev1800_v2_auth_20261021_v1`](../../experiments/data_audits/sen12_scene_dev1800_v2_auth_20261021_v1/report.md).
-- Pixel-profile command and code: [`audit.py`](../../experiments/data_audits/mmcanet_phase_c1_representation_profile_20261028_v1/audit.py).
-- Current preprocessing/degradation: [`degradation.py`](../../MMCANet/src/degradation.py), [`prepare_fixed_degradation.py`](../../scripts/prepare_fixed_degradation.py), and [`sen12_scene_dev1800_v2/b1_revalidation_v2.json`](../../protocols/sen12_scene_dev1800_v2/b1_revalidation_v2.json).
+- SEN1-2 官方补充文档：[`SupportingDocument.txt`](../../experiments/data_audits/sen1_2_upstream_hash_crosswalk_20261019_v1/SupportingDocument.txt)。
+- 官方数据集论文：Schmitt、Hughes 与 Zhu，[SEN1-2 数据集论文](https://doi.org/10.5194/isprs-annals-IV-1-141-2018)。
+- 来源与配对核验：[`sen12_scene_dev1800_v2_auth_20261021_v1`](../../experiments/data_audits/sen12_scene_dev1800_v2_auth_20261021_v1/report.md)。
+- 像素分布检查命令与代码：[`audit.py`](../../experiments/data_audits/mmcanet_phase_c1_representation_profile_20261028_v1/audit.py)。
+- 当前预处理/退化代码：[`degradation.py`](../../MMCANet/src/degradation.py)、[`prepare_fixed_degradation.py`](../../scripts/prepare_fixed_degradation.py) 和 [`sen12_scene_dev1800_v2/b1_revalidation_v2.json`](../../protocols/sen12_scene_dev1800_v2/b1_revalidation_v2.json)。
 
-`test_set_accessed=false`, `test_set_used=false`, `training_or_inference_performed=false`, and `model_selection_performed=false` for this audit.
+本次审计的 `test_set_accessed=false`、`test_set_used=false`、`training_or_inference_performed=false`、`model_selection_performed=false`。

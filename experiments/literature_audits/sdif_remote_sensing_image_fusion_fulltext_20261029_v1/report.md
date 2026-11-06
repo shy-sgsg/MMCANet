@@ -1,40 +1,40 @@
-# SDIF optical–SAR diffusion image-fusion audit
+# SDIF 光学–SAR 扩散影像融合审计
 
-Date: 2026-10-29
-Audit ID: sdif_remote_sensing_image_fusion_fulltext_20261029_v1
-Question: Does Zhang et al.'s semantic-information-guided diffusion posterior sampling paper provide direct prior art for optical-guided SAR-output joint restoration, and what does its protocol establish?
+**日期：** 2026-10-29
+**审计编号：** `sdif_remote_sensing_image_fusion_fulltext_20261029_v1`
+**研究问题：** Zhang 等人的语义信息引导扩散后验采样论文，是否为光学引导的 SAR 输出联合恢复提供直接先例？其研究协议能够支持哪些结论？
 
-## Evidence reviewed
+## 已审阅证据
 
-The full publisher article for [Semantic information guided diffusion posterior sampling for remote sensing image fusion](https://www.nature.com/articles/s41598-024-78778-5) was reviewed, including its method, datasets, metrics, implementation settings, results, conclusion, and data-availability statement. The publisher record gives six authors—Chenlin Zhang, Yajun Chang, Yuhang Wu, Yang Shui, Zelong Wang, and Jubo Zhu—and identifies the version of record as *Scientific Reports* 14, article 27259 (2024), published 2024-11-08, DOI [10.1038/s41598-024-78778-5](https://doi.org/10.1038/s41598-024-78778-5).
+本次审阅了出版社发表的论文全文 [Semantic information guided diffusion posterior sampling for remote sensing image fusion](https://www.nature.com/articles/s41598-024-78778-5)，包括方法、数据集、指标、实现设置、结果、结论和数据可用性声明。出版社记录列出六位作者：Chenlin Zhang、Yajun Chang、Yuhang Wu、Yang Shui、Zelong Wang 和 Jubo Zhu；正式版本发表于 *Scientific Reports* 第 14 卷，文章号 27259（2024），出版日期为 2024-11-08，DOI 为 [10.1038/s41598-024-78778-5](https://doi.org/10.1038/s41598-024-78778-5)。
 
-The paper's reported measurements, comparisons, and interpretation are author-reported; they were not reproduced in this review. The paper and focused title/identifier code searches did not yield an author-controlled code repository. Code availability remains unverified.
+论文报告的测量、对比和解释均为作者报告内容，本次审阅未复现。论文及针对题名/标识符开展的代码搜索均未找到作者维护的代码仓库；代码可用性仍未核实。
 
-## Verified facts from the article
+## 论文明确报告的事实
 
-- The proposed method, SDIF, targets optical–SAR image fusion. It preprocesses the SAR source with SAR-BM3D, then optimizes a fused image using optical/SAR fidelity terms, an optical-gradient term, a variational diffusion score prior, and a semantic cross-entropy term from FLCNet. The score network is described as an ImageNet-pretrained U-Net used without task-specific fine-tuning. The paper presents fusion and landscape-classification outputs, not a restored SAR-only image or a spatially super-resolved SAR output.
-- Equation 20 includes the semantic loss in reverse diffusion, with its weight set to zero for timesteps above the stated threshold. The article describes the label as an ideal landscape-classification annotation and uses labels to train FLCNet.
-- The authors report 200 randomly cropped 256×256 WHU-OPT-SAR pairs and 100 randomly cropped 256×256 DDHRNet pairs. They state that WHU uses GaoFen-3 optical and GaoFen-1 SAR at 5 m, while DDHRNet uses GaoFen-3 optical and GaoFen-2 SAR at 1 m. The paper says all images are single-channel with brightness adjusted to the same level. These dataset and sensor details are paper statements; this audit did not independently verify dataset provenance, product levels, or pair registration.
-- The authors report training FLCNet on 14,480 optical images for 240 epochs, using a diffusion reverse process with T=1000 on an NVIDIA GeForce RTX 3080. They compare against image-fusion methods including CF-Net, DDcGAN, DenseFuse, UNIFusion, L-PUIF, DPS-IF, DDFM, and a no-semantic-guidance ablation. Reported fused-image metrics include PSNR, SSIM, mutual information, and cross entropy; classification metrics include OA, mIoU, precision, recall, and F1.
-- In a reported scene comparison, adding semantic guidance improves cross-entropy while reducing PSNR relative to the no-semantic-guidance variant. The authors describe several parameters as selected using manual experience and preliminary experiments, and identify computational complexity and robust parameter selection as future work. These observations concern their fusion/classification task only.
-- The data-availability section says study data are available from the corresponding author on reasonable request. No separate code-availability statement or repository link was identified in the reviewed article.
-- The reviewed article reports no controlled optical translation/warp sweep, wrong-pair control, or missing-optical evaluation.
+- 所提方法 SDIF 面向光学–SAR 影像融合。方法先使用 SAR-BM3D 预处理 SAR 源图，再通过光学/SAR 保真项、光学梯度项、变分扩散分数先验，以及 FLCNet 的语义交叉熵项优化融合图像。论文将分数网络描述为使用 ImageNet 预训练的 U-Net，未针对该任务微调。论文展示的是融合结果和地物分类输出，不是恢复后的 SAR 单幅图像，也不是空间超分辨率 SAR 输出。
+- 公式 20 在反向扩散中加入语义损失，并在高于指定阈值的时间步将其权重设为零。论文将标签描述为理想的地物分类标注，并使用标签训练 FLCNet。
+- 作者报告使用 200 组随机裁剪的 256×256 WHU-OPT-SAR 配对数据，以及 100 组随机裁剪的 256×256 DDHRNet 配对数据。论文称 WHU 数据使用 5 m 分辨率的 GaoFen-3 光学影像与 GaoFen-1 SAR 影像，DDHRNet 使用 1 m 分辨率的 GaoFen-3 光学影像与 GaoFen-2 SAR 影像。论文还称全部图像为单通道，并将亮度调整到相同水平。上述数据集和传感器信息来自论文陈述；本次审计未独立核实数据来源、产品级别或配准情况。
+- 作者报告使用 14,480 张光学影像训练 FLCNet，共 240 个 epoch；扩散反向过程的 `T=1000`，硬件为 NVIDIA GeForce RTX 3080。对比方法包括 CF-Net、DDcGAN、DenseFuse、UNIFusion、L-PUIF、DPS-IF、DDFM，以及移除语义引导的消融。融合图像指标包括 PSNR、SSIM、互信息和交叉熵；分类指标包括 OA、mIoU、精确率、召回率和 F1。
+- 在论文报告的一个场景对比中，加入语义引导后，相对于无语义引导版本，交叉熵有所改善，但 PSNR 下降。作者称部分参数依据人工经验和初步实验选择，并把计算复杂度与稳健参数选择列为未来工作。这些观察只适用于论文的融合/分类任务。
+- 数据可用性声明称，研究数据可在合理请求后向通讯作者申请。审阅的论文中没有找到独立的代码可用性声明或代码仓库链接。
+- 论文没有报告受控的光学平移/形变扫描、错误配对控制或缺失光学评价。
 
-## Evidence classification and project boundary
+## 证据分类与项目边界
 
-**Fact:** Optical–SAR diffusion image fusion with a semantic classification-guidance term is published prior art. This narrows broad novelty claims about using diffusion posterior sampling for optical–SAR fusion.
+**事实：** 使用语义分类引导项的光学–SAR 扩散影像融合已有公开先例。这会缩小“使用扩散后验采样做光学–SAR 融合”这一宽泛主张的新颖性范围。
 
-**Observation:** The paper's target is a fused image evaluated for fusion quality and landscape classification. Its SAR-BM3D preprocessing and fusion objective do not define an optical-guided SAR restoration output or a joint despeckling/super-resolution benchmark.
+**观察：** 论文的目标是融合影像，并以融合质量和地物分类评价。其 SAR-BM3D 预处理与融合目标并未定义光学引导的 SAR 恢复输出，也未定义联合去斑/超分辨率基准。
 
-**Inference:** SDIF is adjacent to the project through its use of optical and SAR inputs and diffusion-based guidance, but it does not answer whether optical improves a matched SAR-only JDSR baseline or whether a SAR-output model safely falls back under optical mismatch. This is a task-scope comparison, not a result about the local method.
+**推断：** SDIF 在输入模态和扩散引导方面与本项目相邻，但没有回答光学信息是否能提升匹配的 SAR-only JDSR 基线，也没有回答 SAR 输出模型在光学错配时能否安全回退。这是任务范围比较，不是对本地方法的实验结论。
 
-**Open protocol question:** Equation 20 applies cross-entropy to semantic labels during reverse sampling, while the article does not clearly state how the required ideal label is available at inference. Treat inference-time label availability as unclear. The article does not establish test-label leakage, and this review makes no such allegation.
+**开放的协议问题：** 公式 20 在反向采样中使用语义交叉熵，但论文没有明确说明推理时如何获得所需的理想标签。因此，推理阶段标签是否可用仍不清楚。论文没有证明发生了测试标签泄漏；本审计也不作此类指控。
 
-The paper therefore does not establish local optical utility, SAR-output restoration, spatial SR, SAR observation consistency, or mismatch-safe fallback. Its author-reported metrics are not evidence for this project, its target, or its development/confirmation gates.
+因此，该论文不能证明本地光学效用、SAR 输出恢复、空间超分辨率、SAR 观测一致性或错配安全回退。作者报告的指标也不是本项目、本项目目标或开发/确认门槛的证据。
 
-No project code, data, confirmation payload, test image, test metric, checkpoint, prediction, or model was accessed. No experiment or test was run. Current-task flags: test_set_accessed=false, test_set_used=false; cumulative project flags remain true/false. No hypothesis, charter status, gate, protocol, or experiment changed.
+本次未访问项目代码、数据、confirmation 载荷、测试图像、测试指标、checkpoint、预测结果或模型。未运行实验或测试。本次任务标记：`test_set_accessed=false`、`test_set_used=false`；项目累计标记仍为 true/false。未修改假设、总纲状态、阶段门槛、协议或实验。
 
-## Source
+## 来源
 
-- [Publisher full text and article record](https://www.nature.com/articles/s41598-024-78778-5)
-- [DOI record](https://doi.org/10.1038/s41598-024-78778-5)
+- [出版社论文全文与文章记录](https://www.nature.com/articles/s41598-024-78778-5)
+- [DOI 记录](https://doi.org/10.1038/s41598-024-78778-5)

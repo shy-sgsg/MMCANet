@@ -1,35 +1,35 @@
-# Degradation model audit — Phase C1
+# 退化模型审计——C1 阶段
 
-**Date:** 2026-10-28  
-**Scope:** canonical degradation code and frozen SEN1-2 B1 v2 configuration; source review plus synthetic unit tests only. No model forward pass, training run, test data, or new image evaluation.
+**日期：** 2026-10-28
+**范围：** 权威退化代码与冻结的 SEN1-2 B1 v2 配置；仅进行来源审查和合成单元测试。未执行模型前向计算、训练、测试数据读取或新增图像评价。
 
-## Frozen B1 v2 degradation chain
+## 冻结的 B1 v2 退化链
 
-The run-bound configuration specifies the following order for each 256×256 normalized SAR pseudo-target:
+运行绑定配置为每个 256×256 的归一化 SAR 伪目标指定了以下顺序：
 
-1. Centered rectangular FFT low-pass with a 129×129 retained window (bins −64 through +64 on each axis).
-2. No anisotropic blur.
-3. Bilinear resize to 128×128 with `align_corners=false` (×2 SR input).
-4. Clamp negative values to zero before the multiplier.
-5. Multiply by an independent unit-mean Gamma factor with shape/rate `L=2`, directly in the normalized representation domain.
-6. Do not upper-clamp or renormalize after the multiplier.
+1. 对中心对齐的 FFT 频谱执行矩形低通，保留 129×129 窗口（两个轴上的频率索引均为 −64 至 +64）。
+2. 不施加各向异性模糊。
+3. 使用双线性插值缩放到 128×128，作为 ×2 超分辨率输入；`align_corners=false`。
+4. 在乘法器之前将负值截断为 0。
+5. 在归一化表示域中直接乘以独立、均值为 1 的 Gamma 随机因子，shape/rate 参数为 `L=2`。
+6. 乘法后不做上界截断或重新归一化。
 
-The canonical implementation is [`MMCANet/src/degradation.py`](../../MMCANet/src/degradation.py); the frozen parameters are in [`b1_revalidation_v2.json`](../../protocols/sen12_scene_dev1800_v2/b1_revalidation_v2.json). The 129-bin cutoff is the run-bound v2 setting; the CLI's legacy default of 64 is not interchangeable. Bilinear downsampling contributes additional passband attenuation, so the combined chain is not a sensor point-spread function.
+权威实现为 [`MMCANet/src/degradation.py`](../../MMCANet/src/degradation.py)；冻结参数见 [`b1_revalidation_v2.json`](../../protocols/sen12_scene_dev1800_v2/b1_revalidation_v2.json)。129 频点截断是运行绑定的 v2 设置，不能与 CLI 的历史默认值 64 混用。双线性下采样还会带来额外通带衰减，因此整条处理链不等同于传感器点扩散函数。
 
-## Statistical and physical interpretation
+## 统计性质与物理解释
 
-For a fixed nonnegative pre-speckle representation value `q`, the sampled `G ~ Gamma(L, rate=L)` has `E[G]=1` and `Var(G)=1/L`, so the implemented multiplier has `E[qG|q]=q` and `Var(qG|q)=q²/L`. At `L=2`, the conditional representation-space variance is `q²/2`. The official source describes the input codes as sigma-nought dB representations, and the B1 pipeline first normalizes/transforms these codes. Therefore `L=2` is a controlled synthetic stress parameter, not a measured number of sensor looks and not a calibrated intensity-speckle model.
+给定非负的乘 speckle 前表示值 `q`，采样的 `G ~ Gamma(L, rate=L)` 满足 `E[G]=1`、`Var(G)=1/L`。因此乘法结果满足 `E[qG|q]=q` 和 `Var(qG|q)=q²/L`。当 `L=2` 时，表示域条件方差为 `q²/2`。官方来源将输入编码描述为 σ⁰ dB 表示，而 B1 流程会先对编码进行归一化/变换。因此 `L=2` 是受控合成压力参数，既不是测得的传感器视数，也不是经过定标的强度 speckle 模型。
 
-The HR target is already a noisy 8-bit SAR representation. Applying a new multiplier after filtering and resizing composes synthetic multiplicative variation with residual source noise and nonlinear representation transforms. This is a controlled composite-noise assumption, not a claim about how a physical SAR sensor generated the pair. The separate derivation in [`representation_domain_gamma_composition_20261025.md`](representation_domain_gamma_composition_20261025.md) shows why applying the multiplier before versus after a log transform is not equivalent.
+HR 目标本身已经是含噪的 8 位 SAR 表示。对其滤波、缩放后再施加新的乘法因子，会把合成乘性变化与源数据残余噪声及非线性表示变换组合起来。这是一项受控复合噪声假设，并非声称物理 SAR 传感器就是以此方式生成配对数据。独立推导见 [`representation_domain_gamma_composition_20261025.md`](representation_domain_gamma_composition_20261025.md)，其中说明乘法因子施加在对数变换前后会产生不同结果。
 
-## Verification evidence
+## 验证证据
 
-- Existing one-million-sample sampler audit passed mean/variance checks for `L=1,4,8` in declared intensity, representation, and amplitude modes; it validates sampler moments only, not the data or a sensor model.
-- This continuation ran 38 synthetic unit tests covering canonical normalization, FFT cutoffs and real-valued behavior, Gamma moments/determinism, evaluator known cases, empty/degenerate masks, ratio direction, and fail-closed aggregation. All 38 passed. The selected tests used generated arrays and did not execute a model.
-- The FFT support and bilinear response have prior synthetic regressions recorded in [`test_degradation_and_model.py`](../../tests/test_degradation_and_model.py) and [`frequency_resampler_response_20261025_v1`](../../experiments/data_audits/frequency_resampler_response_20261025_v1/report.md).
+- 既有百万样本采样器审计已在声明的强度域、表示域和幅度域下，对 `L=1,4,8` 的均值/方差进行核验并通过。该测试只验证采样器矩，不验证数据或传感器模型。
+- 本轮运行 38 个合成单元测试，覆盖权威归一化、FFT 截断与实数输出、Gamma 矩/确定性、评价器已知样例、空/退化掩码、ratio 方向，以及 fail-closed 汇总；38 项全部通过。测试使用生成数组，没有执行模型。
+- FFT 支持域与双线性响应的既有合成回归记录于 [`test_degradation_and_model.py`](../../tests/test_degradation_and_model.py) 和 [`frequency_resampler_response_20261025_v1`](../../experiments/data_audits/frequency_resampler_response_20261025_v1/report.md)。
 
-## C2 condition boundary
+## C2 条件边界
 
-If C1 obtains new eligible groups, `L=8` (variance factor `1/8`) and `L=2` (`1/2`) can serve as candidate light/severe *representation-space* levels, with a fixed 2×/4× spatial pipeline and a single predeclared noise realization per identity/method comparison. They must not be called physical ENL or sensor looks. Before freezing C2, check the observed input range and model input contract, because no post-noise upper clamp allows values above 1.0. Do not run C2 on the already-used B1 v2 validation groups.
+若 C1 获得新的合格来源组，`L=8`（方差因子 `1/8`）和 `L=2`（`1/2`）可作为较轻/较重的表示域候选等级，并固定 2×/4× 空间处理链，以及每个身份/方法对比共用的一份预先声明噪声实现。不得将这些等级称为物理 ENL 或传感器视数。冻结 C2 前应检查观测输入范围与模型输入合同，因为噪声乘法后没有上界截断，数值可能超过 1.0。不得在已用于 B1 v2 的验证来源组上运行 C2。
 
-`test_set_accessed=false`, `test_set_used=false`, and `model_forward_or_training=false` for this audit. This document does not change B1's historical gate or authorize C2.
+本审计的 `test_set_accessed=false`、`test_set_used=false`、`model_forward_or_training=false`。本文件不改变 B1 历史门槛，也不授权启动 C2。

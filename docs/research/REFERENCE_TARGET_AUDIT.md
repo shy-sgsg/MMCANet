@@ -1,31 +1,31 @@
-# Reference target audit — Phase C1
+# 参考目标审计——C1 阶段
 
-**Date:** 2026-10-28  
-**Status:** target semantics identified for the verified SEN1-2 cohort; no independent clean SAR reference is available in the current protocol.
+**日期：** 2026-10-28
+**状态：** 已识别经核验 SEN1-2 子集的目标语义；当前协议中没有独立的 clean SAR 参考。
 
-## What the target is
+## 训练目标的性质
 
-The B1 v2 high-resolution target is the same source SAR patch loaded from the official 8-bit sigma-nought-dB representation, converted to `[0,1]` by byte scaling and passed through the configured log normalization. It is therefore a **noisy SAR pseudo-target** in a normalized representation space. It is not a clean image of latent reflectivity and is not a calibrated linear-intensity ground truth.
+B1 v2 的高分辨率目标是同一来源 SAR 图像块。源文件为官方提供的 8 位 σ⁰ dB 表示；流程先按字节值缩放到 `[0,1]`，再执行配置中的对数归一化。因此它是归一化表示域中的**含噪 SAR 伪目标**，不是潜在反射率的无噪图像，也不是经过定标的线性强度真值。
 
-For each training pair, the low-resolution SAR input is deterministically derived from that same target using the frozen FFT/resize/negative-clamp chain, followed by representation-domain Gamma multiplication. Thus the model is evaluated for agreement with a noisy target that is statistically related to its input. PSNR, SSIM, and the additional structure/scatterer metrics describe this proxy-target agreement under the declared normalization and masks; they do not directly measure clean-SAR recovery.
+对每组训练配对，低分辨率 SAR 输入由该目标确定性生成：使用冻结的 FFT/缩放/负值截断链，再施加表示域 Gamma 乘法。因此模型评价的是它与含噪目标之间的一致性；该目标与模型输入在统计上相关。PSNR、SSIM 及附加的结构/散射体指标描述的是声明的归一化和掩码下的伪目标一致性，不能直接衡量 clean SAR 恢复质量。
 
-## What is not available
+## 当前缺少的信息
 
-The selected 1,800-pair cohort does not include raw Sentinel-1 SAFE/SLC data, a documented DN↔sigma-nought transfer table, independent multilook estimates, or repeated same-scene acquisitions that could establish a clean reference. The official source folder match proves file provenance for this cohort, not a noise-free target or exact acquisition-time pairing. The separate project numeric 2,000-pair subset remains unmapped and has no verified target lineage.
+所选 1,800 组数据不含原始 Sentinel-1 SAFE/SLC 数据、文档化的 DN↔σ⁰ 映射表、独立多视估计，或能建立 clean 参考的同场景重复采集。官方来源文件夹匹配可以证明该子集的文件来源，但不能证明目标无噪，也不能确认精确的采集时间配对。项目中以数值命名的另一组 2,000 对数据仍未映射来源，目标沿革也未经核验。
 
-## Consequences
+## 对研究的约束
 
-- Describe current results as reconstruction against normalized, noisy 8-bit pseudo-targets under controlled synthetic degradation.
-- Keep PSNR/SSIM and target-derived TBR/edge/bright-region metrics as representation-domain diagnostics. Pair them with structure and ratio measures, but do not label them calibrated radiometric fidelity or real despeckling quality.
-- Track A (controlled synthetic degradation) is feasible on the verified source cohort only after a new eligible source-group protocol is available.
-- Track B (real SAR evaluation) is not currently executable as defined. It needs real low-resolution observations and a defensible independent reference or measurement protocol; a second synthetic transform of the existing pseudo-target is not Track B.
-- Any future clean-reference claim requires a documented target-generation process and an explicit argument about residual target noise and its relation to the LR input.
+- 当前结果应描述为：受控合成退化下，对归一化、含噪 8 位伪目标的重建结果。
+- PSNR/SSIM 与由目标推导的 TBR、边缘、亮散射区域指标应作为表示域诊断。可与结构及 ratio 指标共同报告，但不得称为定标辐射保真度或真实去斑质量。
+- 路线 A（受控合成退化）只能在经核验来源子集上开展，并且须先获得新的合格来源组划分。
+- 路线 B（真实 SAR 评价）目前无法按既定定义执行。它需要真实低分辨率观测，以及可信的独立参考或测量协议；对现有伪目标再施加一次合成变换不构成路线 B。
+- 未来若要声称使用 clean reference，必须记录目标生成流程，并明确论证目标残余噪声及其与 LR 输入的关系。
 
-## Sources
+## 来源
 
-- Run-bound semantics and parameters: [`b1_revalidation_v2.json`](../../protocols/sen12_scene_dev1800_v2/b1_revalidation_v2.json).
-- Fixed degradation and same-target derivation: [`degradation.py`](../../MMCANet/src/degradation.py), [`prepare_fixed_degradation.py`](../../scripts/prepare_fixed_degradation.py), and [`MMCANetV2/data.py`](../../MMCANetV2/data.py).
-- Official SEN1-2 encoding description: [`SupportingDocument.txt`](../../experiments/data_audits/sen1_2_upstream_hash_crosswalk_20261019_v1/SupportingDocument.txt).
-- Source and split constraints: [`sen12_scene_dev1800_v2_auth_20261021_v1`](../../experiments/data_audits/sen12_scene_dev1800_v2_auth_20261021_v1/report.md) and [`sen1_2_train_val_spatial_overlap_audit.md`](sen1_2_train_val_spatial_overlap_audit.md).
+- 运行绑定的语义与参数：[`b1_revalidation_v2.json`](../../protocols/sen12_scene_dev1800_v2/b1_revalidation_v2.json)。
+- 固定退化与同目标生成链：[`degradation.py`](../../MMCANet/src/degradation.py)、[`prepare_fixed_degradation.py`](../../scripts/prepare_fixed_degradation.py) 和 [`MMCANetV2/data.py`](../../MMCANetV2/data.py)。
+- SEN1-2 官方编码说明：[`SupportingDocument.txt`](../../experiments/data_audits/sen1_2_upstream_hash_crosswalk_20261019_v1/SupportingDocument.txt)。
+- 来源与划分限制：[`sen12_scene_dev1800_v2_auth_20261021_v1`](../../experiments/data_audits/sen12_scene_dev1800_v2_auth_20261021_v1/report.md) 和 [`sen1_2_train_val_spatial_overlap_audit.md`](sen1_2_train_val_spatial_overlap_audit.md)。
 
-No test data was accessed, no model was run, and no historical result or gate was altered.
+本次未访问测试数据、未运行模型，也未改写任何历史结果或阶段门槛。
