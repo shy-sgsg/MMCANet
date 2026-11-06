@@ -1,0 +1,6 @@
+等待器命令：
+/home/shy/anaconda3/envs/AISAR/bin/python scripts/wait_for_c3a_gpu.py --run-id c3a_gpu_wait_20261106_v8
+轮询 GPU 0 资源与项目分区剩余空间；等待期间不读取影像，也不删除文件。
+达到零个其他 CUDA 计算进程、空闲显存不少于 3,072 MiB 且磁盘至少剩余 2 GiB 后，依次运行：
+/home/shy/anaconda3/envs/AISAR/bin/python scripts/run_phase_c3a_sar_flow.py
+/home/shy/anaconda3/envs/AISAR/bin/python scripts/evaluate_c3a_multisample.py --training-run-dir /home/shy/AIR/SAR+AI/project/JDSR/experiments/phase_c3a_sar_only_flow_c1_v2_20261105_v1

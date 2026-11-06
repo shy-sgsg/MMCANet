@@ -1,0 +1,61 @@
+{
+  "记录格式": "C3-A 训练与多次采样诊断 GPU/磁盘等待记录 v1",
+  "运行编号": "c3a_gpu_wait_20261106_v8",
+  "状态": "等待器被手动中断；未清理或覆盖任何运行结果",
+  "启动时间 UTC": "2026-11-06T10:15:25.704375+00:00",
+  "轮询间隔秒": 60,
+  "训练协议路径": "protocols/mmcanet_phase_c3a/sar_only_flow_c1_v2_20261105_v1.json",
+  "训练协议 SHA-256": "147c361b3e91bc4cd8d76ce5c464ad9d2137f2d06b38f31a0bc7c7a7e93101a7",
+  "多次采样诊断协议路径": "protocols/mmcanet_phase_c3a/multi_sample_stability_c1_v2_20261105_v2.json",
+  "多次采样诊断协议 SHA-256": "8d886f26023f9d929265b3f70ad9f51314f94788b1e4a01f269af5c1f0a589fc",
+  "资源门槛 MiB": 3072,
+  "磁盘最小可用空间 GiB": 2.0,
+  "CUDA 并发进程要求": 0,
+  "训练运行目录": "experiments/phase_c3a_sar_only_flow_c1_v2_20261105_v1",
+  "多次采样输出目录": "experiments/diagnostics/c3a_multi_sample_eval_c1_v2_20261105_v2",
+  "确认集载荷访问": false,
+  "测试集访问": false,
+  "测试集使用": false,
+  "光学载荷读取": false,
+  "等待期间读取影像": false,
+  "方法选择或 gate 更新": false,
+  "执行命令": [
+    [
+      "/home/shy/anaconda3/envs/AISAR/bin/python",
+      "/home/shy/AIR/SAR+AI/project/JDSR/scripts/run_phase_c3a_sar_flow.py"
+    ],
+    [
+      "/home/shy/anaconda3/envs/AISAR/bin/python",
+      "/home/shy/AIR/SAR+AI/project/JDSR/scripts/evaluate_c3a_multisample.py",
+      "--training-run-dir",
+      "/home/shy/AIR/SAR+AI/project/JDSR/experiments/phase_c3a_sar_only_flow_c1_v2_20261105_v1"
+    ]
+  ],
+  "代码 SHA-256": {
+    "scripts/wait_for_c3a_gpu.py": "381c72b77e539cc8f759416a45de36d6cb41067bb1d0ab4d30bf000341a40b9a",
+    "scripts/run_phase_c3a_sar_flow.py": "40256a2aa11717e5cb15c3030d6c736b967610c1b8a9dd5b4f6f99a3d71dacf9",
+    "scripts/evaluate_c3a_multisample.py": "6f0c32d945610437743e8e2a803187ea031b569306f7fcf1d145d6d959f787ba"
+  },
+  "最近磁盘查询": {
+    "时间 UTC": "2026-11-06T14:47:44.799766+00:00",
+    "可用字节": 17945620480,
+    "可用 GiB": 16.713,
+    "要求可用 GiB": 2.0
+  },
+  "最近 GPU 查询": {
+    "时间 UTC": "2026-11-06T14:47:44.867988+00:00",
+    "device_name": "NVIDIA GeForce RTX 3050 Laptop GPU",
+    "free_memory_mib": 880,
+    "total_memory_mib": 4096,
+    "utilization_percent": 99,
+    "other_process_ids": [
+      12895,
+      36453,
+      109910,
+      118206,
+      170917
+    ]
+  },
+  "最近查询错误": null,
+  "中断时间 UTC": "2026-11-06T14:48:28.091391+00:00"
+}

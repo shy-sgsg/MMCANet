@@ -1,0 +1,8 @@
+数值诊断命令：
+/home/shy/anaconda3/envs/AISAR/bin/python experiments/diagnostics/c3a_flow_cpu_contract_20261106_v1/run_cpu_validation.py
+
+相关回归测试命令：
+/home/shy/anaconda3/envs/AISAR/bin/python -m pytest -q tests/test_phase_c3a_flow.py tests/test_c3a_multisample_eval.py tests/test_c3a_gpu_waiter.py tests/test_wait_for_c3a_gpu.py
+
+相关 Python 文件编译命令：
+/home/shy/anaconda3/envs/AISAR/bin/python -m py_compile MMCANetV2/phase_c3a_flow.py scripts/run_phase_c3a_sar_flow.py scripts/evaluate_c3a_multisample.py tests/test_phase_c3a_flow.py tests/test_c3a_multisample_eval.py experiments/diagnostics/c3a_flow_cpu_contract_20261106_v1/run_cpu_validation.py

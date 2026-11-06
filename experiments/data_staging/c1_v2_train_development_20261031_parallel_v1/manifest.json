@@ -1,0 +1,105 @@
+{
+  "run_id": "c1_v2_train_development_20261031_parallel_v1",
+  "status": "complete",
+  "protocol_id": "mmcanet_phase_c2_screen_20261029_v2",
+  "protocol_sha256": "e7b2eb183968dab3512aa2a5ff65244ebf43764dbdd9baa2d25bfffa0864bd1e",
+  "sample_manifest_sha256": "6a278e97c161164d9440b5388c5b3fcda87746a56e26adfb7cdf658b94924e57",
+  "c1_protocol_json_sha256": "189550fcd3cdd8c24479630fdf49dc1ace1b59efe3a4a396112e40dd0e2ed805",
+  "output_root": "/home/shy/AIR/SAR+AI/project/JDSR/data/derived/c1_v2_train_development_20261031_v1",
+  "role_counts": {
+    "train": 1600,
+    "development": 200
+  },
+  "source_group_counts": {
+    "train": 92,
+    "development": 19
+  },
+  "requested_file_count": 3600,
+  "partial_snapshot_file_count": 786,
+  "partial_snapshot_bytes": 36097941,
+  "network_requested_file_count": 3600,
+  "network_requested_bytes": 296021965,
+  "parallel_workers": 8,
+  "worker_sample_counts": [
+    225,
+    225,
+    225,
+    225,
+    225,
+    225,
+    225,
+    225
+  ],
+  "free_bytes_before_transfer": 18403491840,
+  "confirmation_payload_accessed": false,
+  "test_set_accessed": false,
+  "test_set_used": false,
+  "started_utc": "2026-10-31T07:37:16.138711+00:00",
+  "environment": {
+    "python": "3.13.7 | packaged by Anaconda, Inc. | (main, Sep  9 2025, 19:59:03) [GCC 11.2.0]",
+    "python_executable": "/home/shy/anaconda3/envs/AISAR/bin/python",
+    "packages": {
+      "torch": "2.8.0",
+      "numpy": "2.3.3",
+      "Pillow": "11.3.0"
+    },
+    "rsync_version": "rsync  version 3.4.1  protocol version 32",
+    "platform": "linux",
+    "git_commit": "fc1d2e57fdfbd763cfa6dad91b83628013e4084b",
+    "git_dirty": true,
+    "git_status_entry_count": 5389
+  },
+  "command": [
+    "/home/shy/anaconda3/envs/AISAR/bin/python",
+    "/home/shy/AIR/SAR+AI/project/JDSR/experiments/data_staging/c1_v2_train_development_20261031_parallel_v1/stage_train_dev_parallel.py"
+  ],
+  "credential_written_to_disk": false,
+  "credential_printed": false,
+  "official_item_record_sha256": "aaaaa19232e0f468adfadb06a2ce33bee0c5513ed873986c4e77bcf42120a7c4",
+  "worker_results": {
+    "1": {
+      "file_count": 450,
+      "sample_count": 225,
+      "bytes": 37009416
+    },
+    "2": {
+      "file_count": 450,
+      "sample_count": 225,
+      "bytes": 37009668
+    },
+    "3": {
+      "file_count": 450,
+      "sample_count": 225,
+      "bytes": 36986059
+    },
+    "4": {
+      "file_count": 450,
+      "sample_count": 225,
+      "bytes": 37009993
+    },
+    "5": {
+      "file_count": 450,
+      "sample_count": 225,
+      "bytes": 36977949
+    },
+    "6": {
+      "file_count": 450,
+      "sample_count": 225,
+      "bytes": 37009784
+    },
+    "7": {
+      "file_count": 450,
+      "sample_count": 225,
+      "bytes": 37009547
+    },
+    "8": {
+      "file_count": 450,
+      "sample_count": 225,
+      "bytes": 37009549
+    }
+  },
+  "acquisition_manifest": "/home/shy/AIR/SAR+AI/project/JDSR/data/derived/c1_v2_train_development_20261031_v1/acquisition_manifest.json",
+  "staging_manifest_sha256": "d690fd559b2542ca23b41f5e782b7e211cd339aa675236aa6e1122b8d60181eb",
+  "staging_files_csv_sha256": "b9e867d62dce90ec293cb21b6019ed6a9611c7f5ed519d5e11eef19df0644cc6",
+  "ended_utc": "2026-10-31T07:44:16.304590+00:00"
+}

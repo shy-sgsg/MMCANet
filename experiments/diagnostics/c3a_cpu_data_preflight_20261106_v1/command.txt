@@ -1,0 +1,2 @@
+数据预检命令：
+/home/shy/anaconda3/envs/AISAR/bin/python experiments/diagnostics/c3a_cpu_data_preflight_20261106_v1/run_preflight.py

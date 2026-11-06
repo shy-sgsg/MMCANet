@@ -1,0 +1,226 @@
+{
+  "protocol_id": "mmcanet_phase_c2_screen_20261029_v2",
+  "status": "frozen_before_data_generation",
+  "frozen_date": "2026-10-29",
+  "supersedes": {
+    "protocol_id": "mmcanet_phase_c2_screen_20261029_v1",
+    "sha256": "f5848e061f0cccd486aabdeb1caba608fb93163a1cbf0efa38d310d493578722",
+    "reason": "complete symmetric log-error definitions for mean TBR and bright integrated-energy ratios"
+  },
+  "design_document": "docs/superpowers/specs/2026-10-29-c2-optical-utility-screen.md",
+  "source_manifest": "protocols/mmcanet_phase_c1/v2/source_group_split_20261028_v1/sample_manifest.csv",
+  "source_manifest_sha256": "6a278e97c161164d9440b5388c5b3fcda87746a56e26adfb7cdf658b94924e57",
+  "roles": {
+    "training": {
+      "role": "train",
+      "samples": 1600,
+      "source_groups": 92
+    },
+    "development": {
+      "role": "development",
+      "samples": 200,
+      "source_groups": 19
+    },
+    "confirmation_payload_accessed": false,
+    "test_set_accessed": false,
+    "test_set_used": false
+  },
+  "conditions": {
+    "x2_light": {
+      "scale": 2,
+      "gamma_shape_rate_L": 8.0
+    },
+    "x2_severe": {
+      "scale": 2,
+      "gamma_shape_rate_L": 2.0
+    },
+    "x4_light": {
+      "scale": 4,
+      "gamma_shape_rate_L": 8.0
+    },
+    "x4_severe": {
+      "scale": 4,
+      "gamma_shape_rate_L": 2.0
+    }
+  },
+  "degradation": {
+    "domain": "normalized_png_representation",
+    "normalization": "log1p(20*x)/log1p(20), source byte x/255",
+    "fft_truncation": "centered",
+    "blur": false,
+    "downsample": "bilinear_align_corners_false",
+    "negative_ringing": "clamp_to_zero_before_speckle",
+    "multiplicative_noise": "Gamma(shape=L,rate=L), unit_mean",
+    "upper_clamp_after_noise": false,
+    "target": "normalized_already_speckled_8bit_sar_pseudo_target",
+    "degradation_seed_base": 20261032,
+    "per_sample_seed": "seed_for_name(base_seed, condition_id + ':' + sample_id)"
+  },
+  "model": {
+    "class": "MMCANetV2.phase_c2_matched.C2MatchedJoint",
+    "arms": {
+      "sar_only": {
+        "optical_enabled": false
+      },
+      "optical_guided": {
+        "optical_enabled": true,
+        "training_optical": "matched"
+      }
+    },
+    "width": 32,
+    "blocks": 4,
+    "hr_width": 16,
+    "parameter_counts_must_match": true,
+    "pretrained_weights": false
+  },
+  "training": {
+    "seed": 20261029,
+    "initialization": "same_state_within_scale_across_arms_and_severity_conditions",
+    "sample_order": "same_seeded_shuffle_within_scale_condition_and_arm",
+    "epochs": 30,
+    "batch_size": 8,
+    "optimizer": "Adam",
+    "learning_rate": 0.0001,
+    "weight_decay": 0.0,
+    "betas": [0.9, 0.999],
+    "loss": "L1",
+    "augmentation": "none",
+    "random_crops": false,
+    "mixed_precision": false,
+    "num_workers": 0,
+    "drop_last": false,
+    "schedule": "constant_learning_rate",
+    "deterministic_algorithms": true,
+    "cudnn_benchmark": false,
+    "checkpoint_metric": "development_group_balanced_mean_psnr",
+    "checkpoint_direction": "maximize",
+    "checkpoint_tie_break": "earlier_epoch",
+    "resume_boundary": "epoch"
+  },
+  "permutation": {
+    "method": "cyclic_half_shift_sorted_identities",
+    "sort_keys": ["source_group_id", "patch_id", "sample_id"],
+    "offset": 100,
+    "bijective": true,
+    "donor_must_be_different_source_group": true,
+    "seed": null
+  },
+  "metrics": {
+    "target_domain": "normalized_8bit_representation_noisy_pseudo_target",
+    "data_range": 1.0,
+    "resize_or_postprocessing": false,
+    "full_image": ["psnr", "ssim", "rmse", "mae"],
+    "edge_mask": {
+      "source": "common_hr_pseudo_target",
+      "operator": "Sobel_magnitude_ksize_3_reflect101",
+      "threshold_percentile": 90.0,
+      "percentile_method": "linear",
+      "ties": "include",
+      "metrics": ["epi_corr", "edge_strength_ratio", "abs_log_edge_strength_ratio_error"]
+    },
+    "input_conditioned_masks": {
+      "source": "fixed_canonical_lr_sar",
+      "high_return_percentile": 99.5,
+      "background_percentile": 20.0,
+      "percentile_method": "linear",
+      "ties": "include",
+      "projection": "integer_scale_nearest_neighbor_replication",
+      "reuse_for_all_methods": true,
+      "metrics": [
+        "mean_tbr",
+        "median_tbr",
+        "mean_tbr_abs_error",
+        "median_tbr_abs_error",
+        "abs_log_mean_tbr_ratio_error",
+        "abs_log_median_tbr_ratio_error",
+        "bright_peak_ratio",
+        "abs_log_bright_peak_ratio_error",
+        "bright_integrated_energy_ratio",
+        "abs_log_bright_integrated_energy_ratio_error",
+        "bright_region_mae"
+      ],
+      "interpretation": "input_conditioned_high_return_proxy_region_not_physical_point_target"
+    },
+    "ratio_image": {
+      "implementation": "Early-FusionCascadeJDSR.eval_metrics.ratio_metrics",
+      "direction": "target_over_prediction",
+      "min_signal": 0.001,
+      "report": [
+        "ratio_valid_fraction",
+        "ratio_mean",
+        "ratio_variance",
+        "ratio_cv",
+        "ratio_q05",
+        "ratio_median",
+        "ratio_q95",
+        "ratio_log_residual_edge_corr",
+        "ratio_log_residual_edge_corr_status"
+      ]
+    },
+    "undefined_metric_policy": "fail_entire_evaluation"
+  },
+  "contrasts": [
+    {
+      "candidate": "optical_guided_matched",
+      "comparator": "sar_only",
+      "role": "primary_optical_utility"
+    },
+    {
+      "candidate": "optical_guided_matched",
+      "comparator": "optical_guided_permuted",
+      "role": "correct_pairing_specificity"
+    },
+    {
+      "candidate": "optical_guided_matched",
+      "comparator": "optical_guided_missing",
+      "role": "optical_presence_dependence"
+    },
+    {
+      "candidate": "optical_guided_permuted",
+      "comparator": "optical_guided_missing",
+      "role": "wrong_optical_effect"
+    }
+  ],
+  "metric_gain_direction": {
+    "higher_is_better": "candidate_minus_comparator",
+    "errors": "comparator_minus_candidate"
+  },
+  "statistics": {
+    "cluster_unit": "source_group_id",
+    "cluster_count": 19,
+    "group_weighting": "equal_weight_per_source_group",
+    "bootstrap_samples": 10000,
+    "bootstrap_seed": 20261030,
+    "interval": "paired_95_percentile",
+    "positive_group_rate": "fraction_source_groups_with_positive_gain",
+    "interpretation": "descriptive_single_seed_source_folder_disjoint_development_screen"
+  },
+  "decision_rule": {
+    "continue_to_three_seed_followup": {
+      "any_condition": true,
+      "matched_vs_sar_only_group_psnr_gain_min_db": 0.05,
+      "matched_vs_sar_only_bootstrap_lower_gt": 0.0,
+      "matched_vs_permuted_group_psnr_gain_gt": 0.0,
+      "matched_vs_permuted_bootstrap_lower_gt": 0.0,
+      "ssim_epi_group_point_estimates_must_not_decline": true,
+      "edge_tbr_bright_error_group_point_estimates_must_not_worsen": true
+    },
+    "stop_candidate_when": "all_four_conditions_have_nonpositive_matched_vs_sar_only_and_matched_vs_permuted_group_psnr_gains_or_consistent_structural_return_guardrail_worsening",
+    "otherwise": "inconclusive_no_matrix_expansion_or_same_dev_hyperparameter_tuning",
+    "promotion_or_b1_gate_change": false
+  },
+  "execution": {
+    "device": "cuda",
+    "require_fresh_preflight_before_generation": true,
+    "require_fresh_preflight_before_training": true,
+    "fail_closed_without_cuda": true,
+    "trainings": 8,
+    "epochs_per_training": 30,
+    "optimizer_steps": 48000,
+    "expected_generated_array_bytes_approx": 7844659200,
+    "staging_roles": ["train", "development"],
+    "confirmation_payload_accessed": false,
+    "test_set_accessed": false,
+    "test_set_used": false
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "protocol_id": "mmcanet_phase_c1_v2_sen1_2_source_grouped_20261028",
+  "created_at_utc": "2026-10-28T12:44:18+00:00",
+  "source_roots": [
+    "ROIs1158_spring",
+    "ROIs2017_winter"
+  ],
+  "source_manifest_input_sha256": "a583d353a09f1bda53c3eb7a886648978055d1677de91bb581e06e0a747870bb",
+  "historical_b1_v2_sample_manifest_sha256": "0069e05f7b49408841ca173f2f1be38703f242b09a3cbe64303272844a2f6f39",
+  "official_source_audit_record_sha256": "1183f11459b5b8eb5f0b9756f5026162d36ddcccab90b2794e667c6821970491",
+  "official_supporting_document_sha256": "3e6f71bf61f3df078158ca3a48c4aaa12ed8f5b388221de8a8d4fc942f296116",
+  "official_item_export_sha256": "276f54daf079ad8da8a286c99499c4a3b1692a5de9f6b7e0bc2ec1ebcdaeae03",
+  "official_checksum_index_sha256": "b371c4e3534660b4d137606f80f2585cbe5159b6266431e88279550a3357878f",
+  "builder_sha256": "60c6fff9d21dfc7cdd8d835fd6e74d8139b088f357d76b426afc9ca3060cca90",
+  "artifacts": {
+    "source_manifest.csv": {
+      "bytes": 22468,
+      "sha256": "65721afc81251219df1cf43f700b125c7dbfa29df33fb97937eb895cf4ff42f4"
+    },
+    "group_assignment.csv": {
+      "bytes": 30984,
+      "sha256": "fbd7fb9e5820affcb97ac39513850227c2730eb9159029ad08d723465d32216f"
+    },
+    "sample_manifest.csv": {
+      "bytes": 1028560,
+      "sha256": "6a278e97c161164d9440b5388c5b3fcda87746a56e26adfb7cdf658b94924e57"
+    },
+    "alignment_audit.json": {
+      "bytes": 672,
+      "sha256": "e09de979fd679705fee3a9614aaa32cd03eafa0f2aa35183edc85af9f89c45c7"
+    },
+    "overlap_audit.json": {
+      "bytes": 1387,
+      "sha256": "196e12975c341dcafa203fc2a3322de9f183059e8f3969c563ccda9d6ed4469e"
+    },
+    "protocol.json": {
+      "bytes": 2166,
+      "sha256": "189550fcd3cdd8c24479630fdf49dc1ace1b59efe3a4a396112e40dd0e2ed805"
+    },
+    "summary.json": {
+      "bytes": 1136,
+      "sha256": "8654412a80f1d55eccb7b95f9327447bee11a7bfde6a2dc40aee7cffeafba9d0"
+    },
+    "report.md": {
+      "bytes": 2900,
+      "sha256": "ccbab63979ad52026e8ee22bc0265db9eee0b6e86b3f117b585e7d574f3d5690"
+    },
+    "command.txt": {
+      "bytes": 426,
+      "sha256": "ebe922704685f6ddb1a42e06f130c9a03d1c8ec50d440cd824c760f1b315c511"
+    },
+    "environment.txt": {
+      "bytes": 235,
+      "sha256": "0743bded3ee49dc867fc9cc993337833eb27351185fc5f8b143416f86703abb3"
+    },
+    "git_state.txt": {
+      "bytes": 88,
+      "sha256": "30a8ec86feb575fff780a3c78fe7b36a1c4d815431b1a2c5ffbd2380d16b0572"
+    }
+  },
+  "test_set_accessed": false,
+  "test_set_used": false,
+  "image_payloads_downloaded": false
+}

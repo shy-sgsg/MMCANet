@@ -1,0 +1,83 @@
+{
+  "记录格式": "c3a_cpu_train_development_data_preflight_v1",
+  "运行编号": "c3a_cpu_data_preflight_20261106_v1",
+  "状态": "通过",
+  "开始时间 UTC": "2026-11-06T15:37:08.279224+00:00",
+  "设备": "CPU",
+  "确认集载荷访问": false,
+  "测试集载荷访问": false,
+  "测试集使用": false,
+  "光学载荷读取": false,
+  "数据角色": [
+    "train",
+    "development"
+  ],
+  "载荷数组": [
+    "lr",
+    "target"
+  ],
+  "载荷访问": {
+    "train": true,
+    "development": true,
+    "confirmation": false,
+    "test": false,
+    "optical": false
+  },
+  "结束时间 UTC": "2026-11-06T15:37:11.494485+00:00",
+  "Python": "3.13.7 | packaged by Anaconda, Inc. | (main, Sep  9 2025, 19:59:03) [GCC 11.2.0]",
+  "PyTorch": "2.8.0+cu128",
+  "NumPy": "2.3.4",
+  "平台": "Linux-7.0.0-42-generic-x86_64-with-glibc2.43",
+  "Git": {
+    "HEAD": "fc1d2e57fdfbd763cfa6dad91b83628013e4084b",
+    "工作区有未提交内容": true
+  },
+  "冻结训练协议路径": "protocols/mmcanet_phase_c3a/sar_only_flow_c1_v2_20261105_v1.json",
+  "冻结训练协议 SHA-256": "147c361b3e91bc4cd8d76ce5c464ad9d2137f2d06b38f31a0bc7c7a7e93101a7",
+  "冻结来源清单 SHA-256": "6a278e97c161164d9440b5388c5b3fcda87746a56e26adfb7cdf658b94924e57",
+  "数据记录": {
+    "train": {
+      "样本数": 1600,
+      "来源组数": 92,
+      "已验证数组文件数": 3200,
+      "已验证数组字节数": {
+        "lr": 105062400,
+        "target": 419635200
+      },
+      "固定输入 manifest SHA-256": "64d335f06812859b96b884a5583092df76dd4b6fa181c3a842b18ed5d3bf6eeb",
+      "固定输入 files.csv SHA-256": "97f35201125dcb3830e9d0583d3350159f0d6757056c7acf13c4c1a0910466ad",
+      "读取数组": [
+        "lr",
+        "target"
+      ]
+    },
+    "development": {
+      "样本数": 200,
+      "来源组数": 19,
+      "已验证数组文件数": 400,
+      "已验证数组字节数": {
+        "lr": 13132800,
+        "target": 52454400
+      },
+      "固定输入 manifest SHA-256": "de3101a78105c05653b9779342cabe98d61a9cddac6153b25a7d6347d0ef0da9",
+      "固定输入 files.csv SHA-256": "70d762015b2b16a604d381758091ae3d282526a7137e9de51c6db827b60f2839",
+      "读取数组": [
+        "lr",
+        "target"
+      ]
+    }
+  },
+  "CUDA 预检前已初始化": false,
+  "CUDA 预检后已初始化": false,
+  "读取期间最低磁盘余量字节": 2147483648,
+  "解释边界": [
+    "本次只验证冻结 train/development 的 lr 与 target 文件哈希、尺寸、dtype、有限性和值域。",
+    "未读取 optical 数组；来源 CSV 与 files.csv 中的光学身份/哈希仅作为元数据处理。",
+    "完整性通过不代表模型效果、SAR 辐射定标、物理散斑模型或独立泛化已获验证。"
+  ],
+  "代码 SHA-256": {
+    "MMCANetV2/phase_c2_data.py": "e085812270ff55acf012f64e9d71c88aa560224d583377c0ed27e92c4ce6240c",
+    "MMCANetV2/phase_c3a_flow.py": "ca6652920f3763688a4c9442a4f4efcef4828925daaefd1aaeed1cd78b8078a4",
+    "experiments/diagnostics/c3a_cpu_data_preflight_20261106_v1/run_preflight.py": "63e1f8105d3839762b9c3fe246fd1bc8fb2865d8a77382c280a8ca7b2924a9ef"
+  }
+}

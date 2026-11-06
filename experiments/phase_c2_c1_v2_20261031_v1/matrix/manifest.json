@@ -1,0 +1,385 @@
+{
+  "commands": [
+    {
+      "argv": [
+        "scripts/run_phase_c2.py",
+        "--source-manifest",
+        "protocols/mmcanet_phase_c1/v2/source_group_split_20261028_v1/sample_manifest.csv",
+        "--input-root",
+        "data/derived/c2_fixed_inputs_c1_v2_20261031_v1",
+        "--output-root",
+        "experiments/phase_c2_c1_v2_20261031_v1/matrix"
+      ],
+      "started_utc": "2026-10-31T08:04:38.498607+00:00"
+    }
+  ],
+  "confirmation_payload_accessed": false,
+  "environment": {
+    "cuda_runtime": "12.8",
+    "cudnn": 91002,
+    "device": "NVIDIA GeForce RTX 3050 Laptop GPU",
+    "device_count": 1,
+    "device_total_memory_bytes": 3942383616,
+    "driver": "580.178.04",
+    "platform": "Linux-7.0.0-38-generic-x86_64-with-glibc2.43",
+    "python": "3.13.7 | packaged by Anaconda, Inc. | (main, Sep  9 2025, 19:59:03) [GCC 11.2.0]",
+    "python_executable": "/home/shy/anaconda3/envs/AISAR/bin/python",
+    "pytorch": "2.8.0+cu128",
+    "torchvision": "0.23.0"
+  },
+  "format": "c2_training_matrix_v1",
+  "git": {
+    "commit": "fc1d2e57fdfbd763cfa6dad91b83628013e4084b",
+    "dirty": true,
+    "status_entry_count": 5397
+  },
+  "identity": {
+    "conditions": {
+      "x2_light": {
+        "gamma_shape_rate_L": 8.0,
+        "scale": 2
+      },
+      "x2_severe": {
+        "gamma_shape_rate_L": 2.0,
+        "scale": 2
+      },
+      "x4_light": {
+        "gamma_shape_rate_L": 8.0,
+        "scale": 4
+      },
+      "x4_severe": {
+        "gamma_shape_rate_L": 2.0,
+        "scale": 4
+      }
+    },
+    "input_records": {
+      "x2_light/development": {
+        "files_csv_sha256": "70d762015b2b16a604d381758091ae3d282526a7137e9de51c6db827b60f2839",
+        "manifest_sha256": "de3101a78105c05653b9779342cabe98d61a9cddac6153b25a7d6347d0ef0da9",
+        "root": "/home/shy/AIR/SAR+AI/project/JDSR/data/derived/c2_fixed_inputs_c1_v2_20261031_v1/x2_light/development"
+      },
+      "x2_light/train": {
+        "files_csv_sha256": "97f35201125dcb3830e9d0583d3350159f0d6757056c7acf13c4c1a0910466ad",
+        "manifest_sha256": "64d335f06812859b96b884a5583092df76dd4b6fa181c3a842b18ed5d3bf6eeb",
+        "root": "/home/shy/AIR/SAR+AI/project/JDSR/data/derived/c2_fixed_inputs_c1_v2_20261031_v1/x2_light/train"
+      },
+      "x2_severe/development": {
+        "files_csv_sha256": "c7363c356cbbea07f5b60ea181e0cdb4893d515862956eb11bcd765cdb5b477a",
+        "manifest_sha256": "fc30b62c47f888df36ccdc2645decbfb80d139433cdd9627df7ac823fa62d2e3",
+        "root": "/home/shy/AIR/SAR+AI/project/JDSR/data/derived/c2_fixed_inputs_c1_v2_20261031_v1/x2_severe/development"
+      },
+      "x2_severe/train": {
+        "files_csv_sha256": "4480fdb3e4cee651bc2999f6eb4b0ac985a4a529fda99f422668e699e13e6522",
+        "manifest_sha256": "7a4afea0b5d220a49d1c232e0d6c4353a8f7a0766d653a4a77ae51f01e4fe9dd",
+        "root": "/home/shy/AIR/SAR+AI/project/JDSR/data/derived/c2_fixed_inputs_c1_v2_20261031_v1/x2_severe/train"
+      },
+      "x4_light/development": {
+        "files_csv_sha256": "aa1a4cdc5f93be29c058d36ec00a3b08e55314b705e41e0bb5abc060bf128ebf",
+        "manifest_sha256": "881fe95060ceebb157069f54303999ae92121ab009184802de444fd7f34a9582",
+        "root": "/home/shy/AIR/SAR+AI/project/JDSR/data/derived/c2_fixed_inputs_c1_v2_20261031_v1/x4_light/development"
+      },
+      "x4_light/train": {
+        "files_csv_sha256": "c5abc38a24848dcdc3b217c1b45c77eccf6557b163e619fec7c9425f6a40e7cd",
+        "manifest_sha256": "2c604bbfc626368310fee9d9d02b27d06b57df83a6533b0ba8096ca187be9fe8",
+        "root": "/home/shy/AIR/SAR+AI/project/JDSR/data/derived/c2_fixed_inputs_c1_v2_20261031_v1/x4_light/train"
+      },
+      "x4_severe/development": {
+        "files_csv_sha256": "7ea4117c8d60bd071d0443d34929c4aaf18d3936e0408e77fc31b7b0a4783b3d",
+        "manifest_sha256": "faf98cf01eb03bc3117215c230aabea1715ff72f51b4129793a531903f1f0280",
+        "root": "/home/shy/AIR/SAR+AI/project/JDSR/data/derived/c2_fixed_inputs_c1_v2_20261031_v1/x4_severe/development"
+      },
+      "x4_severe/train": {
+        "files_csv_sha256": "b777418cf63b0dcabe0a57657f31c5db0a30aa840c80e090619d33e22b707110",
+        "manifest_sha256": "be58d7a7420c72042ca1b2cece1846f2cf655e8d152d1747304251910433cfc0",
+        "root": "/home/shy/AIR/SAR+AI/project/JDSR/data/derived/c2_fixed_inputs_c1_v2_20261031_v1/x4_severe/train"
+      }
+    },
+    "model": {
+      "arms": {
+        "optical_guided": {
+          "optical_enabled": true,
+          "training_optical": "matched"
+        },
+        "sar_only": {
+          "optical_enabled": false
+        }
+      },
+      "blocks": 4,
+      "class": "MMCANetV2.phase_c2_matched.C2MatchedJoint",
+      "hr_width": 16,
+      "parameter_counts_must_match": true,
+      "pretrained_weights": false,
+      "width": 32
+    },
+    "protocol_id": "mmcanet_phase_c2_screen_20261029_v2",
+    "protocol_sha256": "e7b2eb183968dab3512aa2a5ff65244ebf43764dbdd9baa2d25bfffa0864bd1e",
+    "run_specs": [
+      {
+        "arm": "sar_only",
+        "condition_id": "x2_light",
+        "gamma_shape_rate_L": 8.0,
+        "optical_enabled": false,
+        "run_id": "x2_light__sar_only",
+        "scale": 2
+      },
+      {
+        "arm": "optical_guided",
+        "condition_id": "x2_light",
+        "gamma_shape_rate_L": 8.0,
+        "optical_enabled": true,
+        "run_id": "x2_light__optical_guided",
+        "scale": 2
+      },
+      {
+        "arm": "sar_only",
+        "condition_id": "x2_severe",
+        "gamma_shape_rate_L": 2.0,
+        "optical_enabled": false,
+        "run_id": "x2_severe__sar_only",
+        "scale": 2
+      },
+      {
+        "arm": "optical_guided",
+        "condition_id": "x2_severe",
+        "gamma_shape_rate_L": 2.0,
+        "optical_enabled": true,
+        "run_id": "x2_severe__optical_guided",
+        "scale": 2
+      },
+      {
+        "arm": "sar_only",
+        "condition_id": "x4_light",
+        "gamma_shape_rate_L": 8.0,
+        "optical_enabled": false,
+        "run_id": "x4_light__sar_only",
+        "scale": 4
+      },
+      {
+        "arm": "optical_guided",
+        "condition_id": "x4_light",
+        "gamma_shape_rate_L": 8.0,
+        "optical_enabled": true,
+        "run_id": "x4_light__optical_guided",
+        "scale": 4
+      },
+      {
+        "arm": "sar_only",
+        "condition_id": "x4_severe",
+        "gamma_shape_rate_L": 2.0,
+        "optical_enabled": false,
+        "run_id": "x4_severe__sar_only",
+        "scale": 4
+      },
+      {
+        "arm": "optical_guided",
+        "condition_id": "x4_severe",
+        "gamma_shape_rate_L": 2.0,
+        "optical_enabled": true,
+        "run_id": "x4_severe__optical_guided",
+        "scale": 4
+      }
+    ],
+    "source_manifest_sha256": "6a278e97c161164d9440b5388c5b3fcda87746a56e26adfb7cdf658b94924e57",
+    "training": {
+      "augmentation": "none",
+      "batch_size": 8,
+      "betas": [
+        0.9,
+        0.999
+      ],
+      "checkpoint_direction": "maximize",
+      "checkpoint_metric": "development_group_balanced_mean_psnr",
+      "checkpoint_tie_break": "earlier_epoch",
+      "cudnn_benchmark": false,
+      "deterministic_algorithms": true,
+      "drop_last": false,
+      "epochs": 30,
+      "initialization": "same_state_within_scale_across_arms_and_severity_conditions",
+      "learning_rate": 0.0001,
+      "loss": "L1",
+      "mixed_precision": false,
+      "num_workers": 0,
+      "optimizer": "Adam",
+      "random_crops": false,
+      "resume_boundary": "epoch",
+      "sample_order": "same_seeded_shuffle_within_scale_condition_and_arm",
+      "schedule": "constant_learning_rate",
+      "seed": 20261029,
+      "weight_decay": 0.0
+    }
+  },
+  "input_root": "/home/shy/AIR/SAR+AI/project/JDSR/data/derived/c2_fixed_inputs_c1_v2_20261031_v1",
+  "output_root": "/home/shy/AIR/SAR+AI/project/JDSR/experiments/phase_c2_c1_v2_20261031_v1/matrix",
+  "parity_audits": {
+    "development": {
+      "conditions": {
+        "x2_light": {
+          "files_csv_sha256": "70d762015b2b16a604d381758091ae3d282526a7137e9de51c6db827b60f2839",
+          "sample_count": 200,
+          "scale": 2,
+          "source_group_count": 19
+        },
+        "x2_severe": {
+          "files_csv_sha256": "c7363c356cbbea07f5b60ea181e0cdb4893d515862956eb11bcd765cdb5b477a",
+          "sample_count": 200,
+          "scale": 2,
+          "source_group_count": 19
+        },
+        "x4_light": {
+          "files_csv_sha256": "aa1a4cdc5f93be29c058d36ec00a3b08e55314b705e41e0bb5abc060bf128ebf",
+          "sample_count": 200,
+          "scale": 4,
+          "source_group_count": 19
+        },
+        "x4_severe": {
+          "files_csv_sha256": "7ea4117c8d60bd071d0443d34929c4aaf18d3936e0408e77fc31b7b0a4783b3d",
+          "sample_count": 200,
+          "scale": 4,
+          "source_group_count": 19
+        }
+      },
+      "protocol_id": "mmcanet_phase_c2_screen_20261029_v2",
+      "protocol_sha256": "e7b2eb183968dab3512aa2a5ff65244ebf43764dbdd9baa2d25bfffa0864bd1e",
+      "role": "development",
+      "sample_count": 200,
+      "shared_source_hashes": true,
+      "shared_target_optical_hashes": true,
+      "source_group_count": 19,
+      "source_manifest_sha256": "6a278e97c161164d9440b5388c5b3fcda87746a56e26adfb7cdf658b94924e57"
+    },
+    "train": {
+      "conditions": {
+        "x2_light": {
+          "files_csv_sha256": "97f35201125dcb3830e9d0583d3350159f0d6757056c7acf13c4c1a0910466ad",
+          "sample_count": 1600,
+          "scale": 2,
+          "source_group_count": 92
+        },
+        "x2_severe": {
+          "files_csv_sha256": "4480fdb3e4cee651bc2999f6eb4b0ac985a4a529fda99f422668e699e13e6522",
+          "sample_count": 1600,
+          "scale": 2,
+          "source_group_count": 92
+        },
+        "x4_light": {
+          "files_csv_sha256": "c5abc38a24848dcdc3b217c1b45c77eccf6557b163e619fec7c9425f6a40e7cd",
+          "sample_count": 1600,
+          "scale": 4,
+          "source_group_count": 92
+        },
+        "x4_severe": {
+          "files_csv_sha256": "b777418cf63b0dcabe0a57657f31c5db0a30aa840c80e090619d33e22b707110",
+          "sample_count": 1600,
+          "scale": 4,
+          "source_group_count": 92
+        }
+      },
+      "protocol_id": "mmcanet_phase_c2_screen_20261029_v2",
+      "protocol_sha256": "e7b2eb183968dab3512aa2a5ff65244ebf43764dbdd9baa2d25bfffa0864bd1e",
+      "role": "train",
+      "sample_count": 1600,
+      "shared_source_hashes": true,
+      "shared_target_optical_hashes": true,
+      "source_group_count": 92,
+      "source_manifest_sha256": "6a278e97c161164d9440b5388c5b3fcda87746a56e26adfb7cdf658b94924e57"
+    }
+  },
+  "resource_preflight": {
+    "device": "NVIDIA GeForce RTX 3050 Laptop GPU",
+    "device_total_memory_bytes": 3942383616,
+    "duration_seconds": 1.8547675889994935,
+    "free_memory_after_bytes": 2462121984,
+    "free_memory_before_bytes": 2982215680,
+    "optimizer_steps": 1,
+    "peak_allocated_memory_bytes": 383524864,
+    "project_data_read": false,
+    "status": "passed",
+    "synthetic_step": {
+      "batch_size": 8,
+      "lr_shape": [
+        8,
+        1,
+        128,
+        128
+      ],
+      "optical_shape": [
+        8,
+        3,
+        256,
+        256
+      ],
+      "scale": 2,
+      "target_shape": [
+        8,
+        1,
+        256,
+        256
+      ]
+    },
+    "train_l1": 0.250896692276001
+  },
+  "runs": {
+    "x2_light__optical_guided": {
+      "best_epoch": 30,
+      "best_score": 21.602688176361898,
+      "parameter_count": 96209,
+      "status": "complete",
+      "trainable_parameter_count": 96209
+    },
+    "x2_light__sar_only": {
+      "best_epoch": 30,
+      "best_score": 21.608208472115223,
+      "parameter_count": 96209,
+      "status": "complete",
+      "trainable_parameter_count": 96209
+    },
+    "x2_severe__optical_guided": {
+      "best_epoch": 28,
+      "best_score": 20.44198252986585,
+      "parameter_count": 96209,
+      "status": "complete",
+      "trainable_parameter_count": 96209
+    },
+    "x2_severe__sar_only": {
+      "best_epoch": 28,
+      "best_score": 20.43776822964792,
+      "parameter_count": 96209,
+      "status": "complete",
+      "trainable_parameter_count": 96209
+    },
+    "x4_light__optical_guided": {
+      "best_epoch": 30,
+      "best_score": 20.480921616301607,
+      "parameter_count": 151697,
+      "status": "complete",
+      "trainable_parameter_count": 151697
+    },
+    "x4_light__sar_only": {
+      "best_epoch": 26,
+      "best_score": 20.47481788683067,
+      "parameter_count": 151697,
+      "status": "complete",
+      "trainable_parameter_count": 151697
+    },
+    "x4_severe__optical_guided": {
+      "best_epoch": 28,
+      "best_score": 19.746868464898224,
+      "parameter_count": 151697,
+      "status": "complete",
+      "trainable_parameter_count": 151697
+    },
+    "x4_severe__sar_only": {
+      "best_epoch": 28,
+      "best_score": 19.749266770959537,
+      "parameter_count": 151697,
+      "status": "complete",
+      "trainable_parameter_count": 151697
+    }
+  },
+  "source_manifest_path": "/home/shy/AIR/SAR+AI/project/JDSR/protocols/mmcanet_phase_c1/v2/source_group_split_20261028_v1/sample_manifest.csv",
+  "started_utc": "2026-10-31T08:04:38.498591+00:00",
+  "status": "training_complete",
+  "test_set_accessed": false,
+  "test_set_used": false,
+  "training_completed_utc": "2026-10-31T09:19:36.535015+00:00"
+}
