@@ -1,5 +1,20 @@
 # 实验登记
 
+## 已知稀疏混合后验下的分布评分校准诊断 — 2026-11-09（纯合成 CPU 方法实验）
+
+- **编号/协议：** `posterior_score_calibration_cpu_20261109_v1r1`；[预登记协议](../../experiments/synthetic_cpu/posterior_score_calibration_cpu_20261109_v1r1/预登记协议.md)、[脚本](../../experiments/synthetic_cpu/posterior_score_calibration_cpu_20261109_v1r1/run.py)、[定向公式检查](../../experiments/synthetic_cpu/posterior_score_calibration_cpu_20261109_v1r1/test_run.py)。
+- **设计：** 六维稀疏高斯混合（64 个成分）、三维正交行线性观测、Gaussian 噪声标准差 0.35；解析枚举精确后验，生成 1,024 个独立联合案例。比较精确后验、`α=0.5` 欠分散、`α=1.5` 过分散和 `α=0` 后验均值塌缩；用闭式混合 CRPS、50%/90% 边际区间覆盖率及 2,000 次案例级配对 bootstrap。
+- **结果：** 平均 CRPS 分别为 0.120799/0.136522/0.131598/0.177281。候选减精确的 95% 区间为：欠分散 `[0.014437,0.017055]`、过分散 `[0.009929,0.011694]`、均值塌缩 `[0.053752,0.059510]`。精确后验覆盖率为 0.4990/0.9014；预声明判据全部通过。结果、逐案例 CSV、命令与中文终端输出见[运行目录](../../experiments/synthetic_cpu/posterior_score_calibration_cpu_20261109_v1r1/)。
+- **验证与环境：** 定向公式检查 6 项通过；CSV 4,096 行/1,024 案例、JSON、指标范围及观测矩阵正交性复核通过；2 个 Python 文件 `py_compile` 通过。Python 3.13.5、NumPy 2.1.3；仅 CPU，42.903 秒；PyTorch 未导入。
+- **隔离与解释边界：** 未访问项目数据、图像、模型/checkpoint、confirmation/test 载荷或测量值；无训练/推理/GPU。只验证指定合成分布中的评分行为，不代表 SAR、图像空间分布或物理后验校准；不改变 C3-A v3、任何 gate、训练状态或数据权限。
+- **失败证据：** 首轮实现误用 5 维而非协议规定的 6 维；维度一致性检查按预期失败。首轮所有产物已保留并标记无效；有效复跑使用独立 v1r1 目录，未覆盖或据首轮结果调参。详见[首轮记录](../../experiments/synthetic_cpu/posterior_score_calibration_cpu_20261109_v1/运行状态.md)。
+
+## 流逆问题控制与后验统计基准文献审查 — 2026-11-09（非本地实验）
+
+- **来源：** ICML 2026 MPC-Flow 的 PMLR 官方摘要；ICLR 2026 *A Statistical Benchmark for Diffusion-Posterior-Sampling Algorithms* 会议全文。
+- **观察与意义：** MPC-Flow 将一般 Flow 先验逆问题推理控制作为既有方向，且包含超分任务；但本轮仅摘要级核验。ICLR 基准以精确 Lévy 后验为金标准，启发了上方独立 CPU 诊断。
+- **边界：** 两篇论文都不验证本项目 SAR 表示域/散斑似然、光学增量效用或真实模型结果；不构成 C3/C4 资格依据。详见[文献审查报告](../../experiments/literature_audits/posterior_sampling_statistical_benchmark_20261109_v1/报告.md)。
+
 ## 局部亮点护栏阈值敏感性解析诊断 — 2026-11-09（合成解析 CPU 方法实验）
 
 - **协议/代码：** [预登记协议](../../experiments/synthetic_cpu/c3a_bright_scatterer_threshold_sensitivity_cpu_20261109_v1/protocol.json)、[运行脚本](../../experiments/synthetic_cpu/c3a_bright_scatterer_threshold_sensitivity_cpu_20261109_v1/run.py)；命令为 `python experiments/synthetic_cpu/c3a_bright_scatterer_threshold_sensitivity_cpu_20261109_v1/run.py`。

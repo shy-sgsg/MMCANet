@@ -1,0 +1,25 @@
+{
+  "审查编号": "posterior_sampling_statistical_benchmark_20261109_v1",
+  "审查日期": "2026-11-09",
+  "本地数据访问": false,
+  "模型与检查点访问": false,
+  "确认集访问": false,
+  "测试集访问": false,
+  "训练或推理": false,
+  "GPU使用": false,
+  "来源": [
+    {
+      "题名": "Solving Inverse Problems with Flow-based Models via Model Predictive Control",
+      "类型": "ICML 2026 出版方书目和摘要",
+      "链接": "https://proceedings.mlr.press/v306/webber26a.html",
+      "证据范围": "官方书目与摘要；PDF 当前读取端点不支持，细节未据此推断"
+    },
+    {
+      "题名": "A Statistical Benchmark for Diffusion-Posterior-Sampling Algorithms",
+      "类型": "ICLR 2026 会议全文",
+      "链接": "https://openreview.net/pdf?id=zDI2G8t0of",
+      "证据范围": "阅读会议全文开篇、贡献与基准方法说明；作者报告未本地复现"
+    }
+  ],
+  "审查报告": "报告.md"
+}

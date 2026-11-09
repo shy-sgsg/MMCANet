@@ -325,3 +325,9 @@ ICMLA 2025 的 *Perception-based multiplicative noise removal with Diffusion mod
 ## ICSP 2024 SAR 扩散超分摘要级先例（2026-11-07）
 
 IEEE Xplore 官方摘要称，`Super-Resolving SAR Images with Diffusion Models: A Dual Evaluation of Metrics and Applications` 使用残差预测的条件扩散进行 SAR 单图超分，在 MSTAR/SARBake 上报告传统指标与下游语义分割结果。官方 PDF 直连未能读取；划分、退化、训练预算和分割评估独立性仍未知。该文只支持单模态 SAR 超分先例，不支持联合去斑或 optical 效用。详见[来源审计](../../experiments/literature_audits/icsp_sar_diffusion_sr_abstract_pdf_route_20261107_v1/report.md)。
+
+## 2026-11-09 补充：Flow 推理控制先例与金标准后验评价
+
+ICML 2026 MPC-Flow 在通用图像逆问题中用模型预测控制引导 Flow 先验，包含超分任务；本轮仅能核验 PMLR 官方摘要，故只记录方法类别与任务范围，不引用未读正文的细节。它不证明 SAR 斑点似然、光学引导或 SAR 输出质量，不使本地 C3/C4 路线获得资格。仅当任务匹配的生成先验和观测模型分别通过现行门槛后，才可把训练后控制求解器列入后续比较。
+
+ICLR 2026 的统计基准使用可精确采样的离散 Lévy 后验评测 DPS，并以覆盖率和最优性差距直接检查分布级质量。为核对本地候选评分量，本项目运行了六维稀疏高斯混合的 CPU 已知后验诊断；三类错误分布的 CRPS 均高于精确后验，精确后验的 50%/90% 覆盖分别为 0.4990/0.9014。该结果只支持该解析合成案例，不外推至 SAR、C3-A 模型或物理后验。详见[来源与范围审查](../../experiments/literature_audits/posterior_sampling_statistical_benchmark_20261109_v1/报告.md)及[CPU 报告](../../experiments/synthetic_cpu/posterior_score_calibration_cpu_20261109_v1r1/报告.md)。

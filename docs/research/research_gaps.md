@@ -642,3 +642,9 @@ FlowSGS 与 FMPS 的一手全文已补入相关工作矩阵。两者覆盖通用
 ## 2026-11-07 补充缺口：乘性噪声 SDE 与本地退化的统计桥接
 
 已核实一项以对数正态乘性噪声为假设的扩散去噪先例，但其数据不是 SAR，也不研究 optical guidance 或联合超分。即使在 `L=8` 下匹配 Gamma 与对数正态乘子的均值、方差，两者偏度和尾部仍不同。尚无证据把该 SDE 解释为本地 normalized PNG Gamma 退化的似然或真实 SAR 观测模型；本地表示与物理量关系仍开放。详见[全文审查](../../experiments/literature_audits/multiplicative_noise_sde_fulltext_20261107_v1/report.md)及[纯合成对照](../../experiments/diagnostics/multiplicative_noise_distribution_cpu_20261107_v1/report.md)。
+
+## 2026-11-09 补充缺口：Flow 逆问题控制的 SAR 迁移与真实后验校准
+
+ICML 2026 MPC-Flow 在通用图像逆问题中已研究训练后 Flow 轨迹控制，并含超分任务；现有可读证据为出版方摘要，不能写成 SAR 物理一致性或光学引导先例。仍缺的是具备资格的 SAR 表示域观测似然、SAR 输出匹配任务的 Flow 比较，以及该方法能否保留亮散射结构。
+
+ICLR 2026 后验统计基准表明，分布采样质量可在精确后验可得的合成问题中直接检验。本地六维稀疏高斯混合 CPU 诊断已经验证部分评分工具，但并未覆盖空间图像、乘性噪声、长尾散射结构或训练模型。如何在不把通用线性高斯结果外推至 SAR 的前提下建立适当的表示域后验校准方案，仍是开放问题。见[MPC-Flow/后验基准审查](../../experiments/literature_audits/posterior_sampling_statistical_benchmark_20261109_v1/报告.md)和[已知后验 CPU 诊断](../../experiments/synthetic_cpu/posterior_score_calibration_cpu_20261109_v1r1/报告.md)。

@@ -1,5 +1,9 @@
 # 总研究计划
 
+## 2026-11-09 已知后验统计评价与 Flow 控制先例
+
+补查 ICLR 2026 的精确后验统计基准及 ICML 2026 MPC-Flow。前者提供以精确后验样本检查分布质量的通用方法，后者说明 Flow 逆问题推理控制及超分已有通用先例；MPC-Flow 本轮仅有出版方摘要级证据。新增六维稀疏高斯混合 CPU 诊断后，精确后验在闭式 CRPS 与边际覆盖检查中优于预设的欠/过分散与均值塌缩预测。该实验属于评价方法验证，不是 SAR 模型结果，也不改变阶段顺序、资格或 gate。C3-A 真实模型质量、SAR 表示域观测似然与光学增量效用仍待各自合规证据。见[文献审查](../../experiments/literature_audits/posterior_sampling_statistical_benchmark_20261109_v1/报告.md)及[CPU 诊断](../../experiments/synthetic_cpu/posterior_score_calibration_cpu_20261109_v1r1/报告.md)。
+
 ## 2026-11-09 局部亮点阈值解析敏感性
 
 独立 Gamma 解析敏感性计算显示，固定阈值 0.25 的目标命中率随目标均值/Gamma 形状从接近零至接近一，整图误报概率也高度依赖分布形状和独立像素假设。因此局部亮点量只保留为未启用候选，不存在可由该构造支持的通用阈值；真实表示域阈值、掩膜和空间误报处理仍待定义。该诊断不改变 C3-A v3、阶段 gate 或研究路线。详见[解析诊断报告](../../experiments/synthetic_cpu/c3a_bright_scatterer_threshold_sensitivity_cpu_20261109_v1/报告.md)。

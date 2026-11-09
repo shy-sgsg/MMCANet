@@ -873,3 +873,9 @@ arXiv:2609.12953 当前版本为 v2，题名已更新为 [*FIRM: Flow-based Imag
 ## 2026-11-07 补充：乘性噪声扩散 SDE 会议版全文
 
 Vuong 与 Nguyen 的 2025 ICMLA 工作 *Perception-based multiplicative noise removal with Diffusion models* 用几何布朗运动描述乘性扰动，并在对数域进行 score-based 反向去噪。作者在 CelebA 与 UC Merced Land Use 图像上注入合成噪声；没有报告真实 SAR 实验。该文构成乘性噪声 SDE 去斑的直接先例，但不研究 SAR–optical 联合恢复、超分辨率或光学增量效用。其对数正态噪声假设也不等同于本项目 normalized PNG 表示域的 `Gamma(shape=L, rate=L)` 退化。见[全文审查](../../experiments/literature_audits/multiplicative_noise_sde_fulltext_20261107_v1/report.md)及[相关工作矩阵](related_work_matrix.csv)。
+
+## 2026-11-09 补充：Flow 逆问题控制与可检验后验样本
+
+ICML 2026 的 MPC-Flow 将预训练 Flow 先验的逆问题条件生成写成推理阶段的控制子问题，并在自然图像修复、去模糊和超分任务上报告评估。现有可核验来源为 PMLR 官方书目与摘要，PDF 本轮不可读取；不推断正文中的具体数据、算子、超参数或数值结果。该工作收窄“Flow 先验配合推理时观测控制”的宽泛新颖性空间，但不涉及 SAR 输出、乘性散斑、光学引导或本项目 JDSR。见[MPC-Flow 出版方记录](https://proceedings.mlr.press/v306/webber26a.html)和[审查报告](../../experiments/literature_audits/posterior_sampling_statistical_benchmark_20261109_v1/报告.md)。
+
+ICLR 2026 的 *A Statistical Benchmark for Diffusion-Posterior-Sampling Algorithms* 使用可精确采样的离散 Lévy 后验作为分布级金标准，并报告 MMSE 最优性差距与后验覆盖检查。它支持在已知后验的合成问题中验证采样评价工具，而非仅用点估计指标推断后验质量。本项目据此完成六维稀疏高斯混合的纯 CPU 评分诊断；该诊断不使用 SAR/项目数据，且未检验本地模型或物理后验。见[ICLR 全文](https://openreview.net/pdf?id=zDI2G8t0of)、[本地诊断报告](../../experiments/synthetic_cpu/posterior_score_calibration_cpu_20261109_v1r1/报告.md)及[文献审查报告](../../experiments/literature_audits/posterior_sampling_statistical_benchmark_20261109_v1/报告.md)。

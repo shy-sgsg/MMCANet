@@ -1,5 +1,13 @@
 # 研究风险与证据边界
 
+## 2026-11-09 通用后验/控制结果不可外推为 SAR 物理证据
+
+ICLR 2026 的已知后验统计基准使用离散 Lévy 先验与线性逆问题；MPC-Flow 本轮只核验到出版方摘要。二者不能证明本地 normalized-PNG/noisy-pseudo-target 具有可用后验似然，也不能证明 Flow 推理控制适用于 SAR 斑点、光学引导或亮散射体。已完成的六维高斯混合 CPU 评分实验仅验证该合成后验下的 CRPS/边际覆盖行为；严禁把它描述成真实 SAR 校准、生成模型结果或 C3-A 晋级证据。MPC-Flow 正文未读取，细节只能在获得新可读一手来源后补核。见[文献审查](../../experiments/literature_audits/posterior_sampling_statistical_benchmark_20261109_v1/报告.md)及[CPU 诊断](../../experiments/synthetic_cpu/posterior_score_calibration_cpu_20261109_v1r1/报告.md)。
+
+## 2026-11-09 方法诊断首轮维度实现偏差
+
+已知后验诊断首轮代码使用 `d=5`、32 个高斯成分，而预登记协议规定 `d=6`、64 个成分。新增维度检查发现不一致；首轮数值不采纳，但原脚本、CSV、JSON 与失败记录均保留。v1r1 只将实现对齐原协议，未改变模型、样本数、指标或成功阈值，且输出到新唯一目录。该事件说明方法脚本的关键配置仍需增加与预登记参数直接绑定的断言。见[首轮状态记录](../../experiments/synthetic_cpu/posterior_score_calibration_cpu_20261109_v1/运行状态.md)和[v1r1 结果](../../experiments/synthetic_cpu/posterior_score_calibration_cpu_20261109_v1r1/报告.md)。
+
 ## 2026-11-09 固定亮点阈值受目标均值与乘性分布影响
 
 整数形状 Gamma 的解析诊断显示，在背景均值 0.04、目标均值 0.12–0.45、形状 4/16/64 的设定下，固定阈值 0.25 的单 draw 命中率从 8.72×10⁻¹² 到 0.999989；独立像素假设下整图至少一次误报率随形状从 0.002674 降至极小值。整图概率基于 64×64 单目标、16 draws 和像素/draw 独立，真实空间相关、归一化映射及模型误差均未覆盖。故不能把 0.25 当通用阈值或将解析误报率解释为真实 SAR 风险；局部量保持未启用候选。见[阈值敏感性报告](../../experiments/synthetic_cpu/c3a_bright_scatterer_threshold_sensitivity_cpu_20261109_v1/报告.md)。

@@ -77,6 +77,8 @@ VS = mean_(i,j in E) ( |y_i-y_j| - mean_k |X_k,i-X_k,j| )^2
 
 2026-11-09 的三项纯 CPU 诊断为以上案例提供初步证据：[二维评价量诊断](../../experiments/synthetic_cpu/c3a_distribution_metric_sanity_cpu_20261109_v1/report.md)、[样本数敏感性诊断](../../experiments/synthetic_cpu/c3a_distribution_draw_count_cpu_20261109_v1/report.md)、[图像域空间依赖指标诊断](../../experiments/synthetic_cpu/c3a_image_distribution_metrics_cpu_20261109_v1/report.md)。评分规则依据与适用边界见[一手来源核验](../../experiments/literature_audits/proper_scoring_rules_multisample_eval_20261109_v1/report.md)。这些证据不决定实际模型的 draw 数或指标阈值。
 
+另按预登记协议完成了一个有闭式后验的六维稀疏高斯混合线性逆问题：精确后验的平均边际 CRPS 低于均值塌缩、欠分散和过分散预测；50%/90% 区间覆盖为 0.4990/0.9014。该诊断补足“评分与已知后验直接比较”的一类小型验证，但不测试空间图像、SAR 噪声或真实模型样本，也不能为本地后验校准背书。研究启发来自 ICLR 2026 的离散 Lévy 后验统计基准，任务、先验与指标并非该论文基准的复现。详见[本地实验](../../experiments/synthetic_cpu/posterior_score_calibration_cpu_20261109_v1r1/报告.md)和[文献审查](../../experiments/literature_audits/posterior_sampling_statistical_benchmark_20261109_v1/报告.md)。
+
 ## 5. 运行前必须冻结的项目
 
 补充实验启动前，需另行形成有唯一版本号的完整 protocol，至少明确：
