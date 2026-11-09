@@ -1,5 +1,17 @@
 # 候选研究缺口
 
+## 局部亮点护栏阈值只做过解析合成敏感性 — 2026-11-09
+
+独立 Gamma 模型的 108 组解析计算显示，固定阈值 0.25 的单 draw 目标命中率随目标均值与 Gamma 形状从 8.72×10⁻¹² 到 0.999989；按独立像素计算的整图误报概率也强烈依赖分布形状。该计算没有项目影像、空间相关或模型输出，不能校准真实阈值。剩余问题是如何在受限的 normalized PNG 表示域为局部目标/背景统计预先定义阈值来源、掩膜和空间误报处理；它仍是评价设计候选，不代表 SAR 物理或正式 gate。见[阈值敏感性报告](../../experiments/synthetic_cpu/c3a_bright_scatterer_threshold_sensitivity_cpu_20261109_v1/报告.md)。
+
+## 全图评分对单个目标的分差受图幅稀释 — 2026-11-09
+
+单亮点漏检的 64×64 至 256×256 合成扫描显示，全图评分的绝对配对差随亮点密度下降而约按面积缩小；当前配对构造中排序仍保持，但不代表真实模型检出率。尚未覆盖多亮点密度、非均匀背景、目标形态或实际预测集合；跨图幅方法比较须控制目标密度，局部护栏也需要单独验证。见[图幅敏感性报告](../../experiments/synthetic_cpu/c3a_bright_scatterer_resolution_sweep_cpu_20261109_v1/报告.md)。
+
+## C1 SEN12MS train-only 文件级身份交叉仍不可用 — 2026-11-09
+
+公开作者训练清单过大，现有网页和网络接口未能提供正文；三个 C1 train-only 文件名搜索没有形成可核验交叉。既有清单哈希审计未保留原始文本，因此无法对冻结 C1 train/development 做离线映射。该缺口不是“无匹配”的证据；在获得可读取的官方 train/development 身份交叉前，不传递地理参考，也不提升来源组独立性表述。见[获取尝试报告](../../experiments/data_audits/c1_sen12ms_trainlist_access_attempt_20261109_v1/report.md)。
+
 ## C1 来源组的地理与 patch footprint 映射仍缺 — 2026-11-09
 
 发现 SEN12MS 官方作者资料提供地理参考 GeoTIFF 和 ROI/patch 命名，但它与 C1 v2 PNG 的逐文件身份尚未核实。分类 `train_list` 不是 C1 划分，不能将其空间属性直接移植。只有获得仅限 train/development 的可追溯文件级映射后，才能评估坐标或 footprint 交叠；目前仍不能声称地理/采集独立。见[来源复核](../../experiments/data_audits/c1_sen12ms_georeference_crosswalk_recheck_20261109_v1/report.md)。

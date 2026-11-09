@@ -1,0 +1,33 @@
+{
+  "实验名称": "单亮点漏检对全图分数的图幅尺度敏感性",
+  "运行日期": "2026-11-09",
+  "代码提交": "bc3bc0c3834a7b60bc59573a3c4b508bbb393164",
+  "分支": "main",
+  "工作区原有未提交状态": true,
+  "运行命令": "CUDA_VISIBLE_DEVICES='' python experiments/synthetic_cpu/c3a_bright_scatterer_resolution_sweep_cpu_20261109_v1/run.py",
+  "运行设备": "CPU",
+  "运行环境": {
+    "Python": "3.13.5",
+    "NumPy": "2.1.3",
+    "平台": "Linux-7.0.0-42-generic-x86_64-with-glibc2.43",
+    "Python可执行文件": "/home/shy/anaconda3/bin/python",
+    "PyTorch已导入": false
+  },
+  "随机种子": 2026110902,
+  "图幅": [
+    64,
+    128,
+    256
+  ],
+  "每图幅重复数": 300,
+  "每集合draw数": 16,
+  "项目数据/模型/checkpoint输入": "无；仅使用协议规定的合成数组。",
+  "confirmation/test访问": false,
+  "输出记录数": 1800,
+  "文件SHA256": {
+    "协议": "810c5a577e56644858f7ae65894687dbac7e48146e4691b464dcad2f5a408c3a",
+    "脚本": "3356eb3fd7e7b098597248c7e0d0245cd64023f4d3bec00fab0a39465803466e",
+    "逐重复结果": "d0e0293e2dbeb976c313b1893ed61a9bc559cd67dc8d05ec3ca12f2dec463bee",
+    "汇总": "1b94f17c62ffb187c5f393de3014148b4e1f5e7e15dbc3a44f1d8d9344cec4a2"
+  }
+}

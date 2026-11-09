@@ -1,0 +1,28 @@
+{
+  "实验名称": "稀疏亮点退化下的多样本全局评分敏感性",
+  "运行日期": "2026-11-09",
+  "代码提交": "bc3bc0c3834a7b60bc59573a3c4b508bbb393164",
+  "分支": "main",
+  "工作区原有未提交状态": true,
+  "运行命令": "CUDA_VISIBLE_DEVICES='' python experiments/synthetic_cpu/c3a_bright_scatterer_metric_sensitivity_cpu_20261109_v1/run.py",
+  "运行设备": "CPU",
+  "运行环境": {
+    "Python": "3.13.5",
+    "NumPy": "2.1.3",
+    "平台": "Linux-7.0.0-42-generic-x86_64-with-glibc2.43",
+    "Python可执行文件": "/home/shy/anaconda3/bin/python",
+    "PyTorch已导入": false
+  },
+  "随机种子": 2026110901,
+  "重复数": 300,
+  "每集合draw数": 16,
+  "项目数据/模型/checkpoint输入": "无；仅使用协议规定的合成数组。",
+  "confirmation/test访问": false,
+  "输出记录数": 1500,
+  "文件SHA256": {
+    "协议": "a9c90e6b1783da388dc9b61c3d2083a63ec5f9ce260abcf50e710c56db8d2a66",
+    "脚本": "20392b539aff9025ba7ffa7fcb00b79c169caea9437cf88159d48ca4b50870fc",
+    "逐重复结果": "5a2a61d49b095ad11608eb3bd11531ce6bb51eb80ddf3cba86831038a7c0e1ba",
+    "汇总": "d897eab59872c6f2be943938212bad1c307e2bccb9af869359d07611adee0c97"
+  }
+}

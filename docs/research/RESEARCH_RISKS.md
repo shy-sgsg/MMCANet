@@ -1,5 +1,17 @@
 # 研究风险与证据边界
 
+## 2026-11-09 固定亮点阈值受目标均值与乘性分布影响
+
+整数形状 Gamma 的解析诊断显示，在背景均值 0.04、目标均值 0.12–0.45、形状 4/16/64 的设定下，固定阈值 0.25 的单 draw 命中率从 8.72×10⁻¹² 到 0.999989；独立像素假设下整图至少一次误报率随形状从 0.002674 降至极小值。整图概率基于 64×64 单目标、16 draws 和像素/draw 独立，真实空间相关、归一化映射及模型误差均未覆盖。故不能把 0.25 当通用阈值或将解析误报率解释为真实 SAR 风险；局部量保持未启用候选。见[阈值敏感性报告](../../experiments/synthetic_cpu/c3a_bright_scatterer_threshold_sensitivity_cpu_20261109_v1/报告.md)。
+
+## 2026-11-09 稀疏亮点与图幅会影响全图分差的解释
+
+合成单亮点扫描中，图幅从 64×64 增至 256×256 时，目标密度降低 16 倍，三项全图评分的漏检−正确绝对分差约缩小 15–16 倍。共享噪声条件下仍有较高正差比例，但该比例不是模型层面的检出概率，且跨图幅原始分差会混入目标密度。局部统计阈值 0.25 只在本次预设亮度和噪声下测试，尚无跨背景、幅值、噪声强度或真实模型证据。故把图幅/目标密度作为分数解释边界，局部护栏仅保留为候选；不改变 C3-A v3 或 gate。见[评分敏感性报告](../../experiments/synthetic_cpu/c3a_bright_scatterer_metric_sensitivity_cpu_20261109_v1/报告.md)及[图幅敏感性报告](../../experiments/synthetic_cpu/c3a_bright_scatterer_resolution_sweep_cpu_20261109_v1/报告.md)。
+
+## 2026-11-09 SEN12MS train_list 正文及跨版本身份无法核验
+
+官方作者训练清单页面未展示正文，当前 raw 访问接口不可用；三个仅限 C1 train 角色的精确检索未得可核验结果。清单曾在先前审计中按哈希读取，但正文没有保留，因而不能在本地完成当前 C1 train/development 的逐文件 join。不得把检索无结果解释为无匹配，也不得把 SEN12MS GeoTIFF 的地理参考应用到 C1 v2 PNG。地理、采集和 patch footprint 独立性继续未知。见[获取尝试报告](../../experiments/data_audits/c1_sen12ms_trainlist_access_attempt_20261109_v1/report.md)。
+
 ## 2026-11-09 C1 来源版本之间尚无地理坐标身份连接
 
 SEN12MS 发布版提供 georeferenced GeoTIFF 和可解析的 ROI/patch 命名，但当前没有证据把这些文件逐项连接到冻结 C1 v2 SEN1-2 PNG。直接把相同 seed/season/patch 字符串视作同一坐标会越过版本身份验证；分类训练清单也不能替代 C1 冻结划分。维持 C1 地理、采集与 footprint 独立性未知。见[路线复核](../../experiments/data_audits/c1_sen12ms_georeference_crosswalk_recheck_20261109_v1/report.md)。

@@ -1,5 +1,38 @@
 # 实验登记
 
+## 局部亮点护栏阈值敏感性解析诊断 — 2026-11-09（合成解析 CPU 方法实验）
+
+- **协议/代码：** [预登记协议](../../experiments/synthetic_cpu/c3a_bright_scatterer_threshold_sensitivity_cpu_20261109_v1/protocol.json)、[运行脚本](../../experiments/synthetic_cpu/c3a_bright_scatterer_threshold_sensitivity_cpu_20261109_v1/run.py)；命令为 `python experiments/synthetic_cpu/c3a_bright_scatterer_threshold_sensitivity_cpu_20261109_v1/run.py`。
+- **设计：** 背景均值 0.04；目标均值 `{0.12,0.20,0.30,0.45}`；整数 Gamma 形状 `{4,16,64}`；9 个阈值 `{0.10,…,0.50}`；64×64 单目标、16 draws。按 Gamma 右尾闭式公式计算命中率、单像素误报率及独立像素假设下的整图至少一次误报概率，不生成图像或随机样本。
+- **结果：** 共 108 条记录。固定阈值 0.25 的单 draw 命中率范围为 8.72×10⁻¹²–0.999989；整图至少一次误报概率按 Gamma 形状分别为 0.002674、2.19×10⁻²¹、6.39×10⁻⁹³。解析特例、概率边界和阈值单调性检查通过。详见[中文报告](../../experiments/synthetic_cpu/c3a_bright_scatterer_threshold_sensitivity_cpu_20261109_v1/报告.md)。
+- **边界：** 只适用于独立像素/抽样的数学 Gamma 构造；整图误报概率依赖该独立性假设。不能迁移到真实 SAR 或模型输出，也不产生阈值建议。不改评分代码、正式协议、C3-A v3、gate 或训练状态。
+- **运行范围：** 仅 Python 标准库、CPU 解析计算；PyTorch 未导入，未访问项目图像、模型/checkpoint、confirmation/test 载荷或测量值；没有训练或推理。
+
+## 稀疏亮点退化下的多样本全局评分敏感性 — 2026-11-09（纯合成 CPU 方法实验）
+
+- **协议/代码：** [预登记协议](../../experiments/synthetic_cpu/c3a_bright_scatterer_metric_sensitivity_cpu_20261109_v1/protocol.json)、[运行脚本](../../experiments/synthetic_cpu/c3a_bright_scatterer_metric_sensitivity_cpu_20261109_v1/run.py)；命令为 `CUDA_VISIBLE_DEVICES='' python experiments/synthetic_cpu/c3a_bright_scatterer_metric_sensitivity_cpu_20261109_v1/run.py`。
+- **设计：** 64×64 归一化合成图、4 个真实亮点、16 draws、300 次重复；正确、压暗、漏检、右移 1 像素和增加伪亮点五种条件。比较逐像素 CRPS、归一化整图能量分数、邻接变差分数及阈值 0.25 下的局部亮点统计。
+- **结果：** 三项全图评分均区分四种错误条件；压暗/漏检/右移/伪亮点的正配对差比例分别为 0.893/1.000/1.000/1.000。精确检出与 3×3 邻域检出区分漏检和错位；真目标区外伪亮点率识别了添加伪点的条件。详见[中文报告](../../experiments/synthetic_cpu/c3a_bright_scatterer_metric_sensitivity_cpu_20261109_v1/报告.md)。
+- **边界：** 仅适用于预设合成图、Gamma 数学随机变量与阈值；不表示真实 SAR 或模型质量，不将 0.25 设为通用阈值。不改评分实现、C3-A v3、阶段 gate 或训练状态。
+- **验证/访问：** `py_compile` 通过；1,500 条逐重复记录、有限评分与清单哈希核对通过。仅 NumPy CPU；未导入 PyTorch，未访问项目图像、模型/checkpoint 或 confirmation/test 载荷/测量值；无训练、推理或 GPU。
+
+## 单亮点漏检对全图分数的图幅尺度敏感性 — 2026-11-09（纯合成 CPU 方法实验）
+
+- **协议/代码：** [预登记协议](../../experiments/synthetic_cpu/c3a_bright_scatterer_resolution_sweep_cpu_20261109_v1/protocol.json)、[运行脚本](../../experiments/synthetic_cpu/c3a_bright_scatterer_resolution_sweep_cpu_20261109_v1/run.py)；命令为 `CUDA_VISIBLE_DEVICES='' python experiments/synthetic_cpu/c3a_bright_scatterer_resolution_sweep_cpu_20261109_v1/run.py`。
+- **设计：** 单亮点、正确预测与漏检预测、64×64/128×128/256×256 三种图幅；每个图幅 300 次配对重复、每集合 16 draws，共 1,800 条记录。
+- **结果：** 亮点密度下降 16 倍时，CRPS 与邻接变差的绝对配对差约缩小 16 倍，整图能量分数约缩小 15 倍。所有配对区间均高于零，正差比例为 0.970–0.993；正确条件的中心点检出率为 0.976–0.979。详见[中文报告](../../experiments/synthetic_cpu/c3a_bright_scatterer_resolution_sweep_cpu_20261109_v1/报告.md)。
+- **边界：** 共享噪声合成配对中的排序率不是模型检出概率。结论仅适用于预设一个亮点和 Gamma 数学构造；不外推真实 SAR，也不把跨图幅绝对分差直接比较为方法质量。不改评分公式、C3-A v3、阶段 gate 或训练状态。
+- **验证/访问：** `py_compile` 通过；1,800 条逐重复记录、有限评分与清单哈希核对通过。仅 NumPy CPU；未访问项目图像、模型/checkpoint 或 confirmation/test 载荷/测量值；无训练、推理或 GPU。
+
+## C1 SEN12MS train_list 正文读取与文件名交叉尝试 — 2026-11-09（只读元数据审查）
+
+- **问题：** 能否通过作者维护的 SEN12MS train_list，将冻结 C1 v2 train/development 文件映射到可核验的地理/patch 元数据？
+- **本地范围：** 仅读取 C1 v2 train/development 暂存清单中的 1,800 个配对记录；不打开图像或其他角色清单。
+- **来源访问：** [作者 train_list 页面](https://github.com/schmitt-muc/SEN12MS/blob/master/splits/train_list.txt)标为 4.91 MB 且不展示正文；网页 raw 读取受内容长度限制，本机网络请求被拒绝。三个 train-only 文件名搜索未得到可核验结果。
+- **观察边界：** 无法判断是否存在跨版本同名文件；精确搜索无结果不代表无匹配。既有 2026-10-25 训练清单审计只保留摘要，未留存可用于当前交叉的清单正文。
+- **结果：** 没有建立文件级身份、坐标、采集日期或 footprint 映射；不更新 C1 独立性主张、划分、阶段 gate 或训练状态。
+- **访问标记：** 项目影像、confirmation/test 载荷、作者 test/hold-out 清单、模型/checkpoint、训练、推理及 GPU 均未访问或使用。报告：[获取尝试](../../experiments/data_audits/c1_sen12ms_trainlist_access_attempt_20261109_v1/report.md)；清单：[审查 manifest](../../experiments/data_audits/c1_sen12ms_trainlist_access_attempt_20261109_v1/manifest.json)。
+
 ## C1 SEN12MS 地理元数据候选路线复核 — 2026-11-09（只读来源审查）
 
 - **问题：** 是否有新的官方 georeferenced SEN12MS 元数据能把冻结 C1 v2 train/development 来源文件连接到坐标或 patch footprint？

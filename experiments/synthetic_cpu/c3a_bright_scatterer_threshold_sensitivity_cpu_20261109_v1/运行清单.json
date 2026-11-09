@@ -1,0 +1,32 @@
+{
+  "实验名称": "局部亮点护栏阈值敏感性解析诊断",
+  "运行日期": "2026-11-09",
+  "代码提交": "bc3bc0c3834a7b60bc59573a3c4b508bbb393164",
+  "分支": "main",
+  "工作区原有未提交状态": true,
+  "运行命令": "python experiments/synthetic_cpu/c3a_bright_scatterer_threshold_sensitivity_cpu_20261109_v1/run.py",
+  "运行设备": "CPU",
+  "运行环境": {
+    "Python": "3.13.5",
+    "平台": "Linux-7.0.0-42-generic-x86_64-with-glibc2.43",
+    "Python可执行文件": "/home/shy/anaconda3/bin/python",
+    "依赖": "Python 标准库",
+    "PyTorch已导入": false
+  },
+  "随机性": "无随机抽样；按预登记 Gamma 右尾闭式计算。",
+  "输出记录数": 108,
+  "输入边界": {
+    "项目数据或模型": false,
+    "confirmation或test访问": false,
+    "图像生成": false,
+    "训练或推理": false,
+    "GPU": false
+  },
+  "文件SHA256": {
+    "协议": "413fa1876f33d449830150d1f40bdbd08bfac8fdcf6fecbf575db9b3cbaf50c7",
+    "脚本": "f72d50fb1be6bb16b328e3f94f7df3d57d2345a4458713108f7e80b5acf3d164",
+    "逐阈值结果": "8d6ce02cd3ba3663298071e31ed508979b828dd5ba889f2d0cbe149f0f4b2d54",
+    "汇总": "36ef6fb309f06ed51c9313114b9272e1ce6cdc2f69d0b5712bcabc4553899129",
+    "报告": "c4bc31bbf06f7e94b899b8ff07a667cb3362df4ae9d385721a1f974038467b8c"
+  }
+}

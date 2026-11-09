@@ -1,5 +1,17 @@
 # 下一步行动
 
+## 2026-11-09 局部亮点阈值解析敏感性诊断完成
+
+- 对 108 组目标均值、Gamma 形状和阈值组合完成解析计算；阈值 0.25 下单 draw 命中率变化范围为 8.72×10⁻¹²–0.999989。整图误报数字依赖独立像素假设，不能解释为真实图像概率。详见[报告](../../experiments/synthetic_cpu/c3a_bright_scatterer_threshold_sensitivity_cpu_20261109_v1/报告.md)。
+- 不选通用阈值，不启用局部统计、不改正式评价协议、C3-A v3 或 gate。
+- **继续：** 训练/GPU 按用户要求暂停；处理新的、能由直接源码/冻结协议/一手来源回答的 CPU 问题。真实模型评价仍等待合规权重与训练恢复；confirmation/test 继续封存。
+
+## 2026-11-09 C1 train_list 文件级映射路线暂停
+
+- 作者维护的 train_list 正文在当前网页/网络接口下不可读取；三个仅限 train 角色的精确文件名搜索没有给出可核验结果。该阴性搜索不等同于不存在匹配，详见[获取尝试报告](../../experiments/data_audits/c1_sen12ms_trainlist_access_attempt_20261109_v1/report.md)。
+- 不重试相同 raw 地址、同一页面或相同精确搜索；不访问作者 test/hold-out 清单、影像或 GeoTIFF。C1 的地理、采集和 patch footprint 独立性继续标为未知。
+- **继续：** 训练/GPU 保持暂停；转做其他有直接源码、冻结协议或可访问一手来源支撑的 CPU 工作。
+
 ## 2026-11-09 C1 SEN12MS 地理元数据候选路线待逐文件核验
 
 - 新官方来源只建立了候选：SEN12MS 作者论文描述 georeferenced GeoTIFF 与 ROI/patch 命名；尚无证据证明它与 C1 v2 train/development 的 SEN1-2 PNG 逐文件对应。来源与限制见[路线复核](../../experiments/data_audits/c1_sen12ms_georeference_crosswalk_recheck_20261109_v1/report.md)。

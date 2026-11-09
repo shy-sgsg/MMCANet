@@ -1,5 +1,17 @@
 # 总研究计划
 
+## 2026-11-09 局部亮点阈值解析敏感性
+
+独立 Gamma 解析敏感性计算显示，固定阈值 0.25 的目标命中率随目标均值/Gamma 形状从接近零至接近一，整图误报概率也高度依赖分布形状和独立像素假设。因此局部亮点量只保留为未启用候选，不存在可由该构造支持的通用阈值；真实表示域阈值、掩膜和空间误报处理仍待定义。该诊断不改变 C3-A v3、阶段 gate 或研究路线。详见[解析诊断报告](../../experiments/synthetic_cpu/c3a_bright_scatterer_threshold_sensitivity_cpu_20261109_v1/报告.md)。
+
+## 2026-11-09 稀疏目标与图幅敏感性的合成补充诊断
+
+在预设 64×64 稀疏亮点构造中，三项全图评分可区分压暗、漏检、错位和伪亮点；在单亮点 64×64 至 256×256 尺度扫描中，漏检造成的绝对分差随目标密度降低而约按面积缩小。保留全图评分并把局部亮点统计作为未启用的补充设计候选；跨图幅不直接比较绝对分差。此证据仅属合成方法诊断，不改变 C3-A v3、阶段 gate、训练/数据权限或总研究路线。详见[评分敏感性报告](../../experiments/synthetic_cpu/c3a_bright_scatterer_metric_sensitivity_cpu_20261109_v1/报告.md)与[图幅敏感性报告](../../experiments/synthetic_cpu/c3a_bright_scatterer_resolution_sweep_cpu_20261109_v1/报告.md)。
+
+## 2026-11-09 C1 train-only 官方清单交叉路线状态
+
+本次官方作者 train_list 正文未能通过可用只读接口取得；三个 train-only 精确文件名搜索也没有形成可核验的交叉项。此结果不能作为“跨版本无匹配”证据。保持 C1 v2 的来源场景文件夹级结论，不把地理属性从 SEN12MS 迁移到 C1 PNG；不重试同一受限读取和搜索，继续其他可独立推进的非 GPU 工作。详见[获取尝试报告](../../experiments/data_audits/c1_sen12ms_trainlist_access_attempt_20261109_v1/report.md)。
+
 ## 2026-11-09 C1 地理元数据的 SEN12MS 候选路线
 
 官方 SEN12MS 作者论文给出 georeferenced GeoTIFF 和 ROI/patch 命名，但未核实这些文件与冻结 C1 v2 SEN1-2 PNG 的逐文件、逐场景对应。README 中的分类 `train_list` / `test_list` 也不是 C1 冻结划分。本轮没有读取影像或 test/hold-out 列表，精确样本映射仍开放；不提升地理或采集独立性主张。仅在获得仅限 train/development 的直接身份交叉表时继续。见[来源复核](../../experiments/data_audits/c1_sen12ms_georeference_crosswalk_recheck_20261109_v1/report.md)。
