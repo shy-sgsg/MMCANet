@@ -1,0 +1,22 @@
+{
+  "实验编号": "c3a_spatial_variogram_anisotropy_cpu_20261109_v1",
+  "状态": "完成",
+  "开始时间_UTC": "2026-11-09T05:17:26.835479+00:00",
+  "结束时间_UTC": "2026-11-09T05:17:28.827636+00:00",
+  "运行命令": "python experiments/synthetic_cpu/c3a_spatial_variogram_anisotropy_cpu_20261109_v1/run.py",
+  "Python版本": "3.13.5",
+  "NumPy版本": "2.1.3",
+  "操作系统": "Linux-7.0.0-42-generic-x86_64-with-glibc2.43",
+  "设备": "CPU；未导入 PyTorch，也未调用 GPU",
+  "协议_SHA256": "2b0adfbb94bf526de30ca6b417b9d8e1757e44661afa3eb1c28199e561c7b4db",
+  "脚本_SHA256": "20853547d1193711fa392df74b16336764d2445f7944990a37a080820f8ff116",
+  "评分实现_SHA256": "3049d32b8e38d63b6944b8ccd753be4d5f00fc2cab7e7299f392beccd3c8eb21",
+  "结果_SHA256": "a0f1d0f92136d29f7a3b265e77ed386a09f520056691e927c37c117084212066",
+  "逐重复CSV_SHA256": "c27e17e029b66c221f9df921f35ef10ab32a0dad3e638ca0815e26712f9df048",
+  "项目数据访问": false,
+  "模型或检查点访问": false,
+  "确认集载荷访问": false,
+  "测试载荷访问": false,
+  "训练或推理": false,
+  "备注": "独立方向错配诊断；不改变多样本补充设计、C3-A v3 或任何 gate。"
+}

@@ -1,5 +1,69 @@
 # 候选研究缺口
 
+## C1 来源组的地理与 patch footprint 映射仍缺 — 2026-11-09
+
+发现 SEN12MS 官方作者资料提供地理参考 GeoTIFF 和 ROI/patch 命名，但它与 C1 v2 PNG 的逐文件身份尚未核实。分类 `train_list` 不是 C1 划分，不能将其空间属性直接移植。只有获得仅限 train/development 的可追溯文件级映射后，才能评估坐标或 footprint 交叠；目前仍不能声称地理/采集独立。见[来源复核](../../experiments/data_audits/c1_sen12ms_georeference_crosswalk_recheck_20261109_v1/report.md)。
+
+## 方向错配诊断仅覆盖平稳可分离场 — 2026-11-09
+
+横纵相关值 0.75/0.35 互换的合成场中，现行逐边变差分数可以识别方向错配；但该案例只覆盖平稳可分离 AR(1) logistic-normal 场。h=8 单尺度区分较弱，其他 lag、边缘/散射点、非平稳方向变化和本地 SAR 输出均未验证。尚无依据修改评分实现或给 lag 设权重。见[诊断报告](../../experiments/synthetic_cpu/c3a_spatial_variogram_anisotropy_cpu_20261109_v1/report.md)。
+
+## 多尺度变差分数的参数稳健性仍不完整 — 2026-11-09
+
+相关强度敏感性诊断扩展了单一 ρ=0.8 结果：ρ={0.4,0.6,0.8,0.9} 的 8 个 AR(1)/RBF 真值条件中，7 个达到预登记区间和排序门槛；ρ=0.4、RBF 真值的排序率为 0.600，低于 0.65。故多距离分数仍是待比较候选，且其区分力依赖参数与真值方向。尚缺非平稳结构、散射点、边缘和本地 SAR 表示案例，真实评价前仍需另行冻结距离、权重与汇总规则。见[敏感性实验](../../experiments/synthetic_cpu/c3a_spatial_variogram_correlation_sweep_cpu_20261109_v1/report.md)。
+
+## 空间分布评分的距离覆盖仍未验证 — 2026-11-09
+
+单邻接变差分数可能无法区分具有相同边际与一阶相关、但长程依赖不同的生成集合。一个预登记的 24×24 logistic-normal AR(1)/RBF 诊断中，`h=1` 排序约为机会水平；四距离等权变差分数在两种真值方向分别以 0.990/0.857 比例选中正确协方差。然而该结论只对应一个平稳可分离协方差对照；其他距离、非平稳结构、亮点与 SAR 图像域尚未验证。因此真实生成评价仍须把距离集合、权重和边界作为预先冻结的设计参数，而不是直接迁移这组值。详见[合成诊断](../../experiments/synthetic_cpu/c3a_spatial_variogram_multiscale_cpu_20261109_v1/report.md)和[C3-A 多样本补充设计](C3A_DISTRIBUTION_EVALUATION_ADDENDUM_DESIGN_20261109.md)。
+
+## 复数 SAR 扩散去斑已有物理引导先例，JDSR 与 optical 效用仍未回答
+
+PCSDD 已在复数 SAR SLC 域结合各向异性 PDE 漂移、学习型 score 修正和 blind-spot 自监督，并在强度域使用 Gamma 似然及 ENL 等约束。因此，通用物理引导/扩散去斑不能单独构成本项目的新颖性。现有全文没有 SAR 超分观测模型、optical 条件、几何错配或回退实验。本地仍需回答 normalized 8-bit PNG/noisy pseudo-target 表示域下的 SAR 联合去斑与超分、optical 的增量价值，以及相应可靠性边界；PCSDD 的复数 SLC 假设不能直接替代这些证据。详见[全文审查](../../experiments/literature_audits/pcsdd_complex_diffusion_despeckling_fulltext_20261109_v1/report.md)。
+
+## 多样本评价量尚未在真实 SAR 输出分布上验证 — 2026-11-09
+
+已知分布诊断表明，均值点估计误差、样本距离、模态质量、支持率、逐像素 CRPS、整图能量分数和空间变差分数回答不同问题；样本数影响有限集合估计波动。图像域受控案例中，边缘分布正确不保证空间依赖正确。通用评分规则来源也表明，整图能量分数对依赖失配可能不够敏感，变差分数不是严格适当且仅概括预先选定的像素对统计。当前仍没有本地模型 draw、SAR 表示域生成分布参照、draw 依赖估计或校准检查。C3-A v3 只覆盖协议内的逐 draw 指标及逐像素标准差，无法事后恢复未保存的分布评价。真实评价须先冻结互补指标、空间权重/边界、所需输出/统计量与计算预算；合成案例中的数值阈值不迁移为正式设置。详见[评分规则来源核验](../../experiments/literature_audits/proper_scoring_rules_multisample_eval_20261109_v1/report.md)、[评价量诊断](../../experiments/synthetic_cpu/c3a_distribution_metric_sanity_cpu_20261109_v1/report.md)、[样本数诊断](../../experiments/synthetic_cpu/c3a_distribution_draw_count_cpu_20261109_v1/report.md)、[图像空间依赖指标诊断](../../experiments/synthetic_cpu/c3a_image_distribution_metrics_cpu_20261109_v1/report.md)及[C3-A 源码/协议审查](C3A_MULTI_SAMPLE_DEPENDENCE_AUDIT_20261107.md)。
+
+## SAR-only 联合去斑/超分已有非生成式直接先例 — 2026-11-07
+
+Amieva 等人的 IW→SM 研究是直接 SAR 联合恢复先例，因此“此前没有 SAR 联合去斑和超分工作”不是可用的宽泛研究缺口。当前仍需回答的是本地归一化 PNG/noisy pseudo-target 设置下的任务匹配比较、光学增量效用及其失效边界；该论文没有 optical 或错配实验，不能提供这些证据。其整集百分位先于拆分的评估边界也应保留。见 D-2026-11-07-055 与[全文审查](../../experiments/literature_audits/amieva_direct_fulltext_followup_20261107_v1/report.md)。
+
+## SAR 联合扩散先例边界需等待 IOP 正文 — 2026-11-07
+
+一个 IOP DOI 线索的题名直接指向 SAR 联合去斑与超分，但 IOP 正文与可验证作者稿尚未取得；现有仅为 ResearchGate 摘要级二手信息。该线索足以要求避免宽泛“无直接先例”表述，却不足以确认方法、比较协议或结果。优先等待新的可验证全文路径，期间不把二手摘要当作本地方法设计依据。见[来源复核](../../experiments/literature_audits/frequency_enhanced_sar_jdsr_source_check_20261107_v1/report.md)。
+
+## 生成式 SAR 超分辨率须区分单样本与均值点估计 — 2026-11-07
+
+MONTI 2026 的 SAR 两阶段潜扩散作者稿报告结构超分后生成散斑，并展示像素均值可提升 PSNR/SSIM；该均值会改变原生成分布，不能当作单个生成样本。独立 Gamma CPU 诊断验证，在理想独立乘性噪声下 K 样本均值的方差按 `1/K` 缩小、ENL 按 K 增长。此观察只限解析合成模型。现有 C3-A 多 draw 评价采用逐次指标汇总，边界正确；真实模型的样本分布与波动仍待训练后评价。见[全文审查](../../experiments/literature_audits/monti_two_stage_sar_sr_20261107_v2/report.md)和[CPU 诊断](../../experiments/synthetic_cpu/c3a_sample_mean_variance_cpu_20261107_v1/report.md)。
+
+相关性补充实验进一步显示，该均值收益依赖 draw 间独立性：共同 Gamma 分量模型中，K=8 的 PSNR 增益随相关系数 ρ 从 0 增至 0.5、0.9、1，约从 9.03 dB 降到 2.49、0.40、0 dB。真实模型的 draw 相关性仍未知；不能把独立噪声的收益推广到模型样本。见[相关 draw 诊断](../../experiments/synthetic_cpu/c3a_correlated_draw_mean_cpu_20261107_v1/report.md)。
+
+当前 C3-A v3 evaluator 不估计显式 draw 依赖，也不保留预测图用于事后求像素均值；这是冻结协议范围，不是缺陷。真实任务若要估算 draw 依赖或均值点估计，需在预测生成前另行冻结采样数、指标与存储/在线统计规则；当前 C3-A 结果不支持这些后设分析。见[协议/源码审查](C3A_MULTI_SAMPLE_DEPENDENCE_AUDIT_20261107.md)。
+
+## SAR-to-optical 条件 flow 已有先例；SAR 输出 JDSR 问题仍未回答 — 2026-11-07
+
+ICLR 2026 ML4RS Workshop 作者稿描述以 SAR latent 为条件的 flow matching 光学生成；IEEE Xplore 有同题名 GRSL Early Access 记录。通用 SAR 条件 flow 与结构一致性不能单独构成本项目新颖性。该工作生成 optical，而不做 SAR 输出去斑/超分或使用 optical 辅助 SAR 恢复；因此本地 Q1/C3-A 仍须由匹配 SAR-only 对照、冻结数据协议和模型实验回答。期刊全文与 workshop 版本对应、按场景分组的拆分尚未核实。见 D-2026-11-07-050 和[来源审查](../../experiments/literature_audits/sar_conditioned_flow_sar_to_optical_review_20261107_v1/report.md)。
+
+## 条件扩散 SAR 去斑已有直接先例，联合 SR 与 optical 价值仍未解决 — 2026-11-07
+
+DiffusionSAR 的一手全文表明，以观测 SAR 为条件的扩散去斑、Gamma speckle 合成及其 log-Yeo–Johnson 噪声变换已有工作。该文没有 SAR 超分或 inference-time optical，故不能将宽泛去斑扩散作为本地独占主张；本项目仍待检验联合去斑/超分任务收益、表示域适配与 optical 的增量价值/失效边界。当前 C3-A 训练暂停且效果未知，不构成反证或支持。详见 D-2026-11-07-026 与[全文审查](../../experiments/literature_audits/diffusionsar_conditional_sar_despeckling_fulltext_20261107_v1/report.md)。
+
+## C1 v2 train/development 官方文件来源链已核实，地理交叉表仍缺 — 2026-11-07
+
+冻结协议、暂存脚本和 manifest 将 C1 v2 train/development 的 3,600 个文件连接到 TUM MediaTUM 条目 1436631，并记录官方 SHA-512 文件校验。旧 `fixed_train_dev2k` / `fixed_val_dev2k` 审计的零精确匹配只适用于其历史输入，不适用于 C1 v2；`./data/` 数字命名子集仍未映射。现有清单没有坐标、日期、轨道或 patch footprint，故不能声称地理/采集独立，也不能排除局部空间重叠。在线 TUM/OAI-PMH 当前 HTTP 429 只阻止刷新，不覆盖已保存的获取记录。见 D-2026-11-07-009 和[C1 来源链核查](C1_OFFICIAL_SOURCE_METADATA_AUDIT_20261107.md)。
+
+## C2 零背景对比差只能描述既有失败样本 — 2026-11-07
+
+已对 6 条 development 零目标背景中位数记录应用零安全均值/中位数对比差，但样本由旧指标失败筛选、每条件仅 1–2 条且总计 2 个来源组。该方法补足了“分母为零时如何描述目标—背景差”的指标缺口，没有解除原 C2 fail-closed，也没有回答完整开发集或独立来源上的 optical 增量效用。后续若将该合同扩展到更多 development 样本，须另行预登记并明确它只是复用 development 的描述分析；不得把本次结果用于晋级或物理一致性主张。见 D-2026-11-07-005。
+
+## C1 v2 来源组拆分通过元数据互斥核验；地理独立仍是开放缺口 — 2026-11-07
+
+冻结清单的三个角色按 `source_group_id` 互斥，train/development 的样本路径和官方文件哈希也互斥。裸 `scene_id`/`patch_id` 有跨季节根目录复用，不能据此认定身份重叠；同时，现有元数据没有坐标、采集日期或 patch footprint。因此可报告来源场景文件夹级隔离，不能上升为地理/采集独立或无部分空间重叠。该拆分事实不支持任何 SAR 质量或 optical utility 假设。详见 D-2026-11-07-003。
+
+## 通用流逆问题与生成式 SAR 回波成像不是本地 PNG-JDSR 证据 — 2026-11-07
+
+MS-Flow 已在通用图像逆问题中使用多重射击流轨迹优化，并报告自然图像超分；UAV SAR Imaging 预印本已在复数反射率与 MIMO-OFDM 回波模型下使用扩散后验重建。因而不能把“流模型求逆问题”“生成先验加观测一致性”或“SAR 扩散成像”单独概括为本项目新颖性。本项目尚待回答的是其固定 8-bit 表示域 SAR 栅格、noisy pseudo-target、optical 条件与失配/可靠性边界下的具体问题；这些先例没有给出本地有效性或 optical 增益证据。当前训练暂停使 C3-A 尚无质量结果，不能越过 C3 gate 推进 C4/C5/C6。见 D-2026-11-07-002 与[文献审查](../../experiments/literature_audits/sar_echo_and_flow_trajectory_prior_art_20261107_v1/report.md)。
+
 ## C3-A 条件采样稳定性尚无本地观察 — 2026-11-05 17:24（中国标准时间）
 
 原 C3-A 单次固定噪声筛选不足以估计同一 checkpoint 的采样波动，因此已冻结四次 draw 的 development 补充协议。复核后在任何载荷访问前发布 v2，加入由固定 LR/noisy pseudo-target 生成并复用于所有方法/采样的 edge mask、EPI、边缘强度比及 mask manifest。AISAR C3-A 专项测试 18 项通过，加入共用 evaluator 回归后合计 44 项通过；GPU 等待会话 `77673` 最近观察到 4 个计算进程和 1,186/4,096 MiB 空闲，训练和完整 development 指标均未运行。该复用 development 的描述性诊断不构成独立泛化或后验校准证据。见[协议 v2](../../protocols/mmcanet_phase_c3a/multi_sample_stability_c1_v2_20261105_v2.json)与[等待记录](../../experiments/diagnostics/c3a_gpu_wait_20261105_v3/manifest.json)。
@@ -528,17 +592,16 @@ The official program confirms the paper's title, authors, and oral slot; its man
 The direct joint-SAR title *Frequency-enhanced diffusion prior network for joint SAR image despeckling and super-resolution* has bibliographic metadata confirmed by Crossref, which exposes official IOP HTML/PDF links. Current metadata-only requests reach a publisher bot-manager challenge; bounded author-repository searches found no manuscript or code. OpenAlex lists only the IOP PDF, no repository full text, and a CC BY-NC-ND tag not verified against the article-specific IOP terms; Crossref's license URI points to IOP's general copyright/permissions page, so rights remain unresolved. Secondary method/result text remains excluded, and the method, data, protocol, and claims are unverified. See D-2026-10-28-011/014/015/016 and the [route audit](../../experiments/literature_audits/frequency_enhanced_joint_sar_diffusion_lead_20261026_v1/report.md).
 
 
-## Optical-derived synthetic training references leave inference-time utility open — 2026-10-28
+## 2026-10-28 光学派生训练参考未回答推理时效用
 
-MONet demonstrates a synthetic training-data route that starts from grayscale optical imagery, but the model receives SAR alone at inference. Its follow-up compares alternative training-reference sources without resolving whether an aligned optical image improves a matched SAR-only joint-restoration baseline. Thus prior optical use in SAR despeckling training narrows broad novelty wording but leaves local H1, joint SR, geometric-mismatch tolerance, and fallback untested. See D-2026-10-28-049 and the [audit](../../experiments/literature_audits/monet_optical_training_reference_20261028_v1/report.md).
-
+MONet 展示了从灰度光学影像构造合成训练数据的路线，但推理时模型只接收 SAR。其后续工作比较了不同训练参考来源，却没有回答配准光学影像是否能优于匹配的 SAR-only 联合恢复基线。因此，已有光学训练参考会收窄宽泛的新颖性表述，但本地 H1、联合超分、几何错配容忍度和回退能力仍未检验。见 D-2026-10-28-049 和[审查记录](../../experiments/literature_audits/monet_optical_training_reference_20261028_v1/report.md)。
 ## 2026-10-30 补充缺口：物理先验与 SAR 后验之间的桥接
 
 已找到 PDE 生成的物理约束先例（CoCoGen、PISD）和精确硬约束后验测度的预印本讨论（CoCoS），但尚无本项目任务下的直接证据。仍待回答：当前归一化 PNG 对应什么可核验的观测模型；方程残差能否表示 SAR 成像/退化约束；约束引导是否保持亮散射点和结构；光学条件在约束生成中是否造成负迁移。上述问题在既有数据来源、C2 验收和 B1 晋级条件完成前不转成训练计划。
 
 ## 2026-10-30 补充缺口：直接恢复先例后的可检验差异
 
-已有 SAR-only 联合去斑/超分、光学引导 SAR 联合恢复、自然图像参考可靠性扩散和通用少步求解先例。仍需解决的开放问题是：正确 optical 在可信来源组上是否产生独立增益；生成式模型是否优于确定性 SAR-only/JDSR 控制；哪些光学信号在错配时可安全抑制；当前表示域能否支持有根据的观测一致性；效率收益是否不损害 SAR 结构。另有一项 2026 区域专用扩散 SAR JDSR DOI 线索待正式来源核验。
+已有 SAR-only 联合去斑/超分、光学引导 SAR 联合恢复、自然图像参考可靠性扩散和通用少步求解先例。仍需解决的开放问题是：正确 optical 在可信来源组上是否产生独立增益；生成式模型是否优于确定性 SAR-only/JDSR 控制；哪些光学信号在错配时可安全抑制；当前表示域能否支持有根据的观测一致性；效率收益是否不损害 SAR 结构。另有 RSDM/LSIR 的 2026 年 DOI 10.1109/JSTARS.2026.3655710 线索，DOAJ 二手索引将其描述为区域专用扩散的 SAR 联合超分/去斑框架；项目既有记录已审阅 ResearchGate 作者稿并描述其作者报告级方法/结果；本轮未重开作者稿，IEEE/DOI 正式正文与版本对应仍未核实。arXiv 有界搜索未命中且官方搜索页/API 受限，不能据此排除预印本。该条目保持为已读作者稿、正式出版来源未核实的先例。详见[来源复核](../../experiments/literature_audits/region_specific_sar_jdsr_source_recheck_20261107_v1/report.md)。
 
 
 ## 2026-10-30 新增数据证据缺口
@@ -557,3 +620,13 @@ C1/C2 的载荷/来源证明及 C2 执行 runner 是进入后续方法比较的�
 ## 2026-11-06 补充：C3-A 等待恢复但仍无方法结果
 
 v7 等待会话已不存在，训练没有启动；旧入口固定写入既有目录，现已加入唯一运行编号并以 v8 恢复等待。最新 GPU 快照仍低于门槛，train/development 影像载荷未读取，故关于 SAR-only Flow 的质量、采样稳定性和效率仍没有本地观察。FIRM 当前 v2 题名校订不改变该方法缺口。见[实验登记](EXPERIMENT_REGISTRY.md)、[v8 等待 manifest](../../experiments/diagnostics/c3a_gpu_wait_20261106_v8/manifest.json)和[条件流文献审计](../../experiments/literature_audits/flow_operator_posterior_support_20261105_v1/report.md)。
+
+
+## 通用 Flow Matching 后验路线的先例范围已更新 — 2026-11-07
+
+FlowSGS 与 FMPS 的一手全文已补入相关工作矩阵。两者覆盖通用 flow 先验后验求解、似然/先验分步采样或速度场条件校正，但均未解决本项目 SAR 表示域观测模型、配对光学对 SAR 输出的独立价值及散射结构保真。研究缺口应限定在经数据协议验证的任务条件 SAR 重建与光学增量证据，不再把通用 flow 后验或数据一致性作为独立创新。此次文献审查不改变 Q1–Q6 假设状态、C2 gate 或 C3-A 结果。详见[审查记录](../../experiments/literature_audits/flow_inverse_methods_update_20261107_v1/report.md)。
+
+
+## 2026-11-07 补充缺口：乘性噪声 SDE 与本地退化的统计桥接
+
+已核实一项以对数正态乘性噪声为假设的扩散去噪先例，但其数据不是 SAR，也不研究 optical guidance 或联合超分。即使在 `L=8` 下匹配 Gamma 与对数正态乘子的均值、方差，两者偏度和尾部仍不同。尚无证据把该 SDE 解释为本地 normalized PNG Gamma 退化的似然或真实 SAR 观测模型；本地表示与物理量关系仍开放。详见[全文审查](../../experiments/literature_audits/multiplicative_noise_sde_fulltext_20261107_v1/report.md)及[纯合成对照](../../experiments/diagnostics/multiplicative_noise_distribution_cpu_20261107_v1/report.md)。

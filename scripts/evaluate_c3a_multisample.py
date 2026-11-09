@@ -46,10 +46,10 @@ from scripts.run_phase_c3a_sar_flow import (
     sha256_file,
 )
 
-EVALUATION_PROTOCOL = ROOT / "protocols/mmcanet_phase_c3a/multi_sample_stability_c1_v2_20261105_v2.json"
+EVALUATION_PROTOCOL = ROOT / "protocols/mmcanet_phase_c3a/multi_sample_stability_c1_v2_20261105_v3.json"
 TRAIN_PROTOCOL = ROOT / "protocols/mmcanet_phase_c3a/sar_only_flow_c1_v2_20261105_v1.json"
-OUTPUT_PATH = ROOT / "experiments/diagnostics/c3a_multi_sample_eval_c1_v2_20261105_v2"
-EXPECTED_EVALUATION_PROTOCOL_SHA256 = "8d886f26023f9d929265b3f70ad9f51314f94788b1e4a01f269af5c1f0a589fc"
+OUTPUT_PATH = ROOT / "experiments/diagnostics/c3a_multi_sample_eval_c1_v2_20261105_v3"
+EXPECTED_EVALUATION_PROTOCOL_SHA256 = "ee83e2cb4dadea7d4fca6576e479d2922d70df44935f1be51116add26e06016c"
 
 
 def draw_noise_for_identity(
@@ -66,6 +66,33 @@ def draw_noise_for_identity(
     generator = torch.Generator(device=device)
     generator.manual_seed(local_seed)
     return torch.randn((1, 1, 256, 256), generator=generator, device=device)
+
+
+def _attach_clip_range_components(
+    rows: list[dict[str, Any]], raw_prediction: torch.Tensor
+) -> None:
+    """区分原始输出低于 0 与高于 1 的比例，保留既有总裁剪比例。"""
+    if (
+        raw_prediction.ndim != 4
+        or raw_prediction.shape[1] != 1
+        or raw_prediction.shape[0] != len(rows)
+        or not torch.is_floating_point(raw_prediction)
+        or not torch.isfinite(raw_prediction).all()
+    ):
+        raise ValueError("原始预测必须是与逐图记录对齐的有限 [B,1,H,W] 浮点张量")
+    lower = (raw_prediction < 0.0).flatten(start_dim=1).float().mean(dim=1).cpu().tolist()
+    upper = (raw_prediction > 1.0).flatten(start_dim=1).float().mean(dim=1).cpu().tolist()
+    for row, lower_fraction, upper_fraction in zip(rows, lower, upper):
+        total_fraction = float(row["最终裁剪比例"])
+        if not math.isfinite(total_fraction) or not math.isclose(
+            lower_fraction + upper_fraction,
+            total_fraction,
+            rel_tol=1e-6,
+            abs_tol=1e-7,
+        ):
+            raise ValueError("上下界越界比例之和与既有总裁剪比例不符")
+        row["原始输出低于0比例"] = float(lower_fraction)
+        row["原始输出高于1比例"] = float(upper_fraction)
 
 
 def aggregate_multi_sample_metrics(
@@ -113,15 +140,31 @@ def aggregate_multi_sample_metrics(
         ):
             raise ValueError(f"样本 {sample_id} 的 flow/baseline 身份/来源组/patch 不一致")
 
+        for row in [*rows, baseline]:
+            total_clip = float(row["最终裁剪比例"])
+            lower_clip = float(row["原始输出低于0比例"])
+            upper_clip = float(row["原始输出高于1比例"])
+            if (
+                not all(math.isfinite(value) and 0.0 <= value <= 1.0 for value in (total_clip, lower_clip, upper_clip))
+                or not math.isclose(lower_clip + upper_clip, total_clip, rel_tol=1e-6, abs_tol=1e-7)
+            ):
+                raise ValueError(f"样本 {sample_id} 的上下界越界比例之和与总裁剪比例不符")
+
         psnr_values = np.asarray([float(row["PSNR"]) for row in rows], dtype=np.float64)
         ssim_values = np.asarray([float(row["SSIM"]) for row in rows], dtype=np.float64)
         epi_values = np.asarray([float(row["EPI"]) for row in rows], dtype=np.float64)
         edge_strength_values = np.asarray([float(row["边缘强度比"]) for row in rows], dtype=np.float64)
         pixel_std_values = np.asarray([float(row["预测像素标准差均值"]) for row in rows], dtype=np.float64)
+        lower_clip_values = np.asarray([float(row["原始输出低于0比例"]) for row in rows], dtype=np.float64)
+        upper_clip_values = np.asarray([float(row["原始输出高于1比例"]) for row in rows], dtype=np.float64)
         baseline_psnr = float(baseline["PSNR"])
         baseline_ssim = float(baseline["SSIM"])
         baseline_epi = float(baseline["EPI"])
         baseline_edge_strength = float(baseline["边缘强度比"])
+        baseline_lower_clip = float(baseline["原始输出低于0比例"])
+        baseline_upper_clip = float(baseline["原始输出高于1比例"])
+        clip_total_values = np.asarray([float(row["最终裁剪比例"]) for row in rows], dtype=np.float64)
+        baseline_clip_total = float(baseline["最终裁剪比例"])
         values = np.concatenate(
             (
                 psnr_values,
@@ -129,7 +172,18 @@ def aggregate_multi_sample_metrics(
                 epi_values,
                 edge_strength_values,
                 pixel_std_values,
-                [baseline_psnr, baseline_ssim, baseline_epi, baseline_edge_strength],
+                clip_total_values,
+                lower_clip_values,
+                upper_clip_values,
+                [
+                    baseline_psnr,
+                    baseline_ssim,
+                    baseline_epi,
+                    baseline_edge_strength,
+                    baseline_clip_total,
+                    baseline_lower_clip,
+                    baseline_upper_clip,
+                ],
             )
         )
         if not np.isfinite(values).all():
@@ -152,6 +206,10 @@ def aggregate_multi_sample_metrics(
                 "Flow EPI 样本标准差": float(epi_values.std(ddof=1)),
                 "Flow 平均边缘强度比": float(edge_strength_values.mean()),
                 "Flow 边缘强度比样本标准差": float(edge_strength_values.std(ddof=1)),
+                "Flow 平均原始输出低于0比例": float(lower_clip_values.mean()),
+                "Flow 低端越界比例样本标准差": float(lower_clip_values.std(ddof=1)),
+                "Flow 平均原始输出高于1比例": float(upper_clip_values.mean()),
+                "Flow 高端越界比例样本标准差": float(upper_clip_values.std(ddof=1)),
                 "平均预测像素标准差": float(pixel_std_values.mean()),
                 "baseline PSNR": baseline_psnr,
                 "平均配对 ΔPSNR": float(psnr_values.mean() - baseline_psnr),
@@ -160,6 +218,8 @@ def aggregate_multi_sample_metrics(
                 "baseline EPI": baseline_epi,
                 "平均配对 ΔEPI": float(epi_values.mean() - baseline_epi),
                 "baseline 边缘强度比": baseline_edge_strength,
+                "baseline 原始输出低于0比例": baseline_lower_clip,
+                "baseline 原始输出高于1比例": baseline_upper_clip,
             }
         )
     return summaries
@@ -197,14 +257,63 @@ def group_bootstrap_summary(
     }
 
 
+def _group_bootstrap_settings(
+    protocol: dict[str, Any],
+) -> tuple[tuple[str, ...], int, int, int]:
+    metrics = protocol.get("metrics")
+    data = protocol.get("data")
+    if not isinstance(metrics, dict) or not isinstance(data, dict):
+        raise ValueError("C3-A 协议缺少 bootstrap 指标或数据配置")
+    metric_names = metrics.get("group_bootstrap_metrics")
+    repeats = metrics.get("bootstrap_repeats")
+    seed = metrics.get("bootstrap_seed")
+    expected_groups = data.get("source_group_count")
+    if (
+        not isinstance(metric_names, list)
+        or not metric_names
+        or any(not isinstance(name, str) or not name for name in metric_names)
+        or len(set(metric_names)) != len(metric_names)
+    ):
+        raise ValueError("C3-A 协议的来源组 bootstrap 指标列表无效")
+    if not isinstance(repeats, int) or isinstance(repeats, bool) or repeats <= 0:
+        raise ValueError("C3-A 协议的 bootstrap 重复次数无效")
+    if not isinstance(seed, int) or isinstance(seed, bool) or seed < 0:
+        raise ValueError("C3-A 协议的 bootstrap seed 无效")
+    if (
+        not isinstance(expected_groups, int)
+        or isinstance(expected_groups, bool)
+        or expected_groups < 2
+    ):
+        raise ValueError("C3-A 协议的来源组数量无效")
+    return tuple(metric_names), repeats, seed, expected_groups
+
+
+def summarize_group_bootstrap_metrics(
+    rows: list[dict[str, Any]], protocol: dict[str, Any]
+) -> dict[str, dict[str, Any]]:
+    metric_names, repeats, seed, expected_groups = _group_bootstrap_settings(protocol)
+    group_ids = {str(row.get("来源组 ID", "")) for row in rows}
+    if "" in group_ids or len(group_ids) != expected_groups:
+        raise ValueError("来源组数量与冻结协议不一致")
+    return {
+        metric: group_bootstrap_summary(rows, metric=metric, seed=seed, repeats=repeats)
+        for metric in metric_names
+    }
+
+
 def _read_protocol() -> tuple[dict[str, Any], str]:
     raw = EVALUATION_PROTOCOL.read_bytes()
     digest = hashlib.sha256(raw).hexdigest()
     if EXPECTED_EVALUATION_PROTOCOL_SHA256 and digest != EXPECTED_EVALUATION_PROTOCOL_SHA256:
         raise ValueError("多次采样诊断协议哈希不匹配")
     protocol = json.loads(raw)
-    if protocol.get("format") != "c3a_multi_sample_stability_protocol_v2":
+    if protocol.get("format") != "c3a_multi_sample_stability_protocol_v3":
         raise ValueError("多次采样诊断协议格式不匹配")
+    if not {"原始输出低于0比例", "原始输出高于1比例"}.issubset(
+        set(protocol.get("metrics", {}).get("per_draw", []))
+    ):
+        raise ValueError("多次采样协议缺少上下界越界比例定义")
+    _group_bootstrap_settings(protocol)
     return protocol, digest
 
 
@@ -478,6 +587,7 @@ def evaluate_multi_sample(
                 raise FloatingPointError("多次采样输出尺寸不符或含 NaN/Inf")
             clipped_predictions.append(raw.clamp(0.0, 1.0))
             draw_rows = _metric_rows(raw, raw, target, batch, method_name="C3-A SAR-only Flow")
+            _attach_clip_range_components(draw_rows, raw)
             structural_rows = _batch_edge_metrics(raw, target, edge_masks)
             for row, structural in zip(draw_rows, structural_rows):
                 row["采样编号"] = draw_index
@@ -517,6 +627,7 @@ def evaluate_baseline_with_structure(
         if raw.shape != target.shape or not torch.isfinite(raw).all():
             raise FloatingPointError("C2 SAR-only baseline 输出尺寸不符或含 NaN/Inf")
         batch_rows = _metric_rows(raw, raw, target, batch, method_name="C2 SAR-only")
+        _attach_clip_range_components(batch_rows, raw)
         structural_rows = _batch_edge_metrics(
             raw, target, _edge_masks_for_batch(batch, edge_masks_by_id)
         )
@@ -524,7 +635,7 @@ def evaluate_baseline_with_structure(
             row.update(structural)
         rows.extend(batch_rows)
         if batch_index % 10 == 0 or batch_index == len(loader):
-            print(f"SAR-only baseline 评价进度：{batch_index}/{len(loader)} 批。", flush=True)
+            print(f"仅 SAR 基线评价进度：{batch_index}/{len(loader)} 批。", flush=True)
     torch.cuda.synchronize(device)
     return rows, time.perf_counter() - started
 
@@ -559,7 +670,7 @@ def _run(run_dir: Path) -> int:
     code_sha256 = {name: sha256_file(path) for name, path in code_paths.items()}
     OUTPUT_PATH.mkdir(parents=True, exist_ok=False)
     manifest: dict[str, Any] = {
-        "format": "c3a_multi_sample_stability_result_v2",
+        "format": "c3a_multi_sample_stability_result_v3",
         "run_id": OUTPUT_PATH.name,
         "status": "running",
         "started_utc": started_utc,
@@ -580,6 +691,7 @@ def _run(run_dir: Path) -> int:
         "function_evaluations_per_draw": int(protocol["sampling"]["function_evaluations_per_draw"]),
         "determinism": protocol["determinism"],
         "structural_metric_protocol": protocol["metrics"]["structural"],
+        "clip_component_protocol": protocol["metrics"]["clip_component_definition"],
         "development_payload_accessed": False,
         "baseline_runtime_seconds": None,
         "flow_runtime_seconds": None,
@@ -664,7 +776,18 @@ def _run(run_dir: Path) -> int:
         _csv_write(
             OUTPUT_PATH / "baseline_metrics.csv",
             baseline_rows,
-            ["样本 ID", "来源组 ID", "patch ID", "PSNR", "SSIM", "EPI", "边缘强度比", "最终裁剪比例"],
+            [
+                "样本 ID",
+                "来源组 ID",
+                "patch ID",
+                "PSNR",
+                "SSIM",
+                "EPI",
+                "边缘强度比",
+                "最终裁剪比例",
+                "原始输出低于0比例",
+                "原始输出高于1比例",
+            ],
         )
         baseline_parameter_count = sum(parameter.numel() for parameter in baseline_model.parameters())
         baseline_model.to("cpu")
@@ -693,33 +816,25 @@ def _run(run_dir: Path) -> int:
             baseline_rows,
             expected_draws=int(protocol["sampling"]["draws_per_identity"]),
         )
-        bootstrap_seed = int(protocol["statistics"]["bootstrap_seed"])
-        bootstrap_repeats = int(protocol["statistics"]["bootstrap_repeats"])
-        summaries = {
-            metric: group_bootstrap_summary(
-                identity_summary,
-                metric=metric,
-                seed=bootstrap_seed + offset,
-                repeats=bootstrap_repeats,
-            )
-            for offset, metric in enumerate(
-                (
-                    "平均配对 ΔPSNR",
-                    "平均配对 ΔSSIM",
-                    "平均配对 ΔEPI",
-                    "Flow PSNR 样本标准差",
-                    "Flow SSIM 样本标准差",
-                    "Flow EPI 样本标准差",
-                    "Flow 平均边缘强度比",
-                    "平均预测像素标准差",
-                )
-            )
-        }
+        summaries = summarize_group_bootstrap_metrics(identity_summary, protocol)
 
         _csv_write(
             OUTPUT_PATH / "flow_per_draw_metrics.csv",
             flow_rows,
-            ["样本 ID", "来源组 ID", "patch ID", "采样编号", "PSNR", "SSIM", "EPI", "边缘强度比", "最终裁剪比例", "预测像素标准差均值"],
+            [
+                "样本 ID",
+                "来源组 ID",
+                "patch ID",
+                "采样编号",
+                "PSNR",
+                "SSIM",
+                "EPI",
+                "边缘强度比",
+                "最终裁剪比例",
+                "原始输出低于0比例",
+                "原始输出高于1比例",
+                "预测像素标准差均值",
+            ],
         )
         _csv_write(OUTPUT_PATH / "identity_summary.csv", identity_summary, list(identity_summary[0]))
         _json_write(OUTPUT_PATH / "group_bootstrap_summary.json", summaries)

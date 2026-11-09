@@ -1,0 +1,24 @@
+{
+  "运行编号": "c3a_distribution_metric_runtime_cpu_20261109_v1",
+  "运行类型": "合成数组 CPU 评分工具耗时诊断；非模型运行",
+  "开始时间UTC": "2026-11-09T03:43:40.118742+00:00",
+  "结束时间UTC": "2026-11-09T03:43:40.502160+00:00",
+  "命令": "python experiments/synthetic_cpu/c3a_distribution_metric_runtime_cpu_20261109_v1/run.py",
+  "代码提交": "19772c769605fcd90329625003443faaa48c7ca5",
+  "工作树有改动": true,
+  "Python版本": "3.13.5",
+  "NumPy版本": "2.1.3",
+  "平台": "Linux-7.0.0-42-generic-x86_64-with-glibc2.43",
+  "处理器说明": "系统未提供处理器名称",
+  "设备": "CPU",
+  "随机种子": 20261109,
+  "项目数据访问": false,
+  "模型与检查点访问": false,
+  "确认测试载荷访问": false,
+  "文件SHA256": {
+    "协议": "20ddebf383122e6bc18533cf72f626bb742caa3b09f90fe1bb4a9540d0bfe9cd",
+    "脚本": "596373d6d39be30117a986cf11f8b8d8ae35ab149ca9508893a8da498cec39d9",
+    "逐次计时": "7879825e447afbf3a4d647f37fbc9bbce5a1b53e66c96c1e8b98703815d292c7",
+    "汇总结果": "59adbcbfe3cdb3267283624afc74325fdbff6e4c9f61ea9a0b6bdc5bc4e42765"
+  }
+}

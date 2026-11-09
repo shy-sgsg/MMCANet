@@ -1,5 +1,25 @@
 # 光学信息效用分析
 
+## SAR-only 联合恢复论文全文不提供 optical utility 证据 — 2026-11-07
+
+Amieva 等人的研究使用 Sentinel-1 IW 输入与 SM 参考，不使用 optical，也没有 matched/permuted optical 对照。它既不支持也不反证 Q1/Q2；本地 C2 gate 仍未判定，训练暂停状态不变。它只收窄相关 SAR 联合恢复的宽泛新颖性措辞，不能替代本地匹配基线。见 D-2026-11-07-055 与[全文审查](../../experiments/literature_audits/amieva_direct_fulltext_followup_20261107_v1/report.md)。
+
+## C2 全 development 对比差诊断仍不能判定 Q1 — 2026-11-07
+
+按 v5 冻结范围对四种退化条件的全部 200 个 development 样本作 matched/permuted/missing/SAR-only CPU 对照。目标背景中位数为零的记录按条件为 2/2/1/1。matched−SAR-only 来源组等权均值对比误差差分别为 x2_light −0.000191、x2_severe −0.000939、x4_light −0.000862、x4_severe +0.000677；方向依条件改变。该量只描述固定目标—背景对比误差，且 development 已用于训练/选择，不回答总体 optical utility、独立泛化或失败回退。H1/Q1 与 C2 gate 保持开放。见 D-2026-11-07-049 与[报告](../../experiments/diagnostics/c2_all_development_contrast_cpu_20261107_v5/report.md)。
+
+## C2 零背景失败样本的 CPU 对比差观察不更新 Q1/Q2 — 2026-11-07
+
+对既有 6 条零目标背景中位数的 development 失败记录，在冻结 matched/permuted/missing/SAR-only 控制下计算零安全目标—背景均值/中位数对比差。matched−SAR-only 的误差差值在 x2 两条件均略为负；x4_light 的均值误差差为负但中位数误差差为正，x4_severe 则相反。每条件仅 1–2 条、总计 2 个来源组，且样本由原指标失败选出；该结果仅解释这类分母失败，不构成整体 optical utility 或失配回退证据。H1/Q1 与 C2 gate 均不更新。没有读取 confirmation/test 载荷或指标。详见 D-2026-11-07-005 与[诊断报告](../../experiments/diagnostics/c2_zero_background_contrast_cpu_20261107_v4/report.md)。
+
+## C1 v2 拆分元数据复核不新增 optical utility 证据 — 2026-11-07
+
+此次只核验 train/development/confirmation 的角色、来源组和文件身份元数据，没有打开 optical 图像、计算 optical 指标或分析光学条件。Q1/Q2 与 matched-optical 增益判断均不更新；C2 gate 仍未判定，C3-A 训练暂停。详见 D-2026-11-07-003。
+
+## 近期流逆问题与 SAR 后验成像文献不更新 optical utility — 2026-11-07
+
+本次核对的 MS-Flow 与 UAV SAR Imaging 均未使用 optical 条件；它们不检验 optical 对 SAR 栅格恢复的增量贡献、错配影响或无光学回退。因此 Q1/Q2 仍由既有本地证据和 gate 状态约束：C2 gate 未判定，C3-A 尚无模型结果，不能据此声称 optical 有效或无效。详见 D-2026-11-07-002 与[文献审查](../../experiments/literature_audits/sar_echo_and_flow_trajectory_prior_art_20261107_v1/report.md)。
+
 ## C3-A SAR-only flow 不新增 optical utility 证据 — 2026-11-05
 
 当前预登记的 `x2_light` Flow Matching 筛选只读取 SAR LR 与 noisy pseudo-target，不将 optical 作为输入，也不估计 optical 特征贡献。因此它不改变 Q1/Q2：confirmation 描述性复核仍未观察到达到门槛的 matched-optical 增益，development 也已用于选模；C3-A 尚无训练或完整 development 评价结果。补充协议 v2 将量化 SAR-only Flow 的条件采样波动及 pseudo-target 固定边缘区域上的表示域指标，不使用 optical。后续 optical 方法仍须建立在任务匹配 SAR-only baseline 和新的开发集协议上。见 D-2026-11-05-012 与[实验登记](EXPERIMENT_REGISTRY.md)。
@@ -568,3 +588,13 @@ HSFMamba 提供了光学引导 SAR 联合超分/去噪的直接发表先例；OG
 ## 2026-11-06 光学效用假设状态
 
 C3-A 仍只读取 SAR LR 与 noisy pseudo-target。v8 等待尚未开始训练，因此本轮没有新增 optical 效用或 SAR-only Flow 结果；H1/H2 不变，C2 原 gate 仍未判定，optical-conditioned C3-B 不启动。FIRM/Twist Flow 的文献更新均未检验 SAR–optical 增量效用或错配回退。数据和资源边界见[v8 等待 manifest](../../experiments/diagnostics/c3a_gpu_wait_20261106_v8/manifest.json)。
+
+
+## 2026-11-07 文献更新边界
+
+本轮新增的 FlowSGS 与 FMPS 是通用 flow 逆问题/条件采样工作，没有测试 optical–SAR 对应关系或 SAR 输出。它们不改变光学信息增益、可迁移结构或错配负迁移的本地假设与证据状态。
+
+
+## 2026-11-07 补充：乘性噪声 SDE 文献不构成光学引导证据
+
+ICMLA 2025 的乘性噪声去噪工作把 UC Merced Land Use 用作跨数据集测试，但没有将 optical 与 SAR 配对输入模型，也没有测量 optical 相对 SAR-only 基线的增益。因此它不能支持或否定本项目 Q1/Q2；相关证据状态不变。见[文献全文审查](../../experiments/literature_audits/multiplicative_noise_sde_fulltext_20261107_v1/report.md)。

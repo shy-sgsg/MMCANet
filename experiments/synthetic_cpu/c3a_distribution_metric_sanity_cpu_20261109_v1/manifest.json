@@ -1,0 +1,27 @@
+{
+  "运行编号": "c3a_distribution_metric_sanity_cpu_20261109_v1",
+  "运行类型": "合成数据CPU诊断；非模型运行",
+  "开始时间UTC": "2026-11-09T02:28:31.569821+00:00",
+  "结束时间UTC": "2026-11-09T02:28:33.711660+00:00",
+  "命令": "python experiments/synthetic_cpu/c3a_distribution_metric_sanity_cpu_20261109_v1/run.py",
+  "代码提交": "19772c769605fcd90329625003443faaa48c7ca5",
+  "工作树有改动": true,
+  "Python版本": "3.13.5",
+  "NumPy版本": "2.1.3",
+  "平台": "Linux-7.0.0-42-generic-x86_64-with-glibc2.43",
+  "设备": "CPU",
+  "随机种子": 20261109,
+  "确认测试载荷访问": false,
+  "项目影像载荷访问": false,
+  "模型与检查点访问": false,
+  "输入": [
+    "protocol.json中的合成分布定义"
+  ],
+  "文件SHA256": {
+    "协议": "ed071014790a87fe182479fe4baa45236a64ed72e3af94bbd9f3c3611f7b10f1",
+    "脚本": "28c1cd7cc539458954072cf4620106d8837f594be4dea72cd28286e38307ba41",
+    "逐重复结果": "b8f9f95f80d184d7b2c61d84622b57795cb1ac990c076a3ef76503afb6bf1040",
+    "汇总结果": "2852e04204821f7f0066c7fe9ac9dcb0e2260d8ac9436544ac5acaf89e1887b7"
+  },
+  "评价器版本": "本目录run.py；评价对象与冻结C3-A v3分离"
+}

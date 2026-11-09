@@ -1,5 +1,41 @@
 # 本项目的扩散方法可行性
 
+## 2026-11-09 已知图像分布下的多样本评价量检查
+
+纯合成 `[0,1]` 图像域 Gamma 边缘构造显示，逐像素 CRPS 能区分均值塌缩和乘性噪声过分散，却不能识别每个像素边缘分布相同、空间依赖错误的共享随机因子候选；归一化整图能量分数和邻接变差分数在该已知案例中可识别该差异。二维双峰诊断同时表明，样本数会影响有限集合分数的波动。评分规则一手来源指出，能量分数虽具适当性，对部分相关结构失配的敏感性可能有限；变差分数对相关结构更敏感，但不是严格适当分数，故不能单独验证完整联合分布。结果只验证指标实现/解释的玩具已知案例，不是扩散或流模型效果、SAR 物理证据、样本校准或推荐 draw 数。C3-A v3 和所有 gate 不变。详见[评分规则来源核验](../../experiments/literature_audits/proper_scoring_rules_multisample_eval_20261109_v1/report.md)、[图像域指标诊断](../../experiments/synthetic_cpu/c3a_image_distribution_metrics_cpu_20261109_v1/report.md)、[二维分布诊断](../../experiments/synthetic_cpu/c3a_distribution_metric_sanity_cpu_20261109_v1/report.md)和[样本数诊断](../../experiments/synthetic_cpu/c3a_distribution_draw_count_cpu_20261109_v1/report.md)。
+
+## 非生成式 SAR 联合恢复先例不更新扩散可行性 — 2026-11-07
+
+Amieva 等人的全文确认直接 SAR-only 联合去斑/超分先例，但其 SAN/ESRT 路线为非生成式，不检验 diffusion/flow 的样本质量、数据项一致性或 SAR-only C3-A 效果。因此它只影响先例边界，不改变生成方法设计、C3-A gate 或训练状态。见 D-2026-11-07-055 与[全文审查](../../experiments/literature_audits/amieva_direct_fulltext_followup_20261107_v1/report.md)。
+
+## IOP 直接 SAR 联合扩散先例线索待全文核实 — 2026-11-07
+
+检索发现题为 *Frequency-enhanced diffusion prior network for joint SAR image despeckling and super-resolution* 的 IOP DOI `10.1088/1361-6501/ae8686`；当前 IOP/DOI 正文路径受限，ResearchGate 只显示摘要级二手信息。故暂把它列作高相关开放先例，不将二手摘要中的级联结构、数据集、指标或效果写成事实，也不据此改 C3 方法设计或 gate。见[来源审查报告](../../experiments/literature_audits/frequency_enhanced_sar_jdsr_source_check_20261107_v1/report.md)。
+
+## 多 draw 像素均值收益依赖输出相关性 — 2026-11-07
+
+共同 Gamma 分量纯合成诊断保持每个 draw 的 `Gamma(L,1/L)` 边际不变，仅改变 draw 间相关系数。K=8 时，PSNR 增益从独立 draw 的约 9.03 dB 降至相关系数 0.5 时约 2.49 dB、0.9 时约 0.40 dB，完全相关时为零。该实验只验证预设数学构造，不代表训练模型 draw 相关性，也不证明样本均值的分布真实性。冻结 C3-A v3 evaluator 逐 draw 计算标量指标、报告像素标准差，不保存均值图或显式依赖统计；这是协议范围而非缺陷。未来若列出均值点估计、分布或依赖估计，须另行预登记并明确所需输出。见[CPU 诊断](../../experiments/synthetic_cpu/c3a_correlated_draw_mean_cpu_20261107_v1/report.md)与[协议/源码审查](C3A_MULTI_SAMPLE_DEPENDENCE_AUDIT_20261107.md)。
+
+## SAR 两阶段潜扩散超分辨率已有全文先例 — 2026-11-07
+
+Lee 与 Son 的 MONTI 2026 非归档作者稿先用超分网络恢复结构，再以盲点去噪和条件潜扩散生成 SAR 散斑。它收窄“SAR 潜扩散超分”及“结构恢复后生成散斑”的宽泛新颖性，但不是本项目的光学引导 JDSR 或 SAR 观测一致性证据。全文还显示，四个输出的像素均值可以比单个扩散样本获得更高 PSNR/SSIM；因此生成样本质量、分布真实性与均方误差点估计需分别报告。当前 C3-A 评价器已经按 draw 计算指标，不平均预测图；不改冻结协议。见[全文审查](../../experiments/literature_audits/monti_two_stage_sar_sr_20261107_v2/report.md)和[Gamma 均值 CPU 诊断](../../experiments/synthetic_cpu/c3a_sample_mean_variance_cpu_20261107_v1/report.md)。
+
+## SAR-to-optical latent flow 是反向输出任务先例 — 2026-11-07
+
+SAR 条件 flow matching 已用于从 SAR latent 生成 optical latent，并以 ODE 输出 optical 图像。它说明通用 SAR 条件 flow 和笼统的结构保持说法不能作为独占贡献；但它不验证由 SAR 观测恢复 SAR 图像、联合去斑/超分、optical 对 SAR 输出的增量价值或观测一致性。C3-A 本地 SAR-only Flow 效果仍未知，训练暂停期间不据该文调整模型或 gate。详见[一手审查](../../experiments/literature_audits/sar_conditioned_flow_sar_to_optical_review_20261107_v1/report.md)。
+
+## DiffusionSAR 已覆盖条件扩散 SAR 去斑，不等于本地 JDSR 证据 — 2026-11-07
+
+2024 年 TGRS 的 DiffusionSAR 以带斑 SAR 观测为条件，采用 Gamma speckle 合成数据和 log-Yeo–Johnson 处理，并在多时相 SAR 上微调。它说明宽泛的“扩散 SAR 去斑”已有直接先例；但它不做 SR，推理不使用匹配 optical，也不验证本地 8-bit PNG/noisy pseudo-target 或 SR 观测一致性。论文真实数据的 single-look intensity/SLC 术语不一致，需避免将产品物理域当成已确定。C3-A 仍需按冻结协议回答本地任务条件流是否可行；当前训练暂停，本轮不移植其变换或改协议。见 D-2026-11-07-026 与[全文审查](../../experiments/literature_audits/diffusionsar_conditional_sar_despeckling_fulltext_20261107_v1/report.md)。
+
+## 拆分身份元数据复核不改变扩散方法判断或阶段门槛 — 2026-11-07
+
+C1 v2 的 source group 与文件身份元数据互斥支持既有 train/development 使用边界，但不提供生成模型质量、扩散/Flow 方法适配性或观测似然证据。C3-A 仍无真实训练结果，C4/C6 不因该数据审计提前启动；见 D-2026-11-07-003。
+
+## 新增 SAR 回波域扩散后验与流轨迹优化先例 — 2026-11-07
+
+[UAV SAR Imaging via Diffusion Posterior Sampling](https://arxiv.org/abs/2610.14516) 报告在 MIMO-OFDM SAR 回波算子和复数反射率变量上做扩散后验成像，并联合处理未知轨迹误差；当前可核验来源是 2026-10-10 的 arXiv v1 预印本，具体效果为作者仿真报告。[MS-Flow](https://proceedings.mlr.press/v306/denker26a.html) 是 ICML 2026 的通用流先验逆问题求解方法，以中间轨迹状态和多重射击优化降低对全轨迹反传的依赖。两者分别属于物理回波成像和通用潜变量流逆问题，不等于本地固定退化下的条件 SAR 去斑/超分模型。没有原始复数回波和定标信息时，不将 UAV 论文的似然直接移植至本地 8-bit PNG，也不以这些文献解锁 C4 或 C6。全文边界见[审查报告](../../experiments/literature_audits/sar_echo_and_flow_trajectory_prior_art_20261107_v1/report.md)。
+
 ## C3-A 补充采样结构诊断已冻结 v2；资源等待继续 — 2026-11-05 17:24（中国标准时间）
 
 多次采样协议 v2（SHA-256 `8d886f26023f9d929265b3f70ad9f51314f94788b1e4a01f269af5c1f0a589fc`）除每身份四次固定噪声 draw 外，固定并复用来自 LR/noisy pseudo-target 的 edge mask，报告 EPI、边缘强度比及 mask manifest。这些指标仅反映开发集 pseudo-target 表示域中的结构相似性。AISAR C3-A 专项测试 18 项通过，加入共用 evaluator 回归后合计 44 项通过；等待会话 `77673` 最近观察到 4 个 CUDA 进程、1,186/4,096 MiB 空闲，尚无训练或完整开发集结果。原 C3-A v1 训练协议与选轮规则不变，confirmation/test/optical 继续关闭。见[协议 v2](../../protocols/mmcanet_phase_c3a/multi_sample_stability_c1_v2_20261105_v2.json)与[等待记录](../../experiments/diagnostics/c3a_gpu_wait_20261105_v3/manifest.json)。
@@ -113,7 +149,7 @@ Guo et al.'s 2025 ECDM is SAR-only despeckling prior art. Its conditional DDPM p
 
 - **SAR despeckling diffusion.** [SAR-DDPM](https://arxiv.org/abs/2206.04514) (Perera et al., IEEE GRSL 2023) uses conditional DDPM and cycle-spinning; its reported tests include synthetic and real SAR, with real-scene evidence based on no-reference region metrics rather than clean SAR truth. [R-DDPM](https://arxiv.org/html/2401.03122) is an arXiv v1 regional conditional-DDPM despeckler that averages overlapping regional noise estimates and uses DDIM. Its manuscript describes Sentinel-1 VV+VH data near Shanghai and synthetic observations formed by adding different levels of Gaussian noise; it gives no sample counts or explicit train/validation/test allocation. Real-image evaluation has no clean reference and uses ENL/EPI. The listed region parameters (`m=64`, `n=16`) conflict with the same section’s statement that `n` is a multiple of `m`. This is SAR-only despeckling, not SR or optical-guided joint restoration, and the synthetic noise statement does not establish a Gamma-speckle observation model. See the [full-text audit](../../experiments/literature_audits/rddpm_fulltext_audit_20261026_v1/report.md).;  [DiffusionSAR](https://doi.org/10.1109/TGRS.2024.3419083) explicitly diffuses toward multiplicative Gamma noise and uses log-Yeo–Johnson preprocessing; its authors report synthetic and real SAR comparisons and multitemporal fine-tuning to bridge a synthetic-to-real gap. [Paul and Savakis (2025)](https://www.mdpi.com/1424-8220/25/7/2149) study shortened/non-uniform sampling and sample aggregation. They report that unmodified SAR-DDPM underperforms most evaluated methods on their synthetic benchmark and discuss hallucinated structures; their modifications improve the diffusion results. [ECDM](https://doi.org/10.3390/rs17172970) (Guo et al., 2025) combines variance prediction, wavelet downsampling, and accelerated sampling, and reports synthetic pretraining followed by real multitemporal fine-tuning. Yang et al.'s 2025 [GCOANet](https://www.sciencedirect.com/science/article/pii/S1569843225003243) publisher abstract reports optical-assisted SAR despeckling in which conditional diffusion generates cross-domain references using optical pixel correlation, followed by a multiscale blind-spot network. This is direct diffusion-based reference-generation prior art in optical-assisted despeckling; the official indexed abstract names non-local filtering, interval downsampling, and all-directional gradient loss, reports real and simulated experiments, and says data are available on request. A 2026-10-24 secondary patent-index lead (CN120450996A) describes SAR-plus-optical reference generation and use of the trained generator at prediction, but the official patent text and its identity with the journal article remain unverified; it does not resolve the article's inference inputs. The journal record remains abstract-level and leaves detailed data/degradation, geometry tests, metrics, code, and runtime unresolved. The 2026 [SMSDNet](https://ieeexplore.ieee.org/abstract/document/11495191) publisher abstract describes FFT/DCT multiscale features with a lightweight stochastic feature-space diffusion refinement for residual speckle; full protocol and code were not reviewed here. These are despeckling studies, not optical-guided joint restoration.
 - **SAR super-resolution diffusion.** Chen, Zhang, and Xiong’s [2024 IEEE ICSP article](https://doi.org/10.1109/ICSP62129.2024.10846499) describes residual prediction and MSTAR/SARBake evaluation in its publisher abstract; the proceedings TOC verifies the author list and page 340. The full protocol remains unreviewed; see the [metadata audit](../../experiments/literature_audits/icsp2024_sar_diffusion_sr_metadata_20261028_v1/report.md). [SharpSAR](https://doi.org/10.7527/S1000-6893.2025.32804) (Wang et al., *Acta Aeronautica et Astronautica Sinica*, 2026) uses latent diffusion with wavelet and direction-aware structure modules and a speckle-plus-blur synthetic degradation. Its official publisher tables report PSNR below SwinIR on both listed datasets (`SD`: 21.68 vs 22.23 dB; `KOR`: 22.50 vs 22.62 dB), alongside best listed SSIM/LPIPS/FID. The architecture ablation shows a mixed metric response between W and W+DAE, while the table labels a `Real-SharpSAR` variant without enough accessible detail to identify that change. The abstract's 8.12% aggregate-improvement basis is unspecified on the accessible page. The result tables are visible, but the article body, exact dataset identities, split and degradation protocols, and code were not verified. This is a metric tradeoff in single-image SAR SR, not evidence for optical-conditioned joint restoration. A 2026 [Lee and Son manuscript](https://openreview.net/pdf?id=5iKl7IWJj1) proposes two-stage latent-diffusion SAR SR, separating structural reconstruction and speckle synthesis, with a Fréchet Wavelet Distance evaluation; its publication status and code availability were not confirmed in this review.
-- **SAR-only joint SR and despeckling diffusion.** Kuang et al.'s 2026 IEEE JSTARS paper, [Unsupervised SAR Image Super-Resolution With Despeckling via Region-Specific Diffusion Models](https://doi.org/10.1109/JSTARS.2026.3655710), is a direct SAR-only joint-task prior-art method. The reviewed [full author manuscript](https://www.researchgate.net/publication/399908263_Unsupervised_SAR_Image_Super-Resolution_with_Despeckling_via_Region-Specific_Diffusion_Models) describes RSDM: two Stable Diffusion v2.1 U-Net branches adapted with LoRA for homogeneous and inhomogeneous SAR regions, with attention layers adapted and the other weights frozen. LSIR interpolates the LoRA parameters and text embeddings and uses Bézier interpolation of latent noise. The paper reports ×4 reconstruction on SAR-Airport-1.0, SARBuD-1.0, and FUSAR-Map, comparing 30 SAR images. It reports NIQE/BRISQUE/NRQM plus ENL/CV/EPI/TS; it states that no high-resolution ground truth is used. Adaptation uses two representative SAR images, 200 LoRA steps at rank 16 and learning rate `2e-4`; the stated inference setting is 30 DDIM steps after upsampling the input to the target resolution. The article reports 26.93 s per image and 3.44 s model-load time on one RTX 4090.
+- **SAR-only 联合超分与去斑扩散。** Kuang 等人的 2026 IEEE JSTARS 论文 [Unsupervised SAR Image Super-Resolution With Despeckling via Region-Specific Diffusion Models](https://doi.org/10.1109/JSTARS.2026.3655710) 是直接相关的 SAR-only 联合任务先例。项目既有记录审阅过[ResearchGate 作者稿](https://www.researchgate.net/publication/399908263_Unsupervised_SAR_Image_Super-Resolution_with_Despeckling_via_Region-Specific_Diffusion_Models)，本轮未重新打开或核实其与 IEEE 正式版本的对应关系。按该作者稿，RSDM 用两个 Stable Diffusion v2.1 U-Net 分支，经 LoRA 分别适配均匀和非均匀 SAR 区域，并冻结其余权重；LSIR 插值 LoRA 参数与文本嵌入，并对潜噪声使用 Bézier 插值。作者报告在 SAR-Airport-1.0、SARBuD-1.0 和 FUSAR-Map 上做 ×4 重建，比较 30 幅 SAR 图像；指标为 NIQE/BRISQUE/NRQM 以及 ENL/CV/EPI/TS，并称没有 HR 真值。作者报告使用两幅代表图像适配，LoRA 200 步、rank 16、学习率 `2e-4`；将输入上采样到目标尺寸后以 30 步 DDIM 推理；单图推理时间 26.93 秒，模型加载 3.44 秒，设备为 RTX 4090。以上为作者稿报告，不是独立复现。无参考指标不能证明逐像素 HR 保真或排除无依据结构；受审稿件未建立受控退化核、场景组划分、物理定标或公开代码。该方法收窄 SAR-only 联合扩散新颖性，但未测试 optical 引导或与本项目固定输入 ×2 协议匹配的性能。IEEE 正式来源与作者稿版本对应关系仍开放，详见[来源复核](../../experiments/literature_audits/region_specific_sar_jdsr_source_recheck_20261107_v1/report.md)。
 
   These are author-reported results, not independently reproduced here. The no-reference perceptual and region statistics do not establish pixelwise high-resolution fidelity or rule out unsupported structure; that is a metric limitation, not a demonstrated failure. The text reviewed does not specify a controlled degradation kernel or scene-group split, and it does not establish full-resolution SAR physical units. No official code repository was verified. This paper narrows novelty for SAR-only joint diffusion but does not evaluate optical conditioning or provide a matching baseline for this project's fixed-input ×2 pseudo-target protocol.
 - **Bibliographic-only SAR joint-diffusion lead; technical claims and reuse terms unverified.** Crossref confirms the 2026 *Measurement Science and Technology* record for [Frequency-enhanced diffusion prior network for joint SAR image despeckling and super-resolution](https://doi.org/10.1088/1361-6501/ae8686) and exposes IOP HTML/PDF resource links. Both publisher URLs currently redirect metadata-only HEAD requests to a bot-manager challenge; no article body is available through this review route. OpenAlex lists only the IOP PDF and no repository copy, but its CC BY-NC-ND tag is not verified against the article-specific IOP terms; Crossref's license URI points to IOP's general copyright/permissions page, so reuse terms are unresolved. An exact-title secondary ResearchGate listing exposes abstract-like method/data/results text, but those details remain unverified and are excluded from technical conclusions. The paper is not classified as established SAR-only prior art in the matrix. See D-2026-10-28-014/015/016 and the [route audit](../../experiments/literature_audits/frequency_enhanced_joint_sar_diffusion_lead_20261026_v1/report.md).
@@ -238,10 +274,9 @@ The official program verifies an existence-level SAR despeckling diffusion paper
 
 The Sim2Real paper uses supervised DRUNet/SEDRUNet models trained on MOCEM simulations; it is not diffusion prior art and does not change the project's diffusion-feasibility assessment. Its physical-reference and real-image sidelobe-evaluation limits are recorded in the [full-text audit](../../experiments/literature_audits/sim2real_joint_despeckling_sidelobes_20261028_v1/report.md) and D-2026-10-28-040.
 
-## H8 task-order literature update — 2026-10-29
+## 2026-10-29 H8 任务顺序文献更新
 
-The bounded SAR source review confirms existing joint despeckling/SR work and alternative supervision targets but does not establish a task-order result that selects diffusion or another model family. Diffusion remains deferred pending a valid task-matched target, source provenance, and eligible development protocol. See D-2026-10-29-028.
-
+限定范围的 SAR 来源审查确认已有联合去斑/超分工作及替代监督目标，但没有证据据此选择扩散或其他模型家族。扩散路线仍待任务匹配的目标、来源证明和合格开发协议具备后再评估。见 D-2026-10-29-028。
 ## 2026-10-30 文献补充：物理约束与后验测度
 
 CoCoGen 与 PISD 表明 PDE 反问题中可把离散方程、部分观测或物理更新融入 score/diffusion 采样；它们只支持 PDE 场景中的方法可行性。CoCoS 预印本进一步指出，精确硬约束下“满足方程”与“采到目标后验”可能不是同一件事。当前没有证据说明这些方法可直接作用于项目 8-bit SAR PNG、乘性散斑或 optical 引导。若未来进入 C4，须先核验表示域、推导观测似然/约束测度并验证算子；当前 B1 gate 未通过，不开展 B2/B3。
@@ -267,3 +302,26 @@ CoCoGen 与 PISD 表明 PDE 反问题中可把离散方程、部分观测或物�
 ## 2026-11-06 状态更新：SAR-only Flow 等待 GPU
 
 当前 C3-A 是 v1.6 路线内单独预登记的 SAR-only 可行性筛选；C2 gate 仍未判定，不据此进入 optical-conditioned C3-B。等待器 v8 已恢复，但截至 10:19:26 UTC 空闲显存为 1,453/4,096 MiB、其他 CUDA 进程 2 个，训练尚未启动。已修正的 FIRM v2 题名不改变本地模型比较方案；posterior spread 也不作为后验校准证据。资源变化、启动前门槛和访问边界见[v8 manifest](../../experiments/diagnostics/c3a_gpu_wait_20261106_v8/manifest.json)。
+
+
+## 2026-11-07：区分任务条件 flow 与无条件先验后验采样
+
+FlowSGS 和 FMPS 扩展了通用 flow prior 的后验采样方法谱系；二者以预训练无条件先验和观测/条件步骤为中心，与本地 C3-A 的配对任务条件监督 flow 不是同一比较对象。它们没有提供 SAR 域可行性或光学收益证据，不构成扩大 Flow/Diffusion 预算的依据。C3-A 仍按冻结协议等待用户恢复训练；C4 仍依赖先行阶段和有效观测模型。
+
+## 2026-11-07：log-Yeo–Johnson Gamma 高斯化纯合成诊断
+
+按独立拟合/评估协议，对 `Gamma(L, scale=1/L)`、`L∈{1,2,4,8}` 比较 log-only 与仅由拟合样本确定 `lambda` 的 log-Yeo–Johnson。20 个留出评估结果的等权平均 KS 距离差为 `−0.040896`，四个 L 均在五组重复中下降。结果表明该变换在本次抽象 Gamma 模拟中降低了对标准正态的经验 KS 距离；它不验证真实 SAR 噪声或本地 8-bit PNG/noisy pseudo-target，也不构成训练、迁移或阶段晋级依据。详见[冻结协议与实验报告](../../experiments/synthetic_cpu/log_yj_gamma_normality_20261107_v1/report.md)。
+
+## 2026-11-07：共享 log-Yeo–Johnson 参数对乘性观测的信号强度敏感
+
+第二项纯合成实验固定 `L=8`，对 `Y=sN` 的五档 `s` 用等权训练混合拟合单一 `lambda`，并按信号强度独立校准和留出评估。五档的 KS 距离均下降，但幅度不同。这说明“Gamma 乘子经逐档拟合变换后更接近正态”不能直接转写为对混合信号观测的统一结论；也不验证真实 SAR 或本地 C3-A。见[共享参数实验报告](../../experiments/synthetic_cpu/log_yj_multiplicative_observation_levels_20261107_v1/report.md)。
+
+
+## 2026-11-07 补充：对数正态乘性噪声 SDE 先例
+
+ICMLA 2025 的 *Perception-based multiplicative noise removal with Diffusion models* 为在乘性噪声下构造 SDE/score 去噪提供直接先例，也显示感知指标与逐像素指标可能取舍。它的对数正态乘子、CelebA/UC Merced 合成评测，与本项目 C2 的 Gamma 表示域退化和 SAR–optical 联合任务不同。纯合成 CPU 对照在均值、方差匹配后仍观察到不同高阶矩；此处仅用于避免错误迁移，不构成生成模型效果证据，不改变 C2/C3 阶段门槛。见[审查报告](../../experiments/literature_audits/multiplicative_noise_sde_fulltext_20261107_v1/report.md)和[分布对照](../../experiments/diagnostics/multiplicative_noise_distribution_cpu_20261107_v1/report.md)。
+
+
+## ICSP 2024 SAR 扩散超分摘要级先例（2026-11-07）
+
+IEEE Xplore 官方摘要称，`Super-Resolving SAR Images with Diffusion Models: A Dual Evaluation of Metrics and Applications` 使用残差预测的条件扩散进行 SAR 单图超分，在 MSTAR/SARBake 上报告传统指标与下游语义分割结果。官方 PDF 直连未能读取；划分、退化、训练预算和分割评估独立性仍未知。该文只支持单模态 SAR 超分先例，不支持联合去斑或 optical 效用。详见[来源审计](../../experiments/literature_audits/icsp_sar_diffusion_sr_abstract_pdf_route_20261107_v1/report.md)。

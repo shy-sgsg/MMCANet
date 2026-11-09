@@ -1,5 +1,75 @@
 # 项目事实与证据分类
 
+## 2026-11-09 研究总纲 v1.8 获批
+
+- 用户于 2026-11-09 明确批准采纳完整 `v1.8-proposed` 候选，并授权同步正式总纲、`AGENTS.md` 和 `README.md`；本次同步已完成。
+- v1.8 增补 MONTI 2026 SAR 结构超分后潜扩散散斑生成先例，并规定单次生成 draw、像素均值点估计和样本分布为不同评价对象。具体差异与审批依据见[采纳记录](RESEARCH_CHARTER_CHANGELOG_20261107.md)。
+- 采纳不改变历史结果、C1–C6 阶段资格、数据权限、C2/C3 gate 或训练暂停状态；不授权 confirmation/test 访问或新训练。
+
+## 2026-11-07 Amieva 论文全文核实事实
+
+- 机构仓储中的已发表版 PDF 正文曾成功读取，之后同一 URL 复访超时。正文描述 10 个 Sentinel-1 IW（10 m）/SM（5 m）配对区域、升轨 VV/VH、1–12 天间隔；SM 参考经 Lee 滤波、dB 转换和 GéFolki 配准。
+- 按整景划分 5 train、2 validation、3 test；train 有 435874 个不重叠 48×48/96×96 patch，validation 有 244786 个，test 为整景。
+- 正文称每 band 第 0.1/99.9 百分位基于完整影像集合计算后再划分；输入/参考统计是否分开或合并未写清楚。此事实只支持“预处理使用保留场景像素值分布”，不证明 test 标签训练或依据 test 指标选模。
+- 这是非生成式 SAR-only 联合恢复文献，作者报告值未独立重算。跨模式 Lee-filtered 参考并未被证明为无噪声真值。证据和限制见[审查报告](../../experiments/literature_audits/amieva_direct_fulltext_followup_20261107_v1/report.md)。
+
+## 2026-11-07 SAR 联合扩散论文 DOI 二手线索（尚未核实）
+
+- ResearchGate 搜索结果列出题名 *Frequency-enhanced diffusion prior network for joint SAR image despeckling and super-resolution*、DOI `10.1088/1361-6501/ae8686` 及摘要；该页没有全文。IOP 出版方与 DOI/Crossref 本轮入口不可读。
+- 因证据仅为二手页面，这里只记录“存在高相关查证线索”；不据此确认正式元数据、方法、数据集、指标或作者结论。详见[来源审查](../../experiments/literature_audits/frequency_enhanced_sar_jdsr_source_check_20261107_v1/report.md)。
+
+## 2026-11-07 生成样本均值统计与 SAR 潜扩散超分全文
+
+- OpenReview 作者稿与 MONTI 官方页面确认一项 SAR-only 两阶段超分先例：结构恢复后使用条件潜扩散增强散斑；官方页面标注该 workshop 论文为非归档。它不研究推理时 optical 引导或本项目 8-bit noisy pseudo-target。全文审查见[报告](../../experiments/literature_audits/monti_two_stage_sar_sr_20261107_v2/report.md)。
+- 纯合成实验在 `L={1,2,8}`、`K={1,4,8}` 上验证 Gamma 独立乘性噪声的均值、方差、ENL 与 MSE/PSNR 关系，共 9 个条件通过预声明核验。没有项目载荷或模型参与。结果见[报告](../../experiments/synthetic_cpu/c3a_sample_mean_variance_cpu_20261107_v1/report.md)。
+- 后续共同 Gamma 分量诊断固定单 draw 边际、用 `ρ` 控制 draw 相关性，45 个 `L×ρ×K` 条件全部通过；K=8 增益从 `ρ=0` 时约 9.03 dB 降至 `ρ=0.5` 时约 2.49 dB、`ρ=0.9` 时约 0.40 dB、`ρ=1` 时 0 dB。该观察只限合成构造，不测量模型样本相关性。见[相关 draw 报告](../../experiments/synthetic_cpu/c3a_correlated_draw_mean_cpu_20261107_v1/report.md)。
+- C3-A v3 evaluator 按 draw 计算 PSNR/SSIM/EPI/边缘强度比等，再汇总逐身份指标和逐像素样本标准差；没有逐像素平均预测图、分布距离、显式 draw 依赖统计或预测图保存。与冻结协议相符，不是缺陷；需扩展时应另立协议。此为源码/协议静态观察，不是生成模型结果。见[审查](C3A_MULTI_SAMPLE_DEPENDENCE_AUDIT_20261107.md)。
+
+## 2026-11-07 C2 全 development CPU 对比差诊断
+
+- v5 冻结协议覆盖 4 种退化条件 × 每条件 200 个 development 样本，共 800 条条件—样本、19 个来源组；使用 8 个既有 best checkpoint 完成 3,200 次 CPU 前向。
+- C2 控制为 matched、permuted、missing、SAR-only。零目标背景中位数每条件分别为 2、2、1、1 条；matched−SAR-only 来源组等权均值对比误差差在四条件为 −0.000191、−0.000939、−0.000862、+0.000677。
+- 结果属于重复使用的 development 与归一化 PNG noisy pseudo-target 表示域；只作描述，未运行 bootstrap/显著性检验，不参与 C2 gate、选模或调参。访问标记为 confirmation/test false，CUDA 未初始化。见[实验报告](../../experiments/diagnostics/c2_all_development_contrast_cpu_20261107_v5/report.md)。
+
+## 2026-11-07 SAR 条件 Flow 翻译先例
+
+- OpenReview ICLR 2026 ML4RS Workshop 作者稿描述 SAR 条件潜空间 Flow Matching，将噪声 latent 生成 optical latent；数据为 SAR2Opt，正文给出 1,450/627 个 train/test patch，600×600，TerraSAR-X 与 Google Earth。
+- IEEE Xplore 有同题名 GRSL Early Access 索引记录，日期 2026-10-12、DOI `10.1109/LGRS.2026.3742531`。IEEE 全文和版本对应未核实；该方法输出 optical，不是本项目 SAR 输出 JDSR。见[一手来源审查](../../experiments/literature_audits/sar_conditioned_flow_sar_to_optical_review_20261107_v1/report.md)。
+
+## 2026-11-07 08:29（中国标准时间）DiffusionSAR 全文核验事实
+
+- 2024 年 TGRS DiffusionSAR 研究单幅 SAR 条件扩散去斑；观测 SAR `y` 是推理条件，光学参考只参与合成训练，论文没有联合 SR 或 inference-time optical 实验。
+- 合成数据含 2,400 个 256×256、10 m、来自 16 个地点的 Sentinel-2 patch，使用 Gamma L=1/2/4；另对真实 SAR 多时相序列进行微调。论文采用 log-Yeo–Johnson 噪声变换，但这不等于验证其适用于 C1 8-bit PNG。
+- 论文不同章节分别称真实数据为 single-look intensity 与 SLC，产品表示仍无法核实。全文事实及主张边界见[审计报告](../../experiments/literature_audits/diffusionsar_conditional_sar_despeckling_fulltext_20261107_v1/report.md)与 D-2026-11-07-026。
+
+## 2026-11-07 08:09（中国标准时间）SEN12MS 地理元数据候选路线
+
+- SEN1-2 原始论文按 1158/spring、1868/summer、1970/fall、2017/winter 四组随机 ROI 组织场景；同一作者团队的 SEN12MS 原始论文明确称使用同一批随机 ROI 和季节定义，并将场景导出为有地理参考的 GeoTIFF。
+- SEN12MS 是经独立筛选和处理的后续数据版本。论文未明确保证各版本 ROI 子目录数字编号逐一相同；不得把相同目录数字或 patch 数字直接当作已核验的地理/patch 对应。
+- 本轮仅确认候选元数据路径，未提取坐标或读取 GeoTIFF。TUM MediaTUM 1474000 返回 HTTP 429。C1 地理、采集与精细 footprint 独立性仍未知；不改变当前 split 或阶段 gate。
+- 证据与未核实项见[交叉映射路线审查](../../experiments/data_audits/c1_geospatial_crosswalk_route_20261107_v1/report.md)及 D-2026-11-07-024。
+
+## 2026-11-07 04:06（中国标准时间）C2 固定退化生成器协议绑定事实
+
+- 冻结 C2 v2 退化基种子为 20261032，条件映射为 ×2/×4、Gamma `L=8/2`。原生成器只记录调用方 seed 和硬编码条件，没有强制两者匹配冻结 JSON。
+- 现有生成器在 CUDA 检查、目录创建和影像读取前拒绝 seed 或 condition drift；冻结 JSON、退化公式和 gate 不变。
+- 两个错配回归先在旧实现上失败，修复后连同来源清单错配保护共 3 项 CPU 定向测试通过，两个 Python 文件 `py_compile` 通过。运行只用临时文本清单，无数据载荷、checkpoint、GPU 或模型访问。见 D-2026-11-07-010 和[C2 核查报告](C2_FIXED_GENERATION_PROTOCOL_BINDING_20261107.md)。
+
+## 2026-11-07 03:46（中国标准时间）C1 v2 train/development 官方来源链更正事实
+
+- 冻结 C1 v2 来源协议使用 TUM MediaTUM 官方条目 1436631、`m1436631` 模块和官方 `checksums.sha512` 文件索引；协议按春季/冬季根目录与 source-scene 文件夹构造互斥组。
+- 2026-10-31 train/development 暂存 manifest 记录 1,600/200 个身份、92/19 个来源组、3,600 个文件完成暂存；暂存代码按冻结清单逐文件核对字节数与 SHA-512。786 个复用局部文件在合并前也经 SHA-512 核验。confirmation/test 访问标记为 false。
+- 2026-10-19 上游哈希审计范围仅为旧 `fixed_train_dev2k` / `fixed_val_dev2k` 的 3,600 个文件，字节级精确匹配为 0；不能将该结果外推到 C1 v2 train/development。`./data/` 数字命名 2,000 对与 C1 v2 的逐文件身份映射仍未知。
+- 地理坐标、采集日期、轨道、产品 ID 与 patch footprint 交叉表仍缺；当前仅支持来源场景文件夹及 train/development 文件身份互斥，不声称地理或采集独立。更正依据见 D-2026-11-07-009 和[C1 来源链核查](C1_OFFICIAL_SOURCE_METADATA_AUDIT_20261107.md)。
+
+## 2026-11-07 02:13 C3-A 表示域范围审计与输出越界诊断事实
+
+- 按冻结 C3-A `x2_light` 输入，CPU 核验 train 1,600 个样本/92 个来源组和 development 200 个样本/19 个来源组；只读取 `lr` 与 `target`，逐文件 SHA-256、shape、dtype、有限性和值域均通过。
+- 来源组等权平均的 LR 像素大于 1 比例为 21.57%/22.16%；按模型实际双线性上采样后的 condition 大于 1 比例为 14.94%/15.29%。target 恰为 1 的比例为 1.23%/1.28%，大于等于 0.99 的比例为 1.73%/1.72%；target-condition MAE 均值约 0.1451/0.1454。
+- 这些数字描述 8-bit PNG 派生表示域，不说明定标物理量、真实亮点饱和或干净 SAR 恢复。审计未设置阈值、不改变训练/裁剪/选模规则。
+- 多次采样评价协议 v3 将总越界比例分解为 raw 输出低于 0 与高于 1 的比例，保留 v2 原件；原质量指标、数据划分及阶段门槛不变。合成定向回归 30 项通过；无真实训练/模型结果。
+- 设备仅 CPU；仅访问 train/development SAR 数组。未读取 optical、confirmation、test；未启动训练、正式评价或 GPU 等待器。证据见[审计运行清单](../../experiments/diagnostics/c3a_representation_range_audit_20261107_v1/manifest.json)。
+
 ## 2026-11-07 00:26（中国标准时间） C3-A epoch 续训合同 CPU 验证事实
 
 - C3-A runner 支持显式按完整 epoch 续训，checkpoint v2 绑定冻结协议、输入清单、代码与关键环境，并记录模型/优化器、Python/NumPy/PyTorch RNG、专用 DataLoader/Flow generator、最佳轮次和 train/development 日志。
@@ -509,3 +579,21 @@ Lattari et al. report SAR-only denoising with synthetic speckle pretraining and 
 - 用户明确批准采纳候选 `v1.6-proposed` 及其暂定中文题目；正式版本路径为 `docs/research/RESEARCH_CHARTER.md`。
 - v1.6 定义六个科学问题和 C1–C6 前瞻路线；它没有重写历史实验结论或自动改变门槛。
 - `AGENTS.md` 继续提供工程/数据安全规则，当前阶段由 `CURRENT_STATE.md` 记录；相关同步记录见 D-2026-10-30-011。
+
+
+## 通用 Flow Matching 后验文献事实 — 2026-11-07
+
+- FlowSGS 的 2026-10-08 arXiv v3 全文描述 Split Gibbs Sampling、Stochastic Interpolants 先验步骤，并包含线性逆问题及非线性 Fourier phase retrieval 实验。
+- FMPS 的 2025-08-09 arXiv v3 全文描述预训练 flow 的速度场校正，并包含自然图像超分等通用条件生成实验。
+- 两篇来源均未提供本地 SAR/光学/JDSR 效果证据。来源和适用边界见[一手全文审查](../../experiments/literature_audits/flow_inverse_methods_update_20261107_v1/report.md)。
+
+## 2026-11-07：C3-A 固定尺寸合成 CPU 软件核验
+
+- 事实：固定 `batch_size=4`、256×256 输入下，纯合成 CPU 前向、反向、单次参数更新及 8 步 Heun 采样通过；清单记录 CUDA 不可见且未初始化。
+- 证据：[运行报告](../../experiments/diagnostics/c3a_full_resolution_cpu_smoke_20261107_v1/report.md)及相邻 `manifest.json`。
+- 边界：该结果不涉及项目影像、checkpoint 或真实指标，不能推导训练收敛、重建质量或 GPU 资源可行性。
+
+
+## 2026-11-07：乘性噪声 SDE 去噪文献事实
+
+作者提供的 ICMLA 2025 会议版 *Perception-based multiplicative noise removal with Diffusion models* 将乘性因子建模为几何布朗运动导出的对数正态扰动，并在 CelebA 与 UC Merced Land Use 图像上评测合成噪声；论文未报告 SAR 数据实验。正式题名与作者另经 ICMLA 官方目录核验。审查及来源见[文献记录](../../experiments/literature_audits/multiplicative_noise_sde_fulltext_20261107_v1/report.md)。

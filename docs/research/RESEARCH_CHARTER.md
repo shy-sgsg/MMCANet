@@ -1,13 +1,19 @@
 # SAR 联合恢复研究总纲
 
-**正式版本：** v1.7  
-**采纳日期：** 2026-11-06  
-**批准依据：** 用户于 2026-11-06 明确批准采纳 `v1.7-proposed` 完整候选。  
-**研究题目：** 光学先验引导与 SAR 物理一致性约束的生成式联合去斑和超分辨率重建方法研究。  
-**题目条件：** “物理一致性”仅在测量表示与观测模型经核验支持时使用；否则采用“观测一致性”或“表示域”表述。  
-**修订来源：** `RESEARCH_CHARTER_REVISION_PROPOSAL_20261105.md` 与逐项差异报告 `RESEARCH_CHARTER_CHANGELOG_20261105.md`。  
-**权威关系：** 本文件规定研究问题、假设、C1–C6 路线和主张边界；当前阶段状态由 `CURRENT_STATE.md` 记录。`AGENTS.md` 中更严格的数据安全、实验公平、复现和测试隔离要求继续生效。  
-**版本状态：** 已采纳并生效。采纳不追溯晋级历史阶段，不授权再次访问已封存 confirmation 或任何测试载荷，也不豁免逐阶段执行前审查。
+**正式版本：** v1.8
+
+**采纳日期：** 2026-11-09
+
+**批准依据：** 用户于 2026-11-09 明确批准采纳 `v1.8-proposed` 完整候选，并授权同步 `AGENTS.md` 与 `README.md`。
+
+**研究题目：** 光学先验引导与 SAR 物理一致性约束的生成式联合去斑和超分辨率重建方法研究。
+
+**题目条件：** “物理一致性”仅在测量表示与观测模型经核验支持时使用；否则采用“观测一致性”或“表示域”表述。
+
+**修订来源：** v1.7 正式总纲及 `RESEARCH_CHARTER_REVISION_PROPOSAL_20261107.md`；逐节差异与采纳记录见 `RESEARCH_CHARTER_CHANGELOG_20261107.md`。
+
+**权威关系：** 本文件规定研究问题、假设、C1–C6 路线和主张边界；当前阶段状态由 `CURRENT_STATE.md` 记录。`AGENTS.md` 中更严格的数据安全、实验公平、复现和测试隔离要求继续生效。
+**版本状态：** 已采纳并生效。修订仅补充生成式 SAR 超分先例和生成样本评价边界；不追溯晋级历史阶段，不授权访问已封存 confirmation 或任何测试载荷，也不豁免逐阶段执行前审查。
 
 ## 1. 研究背景与定位
 
@@ -18,6 +24,8 @@
 已确认的先前工作包括：SAR 联合去斑与超分辨率（DSRKD、ISSMSAR）、光学引导的 SAR 联合超分辨率与去噪（HSFMamba）、基于多时相或同传感器不同成像模式的联合恢复，以及光学空间反馈训练和光学引导条件流超分辨率（OGSRN、OGSFlow）。这些工作在输入模态、训练/推理是否使用光学、目标和退化协议上并不相同，但已足以排除“首次联合 SAR 去斑与超分辨率”“首次光学引导 SAR 联合恢复”及一般的 Flow/门控机制主张。另有参考图像条件扩散超分辨率的自适应引导，以及通用少步 Flow/扩散求解方法；它们不是 SAR 证据，却收窄了通用可靠性门控和单步生成的可主张范围。项目必须通过核验来源的文献综述和符合资格的本地证据确定更具体的贡献。不得仅因将 CNN、Transformer、Mamba、注意力层或门控替换为较新的模型家族就推断存在新颖性。
 
 Zhang 等人的 SDIF 增加了已发表的光学—SAR 扩散图像融合相关工作，并使用语义分类引导。其输出是融合图像，所审阅的论文没有测试 SAR 输出 JDSR 或受控光学错配。这缩小了通用扩散融合的新颖性范围，但没有解决本地光学效用或鲁棒性问题；见 D-2026-10-29-015 和[全文审查](../../experiments/literature_audits/sdif_remote_sensing_image_fusion_fulltext_20261029_v1/report.md)。
+
+2026 年 MONTI 作者稿报告了 SAR 两阶段超分辨率潜扩散：先恢复结构，再生成散斑外观；它排除了“首次把潜扩散用于 SAR 超分”及“首次采用结构后散斑生成”的宽泛主张，但没有测试光学条件、完整去斑—超分联合任务或 SAR 观测一致性。作者稿还显示逐像素平均多个扩散结果会提高合成配对像素指标，故必须把均值点估计与单次生成样本质量分开报告。全文事实和范围见[论文审查](../../experiments/literature_audits/monti_two_stage_sar_sr_20261107_v2/report.md)；MONTI 2026 官方页面将其列为录用论文，并说明 workshop 论文不收入 CVPR 2026 会议论文集。
 
 ## 2. 拟议研究主题与范围
 
@@ -193,6 +201,8 @@ $$
 
 6. **算子感知条件流与后验多样性：**可在观测模型成立后，将 measurement-conditioned velocity、operator-aware data consistency 或 augmented posterior transport 作为方法候选，与直接条件流和确定性基线比较。若只有一对 noisy pseudo-target 而没有可校准的后验参照，样本间差异只能作为生成行为诊断，不能称为后验不确定性或置信区间。
 
+**多次生成结果的评价规则：**每个生成方法至少区分三种对象：①按预先固定随机种子生成的单次 draw，逐 draw 报告目标一致性、结构/亮回波和失败率；②多个 draw 的逐像素均值，作为单独的点估计结果评价，不得将其指标写成“单次生成质量”；③样本集合或其统计量，使用适用于 SAR 表示域且经已知案例检查的分布评价。记录 draw 数、种子、聚合顺序和逐样本波动；如果基于 draw 独立假设解释均值收益，应预先规定依赖性检查，无法可靠估计时将相关性标为未知。像素均值会降低独立噪声方差并改变散斑统计；draw 相关性会进一步限制均值收益；均值图不得称作一个代表性随机样本，也不得以均值图替代多样性、观测相容性或亮回波评价。MONTI 两阶段 SAR 潜扩散作者稿的四样本像素均值结果，以及本地独立/相关 Gamma 纯合成诊断，说明这种区分会影响结论；这些证据不测量真实模型 draw 的相关性，详见[论文审查](../../experiments/literature_audits/monti_two_stage_sar_sr_20261107_v2/report.md)、[独立样本诊断](../../experiments/synthetic_cpu/c3a_sample_mean_variance_cpu_20261107_v1/report.md)和[相关样本诊断](../../experiments/synthetic_cpu/c3a_correlated_draw_mean_cpu_20261107_v1/report.md)。本规则仅约束未来预登记评价，不追溯修改当前冻结的 C3-A v3：该协议和实现逐 draw 计算标量指标，并报告逐像素样本标准差；未定义均值图指标、分布距离或 draw 相关系数。实现符合现行协议；若增加这些评价，须另建运行前冻结的补充协议。具体核对见[源码与协议审查](C3A_MULTI_SAMPLE_DEPENDENCE_AUDIT_20261107.md)。
+
 **停止条件：**没有稳定且任务相关的增益；没有正确配对特异性；出现严重缺乏依据的亮结构/结构；训练或采样不稳定；计算成本过高且缺乏相应收益；或目标/数据契约失效。不得仅因技术较新就继续。
 
 ### C4——观测一致性与物理约束推理
@@ -256,7 +266,7 @@ Phase-A2 仅作为历史参照，不能支持“Joint > Strong Cascade”表述�
 
 使用逐图配对差异；在可信来源组层级 bootstrap/汇总，并在相关时同时报告按组加权和按 patch 加权结果。将随机种子和数据组视为不同变异来源。单随机种子筛选仅属探索性。稳定性主张需要预先声明多随机种子规则；正式不确定性应包含配对区间和适用时的正向组比例。不得事后调整阈值、按目标挑选展示样本，或将反复调试同一开发集的结果冒充留出集证据。
 
-每个正式运行使用唯一且不可变的目录，并记录假设、协议/版本、数据和输入清单/哈希、划分/分组清单、精确配置与命令、环境、代码版本/脏状态、随机种子与 RNG 策略、checkpoint 哈希、训练日志、逐图/分组/种子结果、不确定性、运行时间/显存、失败原因、测试标记和决策复核。设计与选择阶段必须封存测试数据和测量值。当前 C2 产物自身标记仍为 false/false；章程审阅发生的独立文本暴露已在 D-2026-10-29-005 记为 test_set_accessed=true、test_set_used=false。
+每个正式运行使用唯一且不可变的目录，并记录假设、协议/版本、数据和输入清单/哈希、划分/分组清单、精确配置与命令、环境、代码版本/脏状态、随机种子与 RNG 策略、checkpoint 哈希、训练日志、逐图/分组/种子结果、不确定性、运行时间/显存、失败原因、测试标记和决策复核。对随机生成方法，还要分别记录单次 draw、draw 集合及任何聚合点估计的定义、样本数、种子和结果；聚合输出不得并入逐 draw 统计。设计与选择阶段必须封存测试数据和测量值。当前 C2 产物自身标记仍为 false/false；章程审阅发生的独立文本暴露已在 D-2026-10-29-005 记为 test_set_accessed=true、test_set_used=false。
 
 ## 9. 候选新颖性与预期学术贡献
 
@@ -278,7 +288,8 @@ Phase-A2 仅作为历史参照，不能支持“Joint > Strong Cascade”表述�
 - **光学引导 SAR 恢复。** HSFMamba（IEEE JSTARS，2025）直接研究光学引导 SAR 联合超分和去噪，并报告跨模态特征选择；OGSRN（Chinese Journal of Aeronautics，2022）利用光学空间反馈训练 SAR 超分网络，推理时只需 SAR 输入；OGSFlow 作者 README 描述 UAV-SAR 光学引导两阶段条件流超分及两阶段可靠性门控。故一般的光学引导、门控、交叉模态选择或 Flow SR 均不是本项目的独立贡献。OGSFlow 当前证据只到作者仓库 README，论文身份、固定源码和结果仍待核验。来源：[HSFMamba](https://ieeexplore.ieee.org/document/11045185/)、[OGSRN](https://www.sciencedirect.com/science/article/pii/S1000936121003459)、[OGSFlow 作者仓库](https://github.com/AG-WDS/OGSFlow)。
 - **自适应参考引导。** Ada-RefSR（ICLR，2026）以隐式相关性门控控制参考图像对单步扩散超分的作用，属于自然图像参考超分而非 SAR—光学跨模态恢复。它表明“可靠性自适应参考注入”及“单步参考扩散”也不是通用新颖性；本项目候选贡献必须限定为推理时可用的 SAR-specific 信号、受控错配损害降低、保持有效配对收益及无光学回退。[OpenReview 论文页](https://openreview.net/forum?id=hYsqBf3Uad)。
 - **少步生成与后验求解。** NeurIPS 2025 的 Blockwise Flow Matching 在 ImageNet 通用生成中分块建模速度场；MeanFlow 研究单函数评估生成；LLE 针对满足特定规范形式的扩散逆问题学习少步线性外推。它们不证明少步数能改善 SAR 结构、亮回波、数据一致性或光学效用。项目必须把少步研究放在质量门槛之后，联合报告函数评估次数、时间、显存、结构/亮回波与观测残差。[Blockwise Flow Matching](https://proceedings.neurips.cc/paper_files/paper/2025/hash/7a67d9390e62237fb90986c48d12ff79-Abstract-Conference.html)、[LLE](https://proceedings.neurips.cc/paper_files/paper/2025/hash/2ca73f0633760e2e2740ccb2a0d3f8a1-Abstract-Conference.html)、[MeanFlow](https://arxiv.org/abs/2505.13447)。
-- **待核实的直接生成式 SAR JDSR 线索。** 项目相关工作矩阵包含一条 2026 年区域专用扩散 SAR 超分/去斑论文的 DOI 线索，但本轮没有取得 IEEE 出版方页面或可核实正文。该项暂列开放核验任务，不据二手摘要写入贡献判断；在完成一手来源核验前，不宣称“已有/没有某种生成式 SAR JDSR 方法”。
+- **SAR 超分辨率潜扩散。** Lee 与 Son 的 *Towards Realistic SAR Super-Resolution: A Two-Stage Enhancement Framework with Latent Diffusion Models*（MONTI 2026 workshop 录用作者稿）先进行结构超分，再通过盲点去噪桥接与条件潜扩散生成 HR 散斑外观。其真实输入实验用 FWD 比较分布；合成配对实验分别报告单次扩散输出与四输出逐像素均值，均值图像素指标更高，但这不能证明单次 draw 更好或均值图仍服从目标散斑分布。该工作没有光学条件，也没有完成 SAR 联合去斑/超分与 SAR 观测一致性比较；因此，潜扩散用于 SAR 超分和结构后散斑生成不构成本项目独立新颖性。该作者稿的数据规模、模式、归一化及证据限制见[全文审查](../../experiments/literature_audits/monti_two_stage_sar_sr_20261107_v2/report.md)；[MONTI 官方页面](https://sites.google.com/view/monti2026/home)说明该 workshop 论文不收入 CVPR 2026 会议论文集。
+- **仍待核实的直接生成式 SAR JDSR 线索。** 区域专用扩散模型 RSDM/潜空间整合 LSIR 的 2026 DOI 线索已有一份 ResearchGate 作者稿记录，但 IEEE 正式正文及两者版本关系未核实。另发现 *Frequency-enhanced diffusion prior network for joint SAR image despeckling and super-resolution* 的 IOP DOI `10.1088/1361-6501/ae8686`；本次 IOP/DOI 正文入口受限，仅可见 ResearchGate 摘要级二手信息。两项均保留为开放核验线索，不把来源未核实的方法/结果写成事实，也不作“没有某种生成式 SAR JDSR 方法”的主张。见[RSDM/LSIR 来源复核](../../experiments/literature_audits/region_specific_sar_jdsr_source_recheck_20261107_v1/report.md)和[IOP 来源复核](../../experiments/literature_audits/frequency_enhanced_sar_jdsr_source_check_20261107_v1/report.md)。
 - **科学反问题及物理约束生成。** OGSFlow 的通用流机制与 CoCoGen、PISD、CoCoS 的 PDE 物理约束/后验测度结果均已单独记录。它们可限定方法新颖性或提出理论检查问题，不是 SAR 数值域、散斑或 optical 效用的验证。完整证据见[前沿文献对照](../../experiments/literature_audits/optical_sar_generative_frontier_20261030_v1/report.md)、[OGSFlow 审查](../../experiments/literature_audits/ogsflow_readme_details_20261030_v1/report.md)、[流后验采样审计](../../experiments/literature_audits/flow_posterior_sampling_frontier_20261030_v1/report.md)和[物理约束审计](../../experiments/literature_audits/physics_constrained_generation_20261030_v1/report.md)。
 ### 2026-11-05 新增的条件流逆问题先例（2026-11-06 版本题名复核）
 
@@ -325,6 +336,7 @@ Phase-A2 仅作为历史参照，不能支持“Joint > Strong Cascade”表述�
 6. 光学可靠性如何影响恢复和失败行为？
 7. 方法在什么数据、退化和场景条件下有效或失败？
 8. 相对于已有工作和任务匹配基线，已核实的增量贡献是什么？
+9. 对随机恢复方法，单次输出、多次输出的点估计与输出分布分别支持哪些质量结论？
 
 候选叙事为：任务/数据与证据边界 → 匹配 SAR-only 基线 → 光学效用与失败模式 → 生成模型比较 → 已验证的观测一致性 → 证据支持时再研究可靠性/回退 → 完整基线、消融、误差和成本。不得预先写正向结论。现有论文仍为历史/归档材料，除非单独审查；仅在最终产物符合资格后，才构建或更新投稿稿件。投稿准备需要完整协议、重复结果、独立审查、可复现图表、LaTeX/PDF 检查及无未解决致命限制。不承诺投稿 venue 或录用。
 
@@ -347,7 +359,7 @@ B1/B1R/B1F 和 Phase-1 R/S/T 的所有报告、清单、指标、失败运行和
 
 冻结 C1 v2 train/development/confirmation 划分直接沿用，不重新随机切分。train/development 仅在各自预登记探索范围内使用；development 已重复用于模型训练与选择，不能支持独立泛化。confirmation 已于 2026-11-05 访问并用于一次访问后修订的描述性复核，故该角色已消耗并永久封存；它不能再被称为 untouched confirmation，也不能重复用于调参、选模或阶段晋级。该访问后复核为 inconclusive，不改变 C2 v2 原 gate。C1 v2 无独立 test 角色；项目历史 test 使用与本轮 C1 v2 confirmation 分别记录。
 
-本总纲规定的 C1–C6 路线是获批的前瞻研究路径，不追溯通过、重开或重命名历史门槛。v1.7 的采纳不改变任何历史协议阈值、B1/B1R/B1F 或 B2/B3 状态，不自动授权新的划分、模型选择、confirmation/test 访问或训练。每阶段仍须满足独立的资格、准备就绪、资源预检和决策记录。
+本总纲规定的 C1–C6 路线是获批的前瞻研究路径，不追溯通过、重开或重命名历史门槛。v1.8 的采纳不改变任何历史协议阈值、B1/B1R/B1F 或 B2/B3 状态，不自动授权新的划分、模型选择、confirmation/test 访问或训练。每阶段仍须满足独立的资格、准备就绪、资源预检和决策记录。
 
 ## 15. 版本与采纳记录
 
@@ -358,11 +370,19 @@ B1/B1R/B1F 和 Phase-1 R/S/T 的所有报告、清单、指标、失败运行和
 - **生效范围：** 研究问题、科学假设、C1–C6 前瞻路线、研究产出边界及论文主张约束；实际阶段状态仍以 `CURRENT_STATE.md` 和逐阶段决策为准。
 - **版本关系：** v1.7 延续 v1.6 的研究主题、Q1–Q6 与 C1–C6 框架，并更新数据资格、文献边界和阶段说明；v1.6 作为历史版本保留。
 
-### v1.7（2026-11-06，当前生效版本）
+### v1.7（2026-11-06，前一正式版本）
 
 - **来源：** 用户批准的 `RESEARCH_CHARTER_REVISION_PROPOSAL_20261105.md`，差异见 `RESEARCH_CHARTER_CHANGELOG_20261105.md`。
 - **审批：** 用户于 2026-11-06 明确批准采纳完整候选。
 - **修订范围：** 补充算子感知条件流与后验样本覆盖相关的一手文献边界；明确沿用冻结 C1 v2 train/development 划分；记录 confirmation 已访问并永久封存；细化 C3-A SAR-only 探索与 C3-B 光学条件路线的阶段资格和主张限制。
 - **同步：** 已同步本正式总纲、`AGENTS.md`、`README.md`、`CURRENT_STATE.md`、研究计划、实验登记、决策与风险记录。
 - **生效边界：** 不追溯改变历史结果、阶段 gate 或数据资格，不授权访问 confirmation/test/optical 载荷；各阶段仍须满足独立的协议和资源前置条件。
+
+### v1.8（2026-11-09，当前生效版本）
+
+- **来源：** v1.7 正式总纲、MONTI 2026 SAR 潜扩散超分作者稿全文审查、独立与相关 Gamma 样本均值 CPU 合成诊断、C3-A 多样本冻结协议/源码核对，以及直接生成式 SAR JDSR 来源边界复核；逐节差异见 `RESEARCH_CHARTER_CHANGELOG_20261107.md`。
+- **审批：** 用户于 2026-11-09 明确批准采纳完整候选，并授权同步 `AGENTS.md` 与 `README.md`。
+- **修订范围：** 将 SAR 结构超分后潜扩散生成散斑外观列为已核验先例；明确单次生成 draw、多次 draw 的像素均值点估计和生成分布是不同评价对象；记录均值会改变散斑统计且收益受 draw 间相关性限制，禁止以均值图指标代替单次生成质量或分布真实性。
+- **同步：** 已同步本正式总纲、`AGENTS.md`、`README.md` 及当前状态、研究计划、事实、下一步和决策记录。
+- **生效边界：** 不改变 C1–C6 路线、数据资格、C2/C3 gate、confirmation/test 封存、训练暂停状态或历史结论；不授权新数据访问、训练或阶段晋级。
 

@@ -1,5 +1,47 @@
 # 研究假设
 
+## 已知分布的评价量诊断不更新 H1–H6 — 2026-11-09
+
+二维双峰和归一化图像域 CPU 实验确认，均值误差、能量分数、逐像素 CRPS、模态统计及空间变差可揭示所设候选分布的不同失配；集合大小影响有限样本比较稳定性。它们未使用本地数据、模型或 SAR 物理表示，也没有测试光学效用、训练泛化、观测一致性或回退。因此不支持或反证 H1–H6，不改变 C2/C3 gate、C3-A v3、训练暂停或阶段资格。真实 Flow/Diffusion 输出的样本分布及 draw 相关性仍开放。见[二维评价量诊断](../../experiments/synthetic_cpu/c3a_distribution_metric_sanity_cpu_20261109_v1/report.md)、[样本数诊断](../../experiments/synthetic_cpu/c3a_distribution_draw_count_cpu_20261109_v1/report.md)与[图像域诊断](../../experiments/synthetic_cpu/c3a_image_distribution_metrics_cpu_20261109_v1/report.md)。
+
+## Amieva 论文全文不更新 H1–H6 — 2026-11-07
+
+该文确认存在非生成式 SAR-only IW→SM 联合去斑/超分先例，并要求避免宽泛的“此前没有 SAR 联合恢复”表述。但它不使用 optical，也没有测试错配或 SAR 观测一致性，因此不支持或反证 optical 增量、生成模型、观测一致性或可靠性假设；H1–H6、C2 gate 与 C3-A 阶段状态不变。见 D-2026-11-07-055 与[全文审查](../../experiments/literature_audits/amieva_direct_fulltext_followup_20261107_v1/report.md)。
+
+## IOP 生成式 SAR JDSR 二手线索不更新 H1–H6 — 2026-11-07
+
+该线索当前只有摘要级二手条目，未核实一手正文；因此它只提示需要收窄宽泛新颖性措辞，不支持或反证光学增量效用、生成模型效果、观测一致性或可靠性假设。H1–H6、C2 gate 与 C3-A 资格状态不变。见 D-2026-11-07-054 与[来源报告](../../experiments/literature_audits/frequency_enhanced_sar_jdsr_source_check_20261107_v1/report.md)。
+
+## 相关 Gamma draw 均值诊断不更新 H1–H6 — 2026-11-07
+
+45 个共同 Gamma 分量合成条件核验了 draw 相关性如何改变像素均值的误差与 ENL 代理；它未使用模型、项目载荷或 SAR 实测，也没有检验光学增量效用、训练泛化或真实生成分布。因此不支持或反证 H1–H6，不改变 C2 gate、C3-A 冻结协议或阶段资格。真实 C3-A draw 相关性和样本质量仍待训练/评价恢复后检查。见 D-2026-11-07-053 与[CPU 报告](../../experiments/synthetic_cpu/c3a_correlated_draw_mean_cpu_20261107_v1/report.md)。
+
+对冻结 C3-A v3 protocol/evaluator 的静态对应核对也不更新 H1–H6：当前输出范围不足以评价像素均值或估计生成分布，且该范围与协议相符。若提出新的评价问题，需另作前瞻协议；不以现有 v3 汇总结果推断未保存图像的性质。见[审查记录](C3A_MULTI_SAMPLE_DEPENDENCE_AUDIT_20261107.md)。
+
+## C2 全 development 对比差观察不更新 H1–H6 — 2026-11-07
+
+零背景中位数诊断扩展至全部四条件 development，每条件 200 样本、19 个来源组。matched−SAR-only 的目标—背景对比误差在三种条件上轻微下降、x4_severe 上升；该指标是表示域局部描述，不是整体重建质量。development 已重复用于训练/选择，因此这些观察既不支持也不否定 H1/Q1，不改变 C2 gate 或 H1–H6 定义。见 D-2026-11-07-049 与[CPU 报告](../../experiments/diagnostics/c2_all_development_contrast_cpu_20261107_v5/report.md)。
+
+## SAR 条件 Flow 的 SAR-to-optical 先例不更新 H1–H6 — 2026-11-07
+
+新审阅的 Flow Matching 工作以 SAR 为条件生成 optical 输出，没有测试 optical 是否改善 SAR 输出恢复。因此它只收窄通用 Flow/SAR 条件生成的新颖性，不为本地 H1–H6 提供支持或反证；C3-A 质量仍未知，C2 gate 不变。见 D-2026-11-07-050 与[来源审查](../../experiments/literature_audits/sar_conditioned_flow_sar_to_optical_review_20261107_v1/report.md)。
+
+## DiffusionSAR 全文只收窄新颖性，不更新 H1–H6 — 2026-11-07
+
+一手全文确认已有条件扩散 SAR 去斑，但没有 SR 或推理时 optical。此文献事实要求避免宽泛的方法首创主张；它不测试本地 joint JDSR、optical 增量价值或失配回退，也不提供本地 C3-A 质量证据。H1–H6 与 Q1–Q6 均不更新，C2 gate 和 C3-A 状态不变。见 D-2026-11-07-026 与[全文审查](../../experiments/literature_audits/diffusionsar_conditional_sar_despeckling_fulltext_20261107_v1/report.md)。
+
+## C2 零背景对比差失败案例不支持或否定 H1 — 2026-11-07
+
+CPU 诊断只覆盖 6 条原 median-TBR 未定义的 development 记录；matched−SAR-only 对比误差方向随退化条件和统计量变化，且每条件仅 1–2 条、总计 2 个来源组。它既非完整 development 的预注册晋级评价，也非独立验证；H1/Q1 保持开放，不据此声称稳定 optical 增益或 optical 无效。C2 v2 gate 仍未判定。见 D-2026-11-07-005。
+
+## C1 v2 划分元数据审计不更新 H1–H6 — 2026-11-07
+
+角色/来源组及文件身份互斥只核验数据划分元数据；它不检验 SAR 重建质量、Flow 收益、生成模型优势、观测一致性或 optical 效用。因此 H1–H6 均无新增支持或反证，保持原定义和状态；见 D-2026-11-07-003。
+
+## 新近流逆问题与 SAR 成像先例不改变 Q1–Q6 — 2026-11-07
+
+MS-Flow 研究通用流先验逆问题求解，UAV SAR Imaging 研究仿真 MIMO-OFDM 回波上的扩散后验重建；两者都没有检验本项目的光学增益、表示域 pseudo-target 质量、光学可靠性或本地 SAR-only Flow 收益。因此 H1–H6 保持原定义和开放状态，不作支持或反证更新；C3-A 结果需待用户恢复训练后取得。详见 D-2026-11-07-002 与[文献审查](../../experiments/literature_audits/sar_echo_and_flow_trajectory_prior_art_20261107_v1/report.md)。
+
 ## C3-A 四次采样稳定性补充仍不更新 H3 — 2026-11-05 17:24（中国标准时间）
 
 已预登记 C3-A best checkpoint 的 development 多次采样补充协议 v2：每个身份固定 4 个噪声 draw，与确定性 C2 SAR-only baseline 配对，并以来源组为 bootstrap 单位；新增的 EPI/边缘强度比使用固定 LR/noisy pseudo-target edge mask，只反映表示域结构一致性。该分析不估计训练 seed 波动、分布校准或 optical 效用。训练与评价尚未启动；GPU 等待会话 `77673` 最近检测到 4 个 CUDA 计算进程、1,186/4,096 MiB 空闲。H3、H4 及 Q1/Q2 均保持开放，历史 gate 不变。见[补充协议 v2](../../protocols/mmcanet_phase_c3a/multi_sample_stability_c1_v2_20261105_v2.json)、[等待记录](../../experiments/diagnostics/c3a_gpu_wait_20261105_v3/manifest.json)和[实验登记](EXPERIMENT_REGISTRY.md)。
@@ -319,3 +361,13 @@ Q1–Q6 已由正式总纲采纳为研究问题；本条只固定问题框架，
 ## 2026-11-06 题名校订与 C3-A 等待不更新假设
 
 arXiv:2609.12953 的当前版本题名校订为 FIRM；这只更新书目事实，不改变 H1–H6。C3-A 等待器 v8 已启动但 GPU 门槛未满足，训练和 development 评价均未开始，故没有新增模型结果：H3 仍未检验，H4 仍缺经核验的观测似然，H1/H2 仍无新增配对光学证据。confirmation/test/optical 载荷未访问。见[条件流文献审计](../../experiments/literature_audits/flow_operator_posterior_support_20261105_v1/report.md)及[v8 manifest](../../experiments/diagnostics/c3a_gpu_wait_20261106_v8/manifest.json)。
+
+
+## 2026-11-07 文献更新后的假设状态
+
+FlowSGS 与 FMPS 已作为通用 flow 后验方法先例登记。文献先例会收窄方法新颖性措辞，但不支持或否定本项目关于 SAR 域任务条件 flow、光学增益、观测相容性或失配回退的任何假设；这些假设状态仅由对应协议下的证据决定。
+
+
+## 2026-11-07 文献边界补记：乘性噪声生成模型
+
+ICMLA 2025 的对数正态乘性噪声 SDE 工作没有检验本项目的光学增量价值、SAR 联合超分、错配回退或真实 SAR 观测一致性。Gamma 与对数正态乘子的一次方差匹配合成对照只支持“分布不能仅凭均值/方差视为相同”，不更新任何 Q1–Q6 假设的证据状态。当前假设仍待本项目合格实验检验。

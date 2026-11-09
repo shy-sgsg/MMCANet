@@ -20,6 +20,7 @@ from scripts.evaluate_c3a_multisample import (
     draw_noise_for_identity,
     group_bootstrap_summary,
 )
+from scripts import evaluate_c3a_multisample as evaluator
 
 
 def _rows(sample_id: str, group_id: str, patch_id: str, psnr_values: list[float]):
@@ -33,6 +34,9 @@ def _rows(sample_id: str, group_id: str, patch_id: str, psnr_values: list[float]
             "SSIM": 0.5 + draw * 0.01,
             "EPI": 0.5 + draw * 0.1,
             "边缘强度比": 0.8 + draw * 0.05,
+            "最终裁剪比例": 0.20,
+            "原始输出低于0比例": 0.05 + draw * 0.01,
+            "原始输出高于1比例": 0.15 - draw * 0.01,
             "预测像素标准差均值": 0.1,
         }
         for draw, value in enumerate(psnr_values)
@@ -43,8 +47,8 @@ def test_identity_aggregation_averages_draws_without_pseudoreplication():
     flow_rows = _rows("sample-a", "scene-a", "1", [21.0, 22.0, 23.0, 24.0])
     flow_rows += _rows("sample-b", "scene-b", "2", [19.0, 19.5, 20.0, 20.5])
     baseline_rows = [
-        {"样本 ID": "sample-a", "来源组 ID": "scene-a", "patch ID": "1", "PSNR": 20.0, "SSIM": 0.4, "EPI": 0.4, "边缘强度比": 0.7},
-        {"样本 ID": "sample-b", "来源组 ID": "scene-b", "patch ID": "2", "PSNR": 18.0, "SSIM": 0.3, "EPI": 0.3, "边缘强度比": 0.6},
+        {"样本 ID": "sample-a", "来源组 ID": "scene-a", "patch ID": "1", "PSNR": 20.0, "SSIM": 0.4, "EPI": 0.4, "边缘强度比": 0.7, "最终裁剪比例": 0.05, "原始输出低于0比例": 0.02, "原始输出高于1比例": 0.03},
+        {"样本 ID": "sample-b", "来源组 ID": "scene-b", "patch ID": "2", "PSNR": 18.0, "SSIM": 0.3, "EPI": 0.3, "边缘强度比": 0.6, "最终裁剪比例": 0.04, "原始输出低于0比例": 0.01, "原始输出高于1比例": 0.03},
     ]
 
     summaries = aggregate_multi_sample_metrics(flow_rows, baseline_rows, expected_draws=4)
@@ -60,8 +64,50 @@ def test_identity_aggregation_averages_draws_without_pseudoreplication():
     assert first["Flow EPI 样本标准差"] == pytest.approx(np.std([0.5, 0.6, 0.7, 0.8], ddof=1))
     assert first["Flow 平均边缘强度比"] == pytest.approx(0.875)
     assert first["平均预测像素标准差"] == pytest.approx(0.1)
+    assert first["Flow 平均原始输出低于0比例"] == pytest.approx(0.065)
+    assert first["Flow 平均原始输出高于1比例"] == pytest.approx(0.135)
+    assert first["baseline 原始输出低于0比例"] == pytest.approx(0.02)
+    assert first["baseline 原始输出高于1比例"] == pytest.approx(0.03)
     assert second["平均配对 ΔPSNR"] == pytest.approx(1.75)
     assert len(summaries) == 2
+
+
+def test_raw_output_range_diagnostics_separate_lower_and_upper_clipping():
+    helper = getattr(evaluator, "_attach_clip_range_components", None)
+    assert callable(helper), "多次采样评价器应提供原始输出上下界越界分解"
+
+    rows = [{"最终裁剪比例": 0.5}]
+    raw = torch.tensor([[[[-0.5, 0.0, 1.0, 1.5]]]], dtype=torch.float32)
+
+    helper(rows, raw)
+
+    assert rows[0]["原始输出低于0比例"] == pytest.approx(0.25)
+    assert rows[0]["原始输出高于1比例"] == pytest.approx(0.25)
+    assert rows[0]["最终裁剪比例"] == pytest.approx(
+        rows[0]["原始输出低于0比例"] + rows[0]["原始输出高于1比例"]
+    )
+
+
+def test_identity_aggregation_rejects_inconsistent_clip_components():
+    flow_rows = _rows("sample-a", "scene-a", "1", [21.0, 22.0, 23.0, 24.0])
+    flow_rows[0]["原始输出高于1比例"] += 0.01
+    baseline = [
+        {
+            "样本 ID": "sample-a",
+            "来源组 ID": "scene-a",
+            "patch ID": "1",
+            "PSNR": 20.0,
+            "SSIM": 0.4,
+            "EPI": 0.4,
+            "边缘强度比": 0.7,
+            "最终裁剪比例": 0.05,
+            "原始输出低于0比例": 0.02,
+            "原始输出高于1比例": 0.03,
+        }
+    ]
+
+    with pytest.raises(ValueError, match="越界比例之和"):
+        aggregate_multi_sample_metrics(flow_rows, baseline, expected_draws=4)
 
 
 def test_aggregation_rejects_missing_or_duplicate_sampling_draws():
@@ -100,7 +146,7 @@ def test_draw_noise_is_reproducible_and_changes_with_draw_index():
 def test_protocol_schema_and_model_configuration_match_frozen_training_run():
     protocol, digest = _read_protocol()
     assert digest == EXPECTED_EVALUATION_PROTOCOL_SHA256
-    assert protocol["format"] == "c3a_multi_sample_stability_protocol_v2"
+    assert protocol["format"] == "c3a_multi_sample_stability_protocol_v3"
     assert protocol["data"]["sample_count"] == 200
     assert protocol["data"]["source_group_count"] == 19
     assert protocol["determinism"]["deterministic_algorithms"] is True
@@ -108,6 +154,11 @@ def test_protocol_schema_and_model_configuration_match_frozen_training_run():
     assert "baseline_metrics.csv" in protocol["outputs"]["files"]
     assert "edge_mask_manifest.csv" in protocol["outputs"]["files"]
     assert "EPI" in protocol["metrics"]["per_draw"]
+    assert "原始输出低于0比例" in protocol["metrics"]["per_draw"]
+    assert "原始输出高于1比例" in protocol["metrics"]["per_draw"]
+    assert protocol["metrics"]["selection_or_gate_change"] is False
+    assert "Flow 平均原始输出低于0比例" in protocol["metrics"]["group_bootstrap_metrics"]
+    assert "Flow 平均原始输出高于1比例" in protocol["metrics"]["group_bootstrap_metrics"]
     assert protocol["metrics"]["structural"]["edge_mask"]["threshold_percentile"] == 90.0
 
     import json
@@ -146,6 +197,28 @@ def test_group_bootstrap_resamples_source_groups_and_is_reproducible():
     assert first == second
     assert first["来源组等权均值"] == pytest.approx(3.5)
     assert first["来源组数"] == 2
+
+
+def test_frozen_v3_group_bootstrap_uses_metrics_config_and_expected_group_count():
+    protocol, _ = _read_protocol()
+    metric_names = protocol["metrics"]["group_bootstrap_metrics"]
+    rows = []
+    for group_index in range(protocol["data"]["source_group_count"]):
+        row = {"来源组 ID": f"合成来源组-{group_index:02d}"}
+        for metric_index, metric in enumerate(metric_names):
+            row[metric] = float(group_index + metric_index + 1)
+        rows.append(row)
+
+    summarize = getattr(evaluator, "summarize_group_bootstrap_metrics", None)
+    assert callable(summarize), "C3-A 冻结 bootstrap 配置汇总器尚未实现"
+    summaries = summarize(rows, protocol)
+
+    assert set(summaries) == set(metric_names)
+    assert all(summary["来源组数"] == 19 for summary in summaries.values())
+    assert all(summary["bootstrap 重复数"] == 10000 for summary in summaries.values())
+    assert all(summary["bootstrap seed"] == 20261106 for summary in summaries.values())
+    with pytest.raises(ValueError, match="来源组数量与冻结协议不一致"):
+        summarize(rows[:-1], protocol)
 
 
 def test_development_manifest_must_cover_expected_unique_identities_and_groups():

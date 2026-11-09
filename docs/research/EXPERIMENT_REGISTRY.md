@@ -1,5 +1,267 @@
 # 实验登记
 
+## C1 SEN12MS 地理元数据候选路线复核 — 2026-11-09（只读来源审查）
+
+- **问题：** 是否有新的官方 georeferenced SEN12MS 元数据能把冻结 C1 v2 train/development 来源文件连接到坐标或 patch footprint？
+- **来源：** SEN12MS 作者论文描述 GeoTIFF、ROI/scene 与命名结构；作者 README 说明提供分类训练清单、测试清单及 ROI 地图 notebook。官方训练清单网页仅显示文件大小，未显示其 4.91 MB 内容。
+- **观察：** C1 train/development 本地来源路径与论文中的 ROI/season/patch 词法相似，但无可核验的逐文件交叉结果。精确检索无结果不等于无匹配；不同发布版的名字相似不能证明身份一致。报告：[来源复核](../../experiments/data_audits/c1_sen12ms_georeference_crosswalk_recheck_20261109_v1/report.md)。
+- **边界：** 只查看论文、README、训练清单页面元数据及 C1 train/development staging/path 元数据；不读取 test/hold-out 清单内容、notebook 输出或影像载荷，不访问 confirmation/test，未训练或使用 GPU。
+
+## 横纵相关轴交换的变差分数诊断 — 2026-11-09（纯合成方法实验）
+
+- **问题：** 逐边平方误差后汇总的现行变差分数，能否在横纵相关不同且候选预测交换两个方向时检测各向异性错配？
+- **协议/输入：** [预登记协议](../../experiments/synthetic_cpu/c3a_spatial_variogram_anisotropy_cpu_20261109_v1/protocol.md)固定 24×24 logistic-normal 场、横纵 AR(1) 相关 0.75/0.35、双向真值、每方向 300 目标、16 draws 与 lag={1,2,4,8}。
+- **结果：** 两个方向 h=1/多尺度正确排序率均为 1.000，且平均差 95% 区间下界大于零；h=8 排序率为 0.593；CRPS 与整图能量分数排序接近 0.5。独立 CSV 和 manifest 复核通过。详见[运行报告](../../experiments/synthetic_cpu/c3a_spatial_variogram_anisotropy_cpu_20261109_v1/report.md)。
+- **边界：** 仅测一个平稳可分离 logistic-normal 各向异性构造；不能外推到非平稳结构、亮散射点或 SAR 模型。未改评分代码、C3-A v3、评价协议或 gate。
+
+## 多尺度变差分数相关强度敏感性诊断 — 2026-11-09（纯合成方法实验）
+
+- **问题：** ρ=0.8 单点上的空间区分观察能否延伸至较弱和较强的一阶高斯相关，以及不同真值方向？
+- **协议/输入：** [预登记协议](../../experiments/synthetic_cpu/c3a_spatial_variogram_correlation_sweep_cpu_20261109_v1/protocol.md)固定 24×24 logistic-normal 场、ρ={0.4,0.6,0.8,0.9}、AR(1)/RBF、每条件 300 目标、16 draws、lag={1,2,4,8}，按目标进行 2,000 次 bootstrap。
+- **结果：** 8 个相关强度/真值条件中 7 个同时满足多尺度平均差区间下界大于零且正确排序比例高于 0.65。ρ=0.4、RBF 真值条件平均差区间为 [0.00001407, 0.00003987]，但正确排序比例 0.600，未达到门槛；其余 7 个排序比例为 0.717–0.990。全部 h=1 排序比例为 0.463–0.550。详见[运行报告](../../experiments/synthetic_cpu/c3a_spatial_variogram_correlation_sweep_cpu_20261109_v1/report.md)。
+- **边界：** 只覆盖指定平稳可分离 logistic-normal 协方差族与 K=16；不外推 SAR、非平稳结构、散射点、真实模型 draw 或后验校准。不接入 C3-A v3，不决定真实 lag、权重、draw 数或 gate。未访问项目数据、模型、checkpoint、confirmation/test 或 GPU。
+
+## 单尺度与多尺度变差分数 CPU 诊断 — 2026-11-09（纯合成方法实验）
+
+- **问题：** 当像素边际分布与 1 像素相关相同、远距离相关不同时，单邻接变差分数能否识别协方差失配？等权组合多个固定距离是否改善区分？
+- **协议/输入：** [预登记协议](../../experiments/synthetic_cpu/c3a_spatial_variogram_multiscale_cpu_20261109_v1/protocol.md)固定 24×24、可分离 AR(1)/RBF logistic-normal 场、一阶相关 0.8、`h={1,2,4,8}`、每方向 300 个目标、16 draws；共同底噪配对预测家族。
+- **结果：** 单尺度 `h=1` 正确排序比例 0.490/0.473；四尺度等权变差分数为 0.990/0.857，且两个方向平均配对差 95% 区间均大于零。逐像素 CRPS 排序接近 0.5；整图能量分数的逐目标排序也较弱。详见[报告](../../experiments/synthetic_cpu/c3a_spatial_variogram_multiscale_cpu_20261109_v1/report.md)。
+- **边界：** 仅一个低维平稳可分离协方差对照；不外推非平稳 SAR 结构、散射点、真实 draw 依赖或后验校准。未接入 C3-A v3、不决定真实评分权重、draw 数或 gate；无项目影像、模型、checkpoint、confirmation/test 或 GPU 访问。
+- **产物：** `protocol.md`、`run.py`、`per_trial.csv`、`results.json`、`manifest.json`；运行前余量约 19.5 GiB，产物约 0.46 MB。
+
+## IOP SAR JDSR 来源路线补查 — 2026-11-09（文献审查，非实验）
+
+- **检索范围：** 精确题名查询 `edu.cn` 页面、机构仓储与 arXiv；未重复请求此前受限的 IOP、DOI 和 Crossref 正文入口。
+- **结果：** 没有发现新的可读取一手全文或可验证作者稿；仍只见 ResearchGate 摘要级二手条目。方法、数据拆分、代码和性能均不升级为事实。
+- **边界：** 有界检索未命中不证明其他位置不存在作者稿；未访问项目数据、模型或 checkpoint，没有训练/GPU，也未读取 confirmation/test 载荷或测量值。见[来源审查报告](../../experiments/literature_audits/frequency_enhanced_sar_jdsr_source_check_20261107_v1/report.md)。
+
+## C3-A development CPU 验证权重预检 — 2026-11-09（只读元数据检查，非模型实验）
+
+- **发现：** 未识别到 C3-A 正式训练 run 或匹配的 `checkpoints/best.pt`。现有评价器需要 run manifest、输入 manifest、协议绑定与权重身份校验。
+- **限制：** 只检查目录名、文件名与元数据；没有打开 checkpoint、图像、split payload 或测量值。没有训练、推理或使用 GPU。
+- **决定：** 当前不运行开发集评价；训练恢复且合规 run 已生成后再调用现有评价器。详见[预检报告](../../experiments/diagnostics/c3a_cpu_evaluation_checkpoint_preflight_20261109_v1/report.md)。
+
+## PCSDD 复数 SAR 扩散去斑全文审查 — 2026-11-09（文献审查，非实验）
+
+- **记录：** [中文审查报告](../../experiments/literature_audits/pcsdd_complex_diffusion_despeckling_fulltext_20261109_v1/report.md)。
+- **来源：** IEEE 官方 DOI 元数据及作者公开 CC BY 4.0 全文；IEEE 全文页面自动访问受机器人验证限制。
+- **结论边界：** 记录为复数 SLC 上 PDE 引导扩散去斑相邻先例。它不涉及 SAR 超分、光学引导或错配回退，不能直接迁移至本地 8-bit 表示域；正文对盲点掩码 `M` 的符号约定与输入构造式/监督集合定义不一致；作者代码未核实，故不宣称无中心像素泄漏已获独立验证。上传版本对应和场景 split 细节未核实。
+- **运行范围：** 未运行代码或数据，未访问项目图像/模型/checkpoint，未使用 GPU，未访问 confirmation/test 载荷或测量值。
+
+## 多样本评分工具单图像 CPU 耗时 — 2026-11-09（合成软件性能诊断，非模型实验）
+
+- **协议与命令：** [预登记协议](../../experiments/synthetic_cpu/c3a_distribution_metric_runtime_cpu_20261109_v1/protocol.json)；`python -m py_compile experiments/synthetic_cpu/c3a_distribution_metric_runtime_cpu_20261109_v1/run.py` 后执行 `python experiments/synthetic_cpu/c3a_distribution_metric_runtime_cpu_20261109_v1/run.py`。
+- **输入/计时：** 固定种子合成 `[16,256,256]` 集合与 `[256,256]` 观测；每项预热一次、计时七次。数组生成和文件 I/O 不计入函数耗时。
+- **结果：** 逐像素 CRPS 中位数 16.700 ms（IQR 15.884–17.801），整图能量分数 7.183 ms（6.925–7.363），邻接变差分数 14.568 ms（14.482–15.653）；21 条逐次记录、每项 7 条，所有评分有限。
+- **边界：** 当前主机单图计算时长；不外推完整开发集或 GPU，不包含模型采样与 I/O，不改变 C3-A v3、指标 gate、draw 数或训练状态。无项目图像/结果、模型、checkpoint、confirmation/test 载荷访问。
+- **产物：** [中文报告](../../experiments/synthetic_cpu/c3a_distribution_metric_runtime_cpu_20261109_v1/report.md)、[逐次 CSV](../../experiments/synthetic_cpu/c3a_distribution_metric_runtime_cpu_20261109_v1/逐次计时.csv)、[JSON 与 manifest](../../experiments/synthetic_cpu/c3a_distribution_metric_runtime_cpu_20261109_v1/)。
+
+## 多样本评分量隔离原型验证 — 2026-11-09（纯 CPU 软件核验，非模型实验）
+
+- **实现：** [独立 NumPy 评分工具](../../scripts/distribution_metrics.py)；函数为 `pixelwise_crps`、`normalized_image_energy_score`、`adjacent_variogram_score`。只接收 `[K,H,W]` 预测集合和 `[H,W]` 观测，输入须为有限实数且位于 `[0,1]`；越界时报错，不自动裁剪。未接入 C3-A v3。
+- **验证：** `python -m pytest tests/test_distribution_metrics.py -q`，10 项通过；`python -m py_compile scripts/distribution_metrics.py tests/test_distribution_metrics.py` 通过。覆盖精确集合、CRPS 手算值、能量分数像素归一化、邻接变差手算值及输入合同失败情况。另以固定种子的 5×7×9 合成数组和独立向量化公式对照，三项分数最大绝对差为 `2.776e-17`。
+- **运行边界：** NumPy CPU 合成小数组，无 PyTorch/GPU、训练或项目图像/模型/检查点访问；confirmation/test 载荷与测量值未访问。
+- **解释：** 这是未启用补充设计中的候选评分量的软件核验，不验证真实图像分布、校准、物理一致性、draw 数或 gate。未来使用前仍需冻结数据、汇总、空间边、重抽样和保存策略。
+
+## 多样本概率评分规则一手来源核验 — 2026-11-09（文献审查，非实验）
+
+- **记录：** [审查报告](../../experiments/literature_audits/proper_scoring_rules_multisample_eval_20261109_v1/report.md)。
+- **来源：** Gneiting 与 Raftery（2007）JASA 适当评分规则全文；Scheuerer 与 Hamill（2015）MWR 变差评分全文，含 NOAA 作者机构存档。
+- **结果/影响：** CRPS 支持逐像素边缘评分；能量分数可评价有限集合表示的多变量分布，但对部分相关失配的敏感性可能有限；变差分数可检查所选配对空间统计，但非严格适当。已把三者的互补关系与局限写入补充设计。两篇来源均未验证 SAR 指标或本地模型。
+
+## 归一化图像域的分布评价量已知案例 — 2026-11-09（纯合成 CPU，非门槛）
+
+- **记录：** [协议](../../experiments/synthetic_cpu/c3a_image_distribution_metrics_cpu_20261109_v1/protocol.json)、[脚本](../../experiments/synthetic_cpu/c3a_image_distribution_metrics_cpu_20261109_v1/run.py)、[报告](../../experiments/synthetic_cpu/c3a_image_distribution_metrics_cpu_20261109_v1/report.md)、[manifest](../../experiments/synthetic_cpu/c3a_image_distribution_metrics_cpu_20261109_v1/manifest.json)。
+- **设计/结果：** 32×32 `[0,1]` 合成图、Gamma(shape=4, scale=1/4) 受控乘性变量、每集合 16 draws、100 次重复。边缘分布相同但错误空间依赖候选的逐像素 CRPS 配对差为 −0.0000128，标准误 0.0001670；归一化整图能量和邻接变差配对差分别为 +0.0051899 和 +0.0044720，100/100 次均高于正确候选。
+- **边界：** Gamma 参数仅为数学构造，不解释为本地物理视数；只用于已知合成例子的评价量检查，不代表项目模型、SAR 物理或 C3-A 结果。
+
+## 已知双峰分布的多样本评价量诊断 — 2026-11-09（纯合成 CPU，非门槛）
+
+## 已知双峰分布的多样本评价量诊断 — 2026-11-09（纯合成 CPU，非门槛）
+
+- **记录：** [协议](../../experiments/synthetic_cpu/c3a_distribution_metric_sanity_cpu_20261109_v1/protocol.json)、[脚本](../../experiments/synthetic_cpu/c3a_distribution_metric_sanity_cpu_20261109_v1/run.py)、[报告](../../experiments/synthetic_cpu/c3a_distribution_metric_sanity_cpu_20261109_v1/report.md)、[manifest](../../experiments/synthetic_cpu/c3a_distribution_metric_sanity_cpu_20261109_v1/manifest.json)。
+- **设计/结果：** 30 次重复、每候选 256 个样本，比较真实双峰、均值塌缩、矩匹配单峰高斯和 0.8/0.2 偏置双峰。均值塌缩均值误差为零，但能量分数 3.0910、模态支持率与成对距离均为零；真实双峰抽样能量分数为 1.8094。均值和协方差匹配仍未匹配双峰形状。
+- **边界：** 仅说明指定二维分布下评价量的诊断行为；不表示本地模型、SAR 物理、校准或 C3-A 结果。C3-A v3 与所有 gate 不变，无训练/GPU/项目影像或确认测试载荷访问。
+
+## 已知双峰分布的评价样本数敏感性 — 2026-11-09（纯合成 CPU，非门槛）
+
+- **记录：** [协议](../../experiments/synthetic_cpu/c3a_distribution_draw_count_cpu_20261109_v1/protocol.json)、[脚本](../../experiments/synthetic_cpu/c3a_distribution_draw_count_cpu_20261109_v1/run.py)、[报告](../../experiments/synthetic_cpu/c3a_distribution_draw_count_cpu_20261109_v1/report.md)、[manifest](../../experiments/synthetic_cpu/c3a_distribution_draw_count_cpu_20261109_v1/manifest.json)。
+- **设计/结果：** 100 次重复，比较 N=4/8/16/32/64/128/256 的能量分数排序。预登记的 0.90 重复比例描述阈值在矩匹配单峰高斯的 N=32、偏置双峰的 N=16 首次达到；重复间分数差波动随 N 增加总体下降。
+- **边界：** 样本数结论只适用于该二维合成例子，不能用作真实 Flow/Diffusion 的 draw 数建议、功效保证或阶段门槛。没有项目影像、模型、checkpoint、confirmation/test 载荷访问，无训练或 GPU。
+
+## ICSP 2024 作者主页全文路线复核 — 2026-11-07（来源审查，非实验）
+
+- **编号：** `LIT-ICSP-SAR-DIFFUSION-ACCESS-20261107-FU1`。
+- **结果：** ResearchGate 对应作者论文条目标注无全文，仅提供向作者请求的入口；本次未请求。IEEE 仍只有摘要，NUDT 精确检索未找到作者稿；会议目录只提供书目信息。
+- **处理：** 保持摘要级证据，不补写协议或结果细节，也不改变 gate。详见[来源记录](../../experiments/literature_audits/icsp_sar_diffusion_sr_abstract_pdf_route_20261107_v1/report.md)。
+
+## Amieva 等人 SAR 联合去斑/超分论文全文补充审查 — 2026-11-07（文献审查，非实验）
+
+- **编号：** `LIT-AMIEVA-DIRECT-FULLTEXT-20261107-v1`。
+- **范围：** 直接读取机构仓储已发表版 PDF 正文；随后复访超时。没有访问项目数据、模型、checkpoint 或 confirmation/test 载荷，没有训练或使用 GPU。
+- **结果：** 核实 IW→SM 跨模式 SAR-only 非生成式联合恢复、整景 5/2/3 划分及全影像集合百分位先于拆分；保留参考噪声、百分位统计池化方式和 test 使用边界等限制。
+- **处理：** 更新原有矩阵行和综述条目，不增加重复文献；不改变 gate 或正式总纲。详见[审查报告](../../experiments/literature_audits/amieva_direct_fulltext_followup_20261107_v1/report.md)。
+
+## IOP SAR 联合去斑/超分 DOI 有界复核 — 2026-11-07（文献来源审查，非实验）
+
+- **编号：** `LIT-FEP-SAR-JDSR-20261107-v1`。
+- **结果：** IOP 出版方、DOI 与 Crossref 入口没有提供可读正文；只检索到 ResearchGate 摘要级二手线索。其题名高度相关，但方法、数据、指标与正式出版元数据仍待一手核实。
+- **处理：** 记入开放先例矩阵和候选总纲，不把二手摘要升级成方法/效果事实；不改变 v1.7、C1–C6、任何 gate 或训练状态。详见[来源报告](../../experiments/literature_audits/frequency_enhanced_sar_jdsr_source_check_20261107_v1/report.md)。
+
+## C3-A 多样本协议与实现对应核查 — 2026-11-07（静态审查，非模型实验）
+
+- **范围：** 只读核对冻结 protocol v3 与 `scripts/evaluate_c3a_multisample.py` 的采样/统计/输出路径。
+- **结论：** 实现逐 draw 计算指标并报告逐像素样本标准差；没有均值图指标、生成分布距离、draw 相关系数或预测图持久化。与协议目标相符，不是代码缺陷，故不修改 evaluator 或协议。
+- **边界：** 不能由此推断真实 draw 独立性/分布校准，也不触碰真实模型输出、项目数据或 confirmation/test 载荷。未来增加评价须另行预登记。详见[静态审查](C3A_MULTI_SAMPLE_DEPENDENCE_AUDIT_20261107.md)。
+
+## 相关 Gamma draw 多样本均值敏感性 — 2026-11-07（纯合成 CPU，非门槛）
+
+- **编号：** `C3A-SYN-CORRELATED-DRAW-MEAN-20261107-v1`；[冻结协议](../../experiments/synthetic_cpu/c3a_correlated_draw_mean_cpu_20261107_v1/protocol.json)。
+- **设计：** `n_k=c+u_k`，固定每个 draw 的 `Gamma(L,1/L)` 边际并控制共同分量形成的相关系数 `ρ∈{0,0.25,0.5,0.9,1}`；`L∈{1,2,8}`、K∈{1,4,8}、每条件 500,000 像素。
+- **结果：** 45/45 个预声明核验通过。K=8 的 PSNR 增益随 `ρ` 增加而从约 +9.03 dB 下降至 0 dB；详细范围见[报告](../../experiments/synthetic_cpu/c3a_correlated_draw_mean_cpu_20261107_v1/report.md)。
+- **解释边界：** 仅为共同 Gamma 数学模型，不测量真实模型输出相关性、不代表项目 SAR 数据，不改变 C3-A 评价协议或任何 gate；未训练、未用 GPU、未访问项目载荷或 checkpoint。
+
+## Gamma 乘性噪声多样本均值效应 — 2026-11-07（纯合成 CPU，非门槛）
+
+- **编号：** `C3A-SYN-SAMPLE-MEAN-20261107-v1`；协议：[protocol.json](../../experiments/synthetic_cpu/c3a_sample_mean_variance_cpu_20261107_v1/protocol.json)。
+- **范围：** 仅 NumPy 合成 `n~Gamma(L,1/L)`；L 为 1/2/8，每条件 500,000 个像素、8 次独立 draw，比较 K=1/4/8 的逐像素均值。
+- **观察：** 9 个条件的均值、方差、ENL、MSE 比和 PSNR 容差全部通过。K=4 的 PSNR 增益约 +6.0 dB、K=8 约 +9.0 dB；ENL 随 K 增长。仅支持该解析 Gamma 设定下的统计观察。
+- **解释边界：** 均值图可作平方误差点估计，但不再是原单样本分布的生成样本。没有项目数据、模型、checkpoint、confirmation/test 载荷访问；没有训练、GPU、选模或 gate 变更。结果与[报告](../../experiments/synthetic_cpu/c3a_sample_mean_variance_cpu_20261107_v1/report.md)和[manifest](../../experiments/synthetic_cpu/c3a_sample_mean_variance_cpu_20261107_v1/manifest.json)对应。
+
+## MONTI 两阶段 SAR 潜扩散超分全文审查 — 2026-11-07（文献审查）
+
+- **编号：** `LIT-MONTI-TWO-STAGE-SAR-SR-20261107-v2`。OpenReview 作者稿全文及 MONTI 官方录用/非归档状态已核验。
+- **影响：** 加强 SAR-only 生成式超分先例边界；不解锁 optical 条件、观测一致性或可靠性阶段，也不改变任何 gate。见[审查报告](../../experiments/literature_audits/monti_two_stage_sar_sr_20261107_v2/report.md)及[manifest](../../experiments/literature_audits/monti_two_stage_sar_sr_20261107_v2/manifest.json)。
+
+## 正式授权预检 CPU 软件核验 — 2026-11-07（非模型实验）
+
+- **范围：** 冻结输入授权、validation checkpoint metadata 绑定、C2 合成清单及 `infer_v4` 光学缺失/全零来源路径。
+- **执行：** 隐藏 CUDA，仅使用 pytest 临时合成清单、checkpoint 与固定 LR 数组。级联/SFT/正式套件在资源检查前完成授权核验；validation evaluator 在资源检查前验证 checkpoint 的 split/manifest hash。实际模型执行仍为 CUDA-only。
+- **结果：** 定向测试 73 项中 72 项通过；历史 B1 源码哈希完整性用例因当前树内 10 个文件与历史 run 固定哈希不一致而失败。SEN12TS 元数据测试在已装 `rasterio` 的环境 4 项通过，没有读取像素。
+- **边界：** 没有训练、正式评价或 CUDA；confirmation/test 载荷和逐样本结果未访问，gate 不变。未重写历史哈希或产物。详见[核验报告](FORMAL_PREFLIGHT_CPU_AUDIT_20261107.md)。
+
+## C2 全 development 对比差 CPU 描述诊断 — 2026-11-07（非门槛）
+
+- **协议：** [`c2_all_development_contrast_cpu_20261107_v5.json`](../../protocols/mmcanet_phase_c2/c2_all_development_contrast_cpu_20261107_v5.json)，运行 ID `mmcanet_c2_all_development_contrast_cpu_20261107_v5`。
+- **范围：** 四条件各 200 个 development 样本、19 个来源组；matched/permuted/missing/SAR-only 四控制；读取 development 固定数组和既有 development 指标以核对输入/掩膜身份。未读取 train 数组、confirmation/test 载荷或指标。
+- **执行：** 仅 CPU、2 线程、8 个既有 best checkpoint、3,200 次前向，约 121.35 秒；未训练、未选模、CUDA 未初始化，输出无图像副本。逐样本 3,200 行、配对差 3,200 行、来源组对比 304 行、来源组汇总 16 行。
+- **观察：** 目标背景中位数为零的计数按 x2_light/x2_severe/x4_light/x4_severe 为 2/2/1/1（每条件 200）。matched−SAR-only 的来源组等权均值对比误差差为 −0.000191/−0.000939/−0.000862/+0.000677；只描述该重复使用的 development，不解释为 optical 总体效用。
+- **状态：** `gate_eligible=false`；C2 v2 原 fail-closed 与 gate 未判定状态不变。详见[报告](../../experiments/diagnostics/c2_all_development_contrast_cpu_20261107_v5/report.md)和[运行清单](../../experiments/diagnostics/c2_all_development_contrast_cpu_20261107_v5/manifest.json)。
+
+## C1 v2 train/development 到本地数字 PNG 的哈希映射核查 — 2026-11-07（只读元数据审计）
+
+将冻结 C1 train/development 的 3,600 个来源模态 SHA-512 与仓库既有的上游精确哈希交叉表连接，命中 0 行、无法恢复数字 PNG 文件名。只解析 C1 train/development 字段；其他角色仅读取 `role` 后排除。既有表仅作为来源索引，不使用历史 validation 指标或模型结果。零命中不证明像素不同，不排除重编码内容，也不确认数据集/传感器身份。未访问影像、数组、checkpoint、confirmation/test 载荷；未训练/GPU。详见[审计报告](../../experiments/data_audits/c1_v2_numeric_png_source_crosswalk_20261107_v1/report.md)、[协议](../../experiments/data_audits/c1_v2_numeric_png_source_crosswalk_20261107_v1/protocol.md)与[结果清单](../../experiments/data_audits/c1_v2_numeric_png_source_crosswalk_20261107_v1/manifest.json)。
+
+## RSDM/LSIR 2026 DOI 一手来源复核 — 2026-11-07（文献审查，非实验）
+
+对 DOI 10.1109/JSTARS.2026.3655710 进行新的出版来源检查。DOAJ 二手索引提供题名、作者、卷页和摘要线索；IEEE Xplore 精确检索未返回正文，期刊卷期入口返回 HTTP 418，DOI/Crossref 页未能读取。结论维持“高优先级开放先例线索”，不将二手材料作为正式方法/结果证据，不声称或否定宽泛首次主张。未访问项目数据、checkpoint、confirmation 内容或 test 数据；未训练或使用 GPU。详见[来源复核报告](../../experiments/literature_audits/region_specific_sar_jdsr_source_recheck_20261107_v1/report.md)及[访问清单](../../experiments/literature_audits/region_specific_sar_jdsr_source_recheck_20261107_v1/access_manifest.json)。
+
+## 等速度场调用预算的解析高斯流求解器比较 — 2026-11-07（纯合成 CPU 数值诊断）
+
+运行 c3a_gaussian_flow_solver_nfe_comparison_20261107_v1：同一 200,000 个源样本、三个目标/源标准差比下，比较 Euler 16 步、Heun 8 步、显式中点法 8 步、经典 RK4 4 步，每个样本的速度场调用数均为 16。12 组中，比值 0.25 时显式中点法的归一化端点 RMSE 最低（0.00175149）；比值 1 和 2 时 RK4 最低（分别为 0.00008399、0.00041202）；Euler 在三种条件下均最大。Heun 结果与同日步数实验精确一致。该结果说明方法排序依赖解析速度场，不代表学习型场、SAR 重建质量或 GPU 延迟。未访问项目载荷、checkpoint、结果、confirmation/test 内容，未导入 PyTorch/CUDA，未训练或使用 GPU。未改变冻结协议或阶段 gate。完整信息见[实验目录](../../experiments/synthetic_cpu/c3a_gaussian_flow_solver_nfe_comparison_20261107_v1/)。
+
+## 解析高斯条件流 Heun 端点误差 — 2026-11-07（纯合成 CPU 数值诊断）
+
+运行 `c3a_gaussian_conditional_flow_solver_20261107_v1`：对独立高斯源/目标的线性插值，使用解析条件均值速度场，固定随机种子与 200,000 个样本，比较三个目标/源标准差比及四种 Heun 步数，共 12 组。8 步归一化端点 RMSE 为 0.021147（比值 0.25）、0.001295（比值 1）和 0.009586（比值 2）；所有条件下增加步数均降低数值积分误差。结果仅是解析一维流的离散误差，不能外推为 C3-A 模型误差、SAR 重建质量或物理一致性。未读取项目 payload、checkpoint、结果或 confirmation/test 载荷；未导入 PyTorch/CUDA、未训练、未用 GPU。未改变冻结协议或阶段 gate。完整协议、命令、环境、结果与 manifest 见[实验目录](../../experiments/synthetic_cpu/c3a_gaussian_conditional_flow_solver_20261107_v1/)。
+
+## C3-A train/development 角色与载荷路径静态审查 — 2026-11-07（源码审查，非实验）
+
+C3-A runner 仅构造 train/development，并以 SAR-only 包装器核验/读取 SAR LR 与目标数组；confirmation 需要显式授权，runner 未启用。续训 manifest 角色与数组集合均 fail-closed 约束。只读源码，未打开任何数据、结果或 checkpoint，未运行测试/GPU/训练/评价。详见[审查记录](C3A_DATA_ACCESS_ROLE_AUDIT_20261107.md)。
+
+## C3-A 续训路径与状态恢复回归 — 2026-11-07（CPU 合成软件验证，非模型实验）
+
+发现 `_resume_code_hashes` 引用不存在的 C2 配对模型路径，修正为实际模块路径，并新增路径解析回归。`tests/test_c3a_resume_code_hashes.py` 与既有 `tests/test_c3a_training_resume.py` 共 16 项通过；Python 编译通过。只用合成 checkpoint 和临时目录，隐藏 GPU；未读取项目 checkpoint、数据或结果，未训练/评价，不改变 gate。详见[C3-A 续训审查](C3A_RESUME_BINDING_AUDIT_20261107.md)。
+
+## C3-A 流目标和 Heun 实现静态审查 — 2026-11-07（协议/源码核对，非实验）
+
+冻结 C3-A v1 的源分布、插值路径、速度目标、MSE 归约、sample_id 固定噪声和 8 步 Heun 均与源码相符；无必要代码改动。未运行代码或测试、未访问数据/模型输出/指标、未使用 GPU，不改变 C3-A 质量或阶段判断。详见[C3-A 静态审查](C3A_FLOW_OBJECTIVE_STATIC_AUDIT_20261107.md)。
+
+## C2 paired screen 写入路径静态审查 — 2026-11-07（源码审查，非实验）
+
+核对 C2 高层 runner 的冻结矩阵/development 输入绑定、输出目录互斥检查，以及 CSV/JSON/Markdown 文件的独占创建。常规路径没有发现静默覆盖或输入身份缺口，不改代码或 C2 gate。只读源码，未运行测试、GPU、模型评价，未访问数据/结果/confirmation/test 载荷。详见[C2 静态审查](C2_SCREEN_WRITER_STATIC_AUDIT_20261107.md)。
+
+## C1 train/development 文件名格式补充 — 2026-11-07（角色限定元数据审查，非实验）
+
+仅核对 train/development 的样本数、来源组数与路径字段；命名结构与 SEN12MS 作者仓库示例相容，但未建立场景或坐标一一对应。未读取作者 split 文件、Notebook 输出、影像、confirmation/test 载荷或结果，不改变任何 gate。详见[C1 路线补充](../../experiments/data_audits/c1_geospatial_crosswalk_route_20261107_v1/report.md)。
+
+## DiffusionSAR 一手全文审查 — 2026-11-07（文献审查，非实验）
+
+审阅 University of Twente 仓储的 2024 TGRS 最终版全文。核实其任务为 SAR 条件扩散去斑，合成退化使用 Gamma speckle，包含 log-Yeo–Johnson 变换与多时相 SAR 微调；无超分或推理时 optical 条件。相关工作矩阵已更新，C3-A 与本地 PNG 的差异及真实场景产品术语不一致均已记录。没有项目数据/结果访问、训练、GPU、代码更改或模型评价，不改变任何 gate。详见[报告与 manifest](../../experiments/literature_audits/diffusionsar_conditional_sar_despeckling_fulltext_20261107_v1/report.md)。
+
+## C1 地理元数据交叉映射路线审查 — 2026-11-07（文献/清单审查，非实验）
+
+一手 SEN12MS 论文称其沿用 SEN1-2 的随机 ROI 与季节定义，并提供有地理参考的 GeoTIFF；这建立了候选来源路线，但未证明两版 ROI 子目录编号一一对应。TUM 1474000 本轮返回 HTTP 429，未下载数据或提取坐标。只读取冻结 C1 v2 train/development 来源组元数据；未读取项目图像、SEN12MS 文件、confirmation/test 载荷、checkpoint 或指标，未运行 GPU、训练或评价。不得将此审查写成坐标交叉表、空间独立证据或阶段晋级。详见[报告与清单](../../experiments/data_audits/c1_geospatial_crosswalk_route_20261107_v1/report.md)。
+
+## C3-A v3 bootstrap 统计字段绑定 — 2026-11-07（CPU 合成验证，非模型实验）
+
+C3-A v3 将 bootstrap 配置置于 `metrics`，但评价器在推理后读取不存在的 `statistics`，且各指标 seed 偏移没有协议依据。现改为在 `_read_protocol` 阶段解析、校验 v3 配置，统一使用协议 seed，并检查 19 组覆盖。19 组合成、多指标与少组拒绝用例通过；C3-A evaluator 测试文件共 31 项通过，编译通过。未运行模型或读取结果。详见[报告与 manifest](../../experiments/diagnostics/c3a_v3_bootstrap_contract_cpu_20261107_v1/report.md)。
+
+## C2 confirmation bootstrap 统计合同核查 — 2026-11-07（CPU 合成验证，非模型实验）
+
+确认协议校验器此前未绑定 bootstrap 的来源组单位、组数、组权重、次数、seed 和区间字段。现已加入按当前 `PROTOCOL_ID` 固定的统计合同校验。六项临时 JSON 漂移回归通过；confirmation/screen 三份定向测试共 46 项通过，六个 Python 文件编译通过。运行只用临时 JSON/source manifest，未读确认载荷或结果、未执行旧协议。详见[报告与 manifest](../../experiments/diagnostics/c2_confirmation_statistics_contract_20261107_v1/report.md)。
+
+## C2 来源组 bootstrap 统计合同核验 — 2026-11-07（CPU 合成验证，非模型实验）
+
+按冻结 C2 v2 的 `source_group_id`、19 组等权、10,000 次、seed `20261030` 与 percentile 区间要求核对实现。发现汇总器只读取次数和 seed，未校验其余统计语义或组数；现加入 fail-closed 字段/组数校验。人工差值区分来源组等权均值 `+1 dB` 与 patch 等权均值 `+2 dB`，bootstrap 同 seed 可复现。C2 paired screen 两份合成测试共 24 项通过，源码编译通过。未运行 GPU、训练或模型评价；无项目数据、confirmation/test 载荷或真实指标访问，不改变 C2 gate。详见[报告与 manifest](../../experiments/diagnostics/c2_source_group_bootstrap_synthetic_20261107_v1/report.md)。
+
+## C2 固定退化生成器与冻结参数绑定核查 — 2026-11-07（CPU 合成验证，非模型实验）
+
+对照 C2 v2 冻结 JSON、`prepare_phase_c2_fixed_inputs.py`、共享退化算子和现有测试。确认实现的归一化、频域截断、下采样、振铃裁剪和 Gamma 表示域乘法与冻结定义一致；发现调用方 seed 与协议的 `degradation_seed_base` 未绑定，四个条件倍率/Gamma `L` 由代码常量重复维护。现已加入前置校验，错 seed 或条件漂移会在 CUDA、输出目录和图像读取之前失败；不改变冻结协议或有效退化。
+
+两个新回归先按预期失败于原来的 CUDA 可用性检查；修复后 C1 source-manifest 错配、seed 错配和条件漂移三个 CPU 定向测试通过，相关生成器/测试文件 `py_compile` 通过。仅使用临时 CSV/JSON，未加载图像、checkpoint 或项目指标，未生成 C2 固定输入、训练、运行模型或初始化 CUDA。C2 gate 未判定；用户要求继续暂停训练。详见 D-2026-11-07-010 和[C2 核查报告](C2_FIXED_GENERATION_PROTOCOL_BINDING_20261107.md)。
+
+## C1 v2 官方来源链与旧文件哈希审计适用范围更正 — 2026-11-07（无 GPU，非实验）
+
+静态核对冻结 C1 v2 来源协议、train/development 暂存脚本及已保留获取 manifest。协议将来源绑定到 TUM MediaTUM 条目 1436631 和官方 `checksums.sha512` 文件索引；暂存清单记录 1,600/200 个 train/development 身份、92/19 个来源组、3,600 个文件完成字节数与 SHA-512 核验。只读现有元数据，没有读取影像载荷。
+
+2026-10-19 旧哈希交叉审计的范围是 `fixed_train_dev2k` / `fixed_val_dev2k` 共 3,600 个文件，精确匹配数为 0；不适用于 C1 v2 train/development。`./data/` 数字命名子集仍未映射。来源链核实不证明坐标、采集日期、轨道或 patch footprint 独立；线上 TUM/OAI-PMH 路线本轮返回 HTTP 429。详见[C1 来源链核查](C1_OFFICIAL_SOURCE_METADATA_AUDIT_20261107.md)与 D-2026-11-07-009；不改变 gate。
+
+## C3-A 数值域实现合同静态核对 — 2026-11-07（无 GPU，非实验）
+
+只读对照 C3-A v1 协议、训练/采样/评价源码与已有测试定义。LR 可大于 1，target 在 `[0,1]`；条件不裁剪，流速度头无界，Heun 不裁剪，最终评价才裁剪并记录 raw 越界比例，接口相互一致。没有训练、checkpoint/数据载荷读取或 GPU 初始化；本轮未运行测试。无需修改冻结协议或实现，不构成方法效果证据。详见[C3-A 数值域合同审计](C3A_NUMERIC_DOMAIN_CONTRACT_AUDIT_20261107.md)。
+
+## 论文 pilot 主张与当前阶段静态核对 — 2026-11-07（无 GPU，非实验）
+
+只读检查旧英文稿与现行 v1.7/C1 v2/C2/C3-A 状态。稿件标注为 2026 年 7 月 pilot，所述 1,900/100 文件级试验不属于当前 C1 v2；C2 gate 未判定，C3-A 尚无真实模型结果，因此旧稿不构成当前效果或晋级证据。详见[静态审计](PAPER_CLAIM_EVIDENCE_AUDIT_20261107.md)。
+
+边界披露：稿件及其生成 TeX 表中被动可见旧 100 样本 test 汇总；未检查底层 test 输入/逐图 CSV、未复算、调参或使用其做研究判断，也未访问冻结 C1 v2 confirmation/test 载荷。发现后停止读取汇总表；不得据该旧样本集合继续调参或选模。稿件未跟踪，本轮未修改。H1/Q1 与阶段 gate 不变。
+
+## C2 零背景对比差描述诊断 — 2026-11-07（CPU，非门槛）
+
+**类型：** 既有 C2 v2 development 失败样本上的表示域描述诊断；不是训练、正式 screen 重跑或晋级实验。
+
+**预登记协议：** [v4 JSON](../../protocols/mmcanet_phase_c2/c2_zero_background_contrast_cpu_20261107_v4.json) 与[说明](../../protocols/mmcanet_phase_c2/c2_zero_background_contrast_cpu_20261107_v4.md)。选择规则固定为历史 `zero_median_cases.csv` 的全部 6 条“条件×样本”记录，来自 2 个来源组；不得外推为全 development 效果。C2 v2 正式指标、fail-closed 结论和 gate 均未改写。
+
+**运行与输入：** [`c2_zero_background_contrast_cpu_20261107_v4`](../../experiments/diagnostics/c2_zero_background_contrast_cpu_20261107_v4/)。仅读取四种退化条件中选定案例的 development LR、target、matched optical 与冻结置换 donor optical，读取量共 24 个数组；核对四套 development manifest/files.csv、所有数组 SHA-256、重建掩膜 SHA-256、训练矩阵身份及八个 best checkpoint。没有读取来源 split manifest、train 数组、confirmation/test 载荷或对应指标。
+
+**方法与验证：** CPU、2 线程，6 条案例 × 4 控制（matched/permuted/missing/SAR-only），24 次前向全部成功；24 行逐图结果、24 行冻结配对差、16 行逐条件汇总。目标中位数 TBR 返回 `null` 且明确标为 `undefined_target_zero_background_median`，没有加 epsilon。CPU 合成模型与 runner 边界测试 10 项通过，相关 Python 文件 `py_compile` 通过；manifest 中协议、runner、模型源码及输入/权重身份均可核验。总用时约 1.11 秒，输出目录约 52 KiB。
+
+**描述观察：** matched−SAR-only 的均值/中位数对比绝对误差差值依次为 x2_light −0.000569/−0.001011、x2_severe −0.006447/−0.007495、x4_light −0.003836/+0.003685、x4_severe +0.008148/−0.005016。差值为候选误差减对照误差，负数只表示这些案例中误差较低。每个条件仅 1–2 条记录，样本来自按既有指标失败条件选出的子集；不作总体 optical utility、独立泛化、显著性或物理解释，H1/Q1 与 C2 gate 不更新。
+
+**代码变化：** [C2MatchedJoint](../../MMCANetV2/phase_c2_matched.py) 移除 CUDA-only 前置检查，以允许相同计算图在 CPU 上运行；参数、state dict、GPU 路径及输入 shape/dtype/device 检查保持不变。v1–v3 预检/前向失败及更正后的访问记录保留在各自输出目录。遵循用户暂停指示，本轮未运行 GPU 回归。
+
+## C3-A 表示域范围审计与多次采样裁剪分解协议更新 — 2026-11-07
+
+**类型：** C3-A 冻结 train/development SAR 输入的 CPU 表示域描述审计，加一项仅用合成张量验证的评价器改进；不是模型训练、推理或效果实验。
+
+**数据结果：** 只读 `x2_light` 的 train 1,600/92 来源组与 development 200/19 来源组 SAR `lr`、`target`，逐文件 SHA-256、shape、dtype、有限性和值域均通过。来源组等权均值：LR 像素 >1 为 21.57%/22.16%；实际 bilinear 上采样 condition 像素 >1 为 14.94%/15.29%；target ==1 为 1.23%/1.28%，target ≥0.99 为 1.73%/1.72%；target-condition MAE 为 0.1451/0.1454。逐样本数值、manifest、代码和输入清单哈希见[审计目录](../../experiments/diagnostics/c3a_representation_range_audit_20261107_v1/)；数据是归一化 PNG 表示域 noisy pseudo-target，不是物理定标观测或干净参考。
+
+**协议/代码：** 原多次采样 v2 保留不动；新增未运行 v3，SHA-256 `ee83e2cb4dadea7d4fca6576e479d2922d70df44935f1be51116add26e06016c`。评价器为 Flow 与 SAR-only baseline 增加 raw 输出低于 0/高于 1 比例，按身份汇总并按来源组 bootstrap；两项互斥且其和必须等于既有总裁剪比例。PSNR/SSIM/EPI、采样、训练、选模规则和所有研究 gate 不变。详细依据见[协议更新记录](../../experiments/diagnostics/c3a_representation_range_audit_20261107_v1/protocol_update.md)。
+
+**验证与边界：** 先观测到接口缺失和比例不一致未被拒绝的预期失败；实现后 `tests/test_c3a_multisample_eval.py` 30 项通过，评价器、审计脚本、测试文件 `py_compile` 通过。训练、checkpoint 推理、正式评价、GPU 查询/等待均未运行；optical、confirmation、test 载荷未读取。v3 结果目录不存在。未改变 C2 gate 未判定、B1 `not_promoted / stop_at_b1`、B2/B3 关闭状态。
+
+## 元数据审计 C1-META-20261107-01 — 冻结拆分身份字段与角色互斥 — 2026-11-07
+
+**类型：** 仅拆分成员元数据审计，不是图像分析、模型实验或训练。输入为冻结 C1 v2 `sample_manifest.csv`，SHA-256 `6a278e97c161164d9440b5388c5b3fcda87746a56e26adfb7cdf658b94924e57`。train/development/confirmation 分别为 1,600/200/200 样本与 92/19/20 来源组；三角色 `source_group_id` 两两互斥。train/development SAR/optical 路径、选择哈希、官方 SHA-512 无交集。
+
+**解释：** 裸 `scene_id`、`patch_id` 非全局身份键。一个 `scene_id+patch_id` 数值组合重复，但位于不同 season root/source group，实际路径与内容哈希不同。支持来源场景文件夹拆分，不支持地理/采集独立结论。仅查看确认集角色成员元数据，不访问任何图像、测量载荷或模型。详见[审计报告](../../experiments/data_audits/c1_v2_split_identity_metadata_20261107_v1/report.md)。
+
+## 文献审计 LIT-20261107-01 — 流轨迹求逆与 SAR 回波扩散后验 — 2026-11-07
+
+**类型：** 一手文献审查，不是项目模型实验。已核对 ICML 2026 PMLR 论文及 arXiv v2 全文 *Trajectory Stitching for Solving Inverse Problems with Flow-Based Models*，并核对 arXiv v1 全文 *UAV SAR Imaging via Diffusion Posterior Sampling under Non-Ideal Motion in ISAC Systems*。相关工作矩阵新增 2 行，现有 151 行增至 153 行；详细来源、作者报告与适用边界见[审计报告](../../experiments/literature_audits/sar_echo_and_flow_trajectory_prior_art_20261107_v1/report.md)及其访问清单。
+
+**结论边界：** 更新通用流逆问题和生成式 SAR 回波成像的先例范围；没有项目数据/模型访问、代码运行或指标结果，不支持本地 C3-A、optical utility 或 C4 结论，不改变任何 gate。
+
 ## C3-A epoch 边界续训与 checkpoint v2 CPU 验证 — 2026-11-07 00:26（中国标准时间）
 
 **类型：** 训练状态恢复的软件合同验证，不是模型训练、模型性能评价或阶段 gate 实验。runner 增加显式 `--resume`，严格绑定冻结协议、固定输入清单、代码状态与关键环境；保存 model/Adam、完整随机状态、专用 DataLoader/Flow generator、最佳轮次与可重建日志。恢复会拒绝不兼容或已完成状态。若中断发生于较新 `best.pt` 原子写入后、`last.pt` 更新前，恢复会把已验证的最新 checkpoint 原子同步到 `last.pt`。评价器兼容 checkpoint v2 并校验绑定。
@@ -2327,3 +2589,117 @@ OpenAlex reports the IOP PDF as the only location and no repository full text, t
 - **数据边界：** 旧 `test_100` 名单中 13 个样本进入优化，`test_set_accessed=true`、`test_set_used=true`；不得再用该旧名单作独立测试。C1 v2 官方确认影像未访问。
 - **有效性：** 不报告指标、不选模型、不用于阶段晋级。C1 v2 与本地 2k 没有验证过的身份映射。
 - **审计：** [C1 v2 与本地 2k 对齐记录](../../experiments/diagnostics/c1_v2_local2k_alignment_20261031_v1/report.md)。
+
+
+## 非实验性文献审查 — 2026-11-07
+
+- **记录：** FlowSGS / FMPS 一手全文审查。
+- **证据：** [审查报告](../../experiments/literature_audits/flow_inverse_methods_update_20261107_v1/report.md)、[FlowSGS 原文](https://arxiv.org/html/2609.20769v3)、[FMPS 原文](https://arxiv.org/html/2411.07625v3)。
+- **边界：** 未运行代码或模型，不产生实验指标，不访问本地数据载荷；不改变阶段 gate。
+
+## `c3a_full_resolution_cpu_smoke_20261107_v1` — 固定尺寸合成 CPU 软件核验
+
+- **类型/状态：** 无 GPU 的合成软件诊断；通过，不是模型性能实验。
+- **问题：** C3-A 现有 CPU 优化步只覆盖 32×36；检查冻结协议实际批量 4、256×256 尺寸的前向、反向、参数更新和推理采样链。
+- **协议/实现：** `protocols/mmcanet_phase_c3a/sar_only_flow_c1_v2_20261105_v1.json`，SHA-256 `147c361b3e91bc4cd8d76ce5c464ad9d2137f2d06b38f31a0bc7c7a7e93101a7`；使用 `SarConditionalFlow(base_channels=16,time_dimension=64)`、纯合成张量、单次 Adam 更新及 8 步 Heun。
+- **结果：** 输入和输出均为 `[4,1,256,256]`；loss/梯度/采样输出有限，参数更新发生，CUDA 不可见且未初始化；耗时 4.627 秒。
+- **载荷：** train、development、confirmation、test、optical 均未读取；未加载 checkpoint。
+- **解释：** 仅证明该张量尺寸的软件链可运行；不证明收敛、图像质量、采样稳定性或物理一致性，不改变 C1/C2/C3 gate。
+- **产物：** `experiments/diagnostics/c3a_full_resolution_cpu_smoke_20261107_v1/` 下的中文报告、执行命令、运行清单及可重放脚本。
+
+
+## 2026-11-07 纯合成噪声分布诊断
+
+- **编号：** `multiplicative_noise_distribution_cpu_20261107_v1`。
+- **目的：** 在均值、方差匹配时比较 C2 `Gamma(8, rate=8)` 乘子与 SDE 对应的均值保持对数正态乘子。
+- **输入与配置：** 纯合成随机变量；每种分布 500,000 个样本；seed `20261107`；目标均值 1、方差 0.125。
+- **观察：** 两者模拟均值/方差符合目标，但偏度约 0.713/1.098、99 分位数约 2.005/2.093。
+- **产物：** [脚本](../../experiments/diagnostics/multiplicative_noise_distribution_cpu_20261107_v1/compare_noise_models.py)、[结果](../../experiments/diagnostics/multiplicative_noise_distribution_cpu_20261107_v1/results.json)、[报告](../../experiments/diagnostics/multiplicative_noise_distribution_cpu_20261107_v1/report.md)。
+- **边界：** 未访问影像、模型、checkpoint、真实逐样本结果或确认/测试载荷；无 GPU、训练或模型评价；不改变 gate。
+
+
+## 2026-11-07 纯合成 log-Yeo–Johnson Gamma 分布诊断
+
+- **编号：** `log_yj_gamma_normality_20261107_v1`。
+- **类型：** 纯合成 CPU 分布诊断；不是 SAR 影像实验、模型训练、项目评价或阶段 gate。
+- **冻结协议：** `N ~ Gamma(L, scale=1/L)`，`L∈{1,2,4,8}`；每个 L 使用 100,000 个拟合样本和 5 组各 100,000 个独立评估样本。Yeo–Johnson `lambda`、两种变换的均值与标准差均只由拟合样本决定；评估指标为标准正态两侧经验 KS 距离 `D`。
+- **观察：** `ΔD=D(log-Yeo–Johnson)−D(log-only)` 等权平均为 `−0.040896`；四种 L 各自的 5/5 个评估重复均为负。此结果只适用于该随机变量、样本量和标准化协议。
+- **产物：** [协议](../../experiments/synthetic_cpu/log_yj_gamma_normality_20261107_v1/protocol.md)、[脚本](../../experiments/synthetic_cpu/log_yj_gamma_normality_20261107_v1/run_cpu_experiment.py)、[逐组结果](../../experiments/synthetic_cpu/log_yj_gamma_normality_20261107_v1/results.json)、[报告](../../experiments/synthetic_cpu/log_yj_gamma_normality_20261107_v1/report.md)、[运行清单](../../experiments/synthetic_cpu/log_yj_gamma_normality_20261107_v1/manifest.json)。
+- **数据边界：** 只生成合成随机数；未访问项目 train/development/confirmation/test 载荷、模型、checkpoint 或项目指标；未导入 PyTorch/CUDA，无训练、推理、模型评价或项目测试；不改变冻结协议和研究阶段 gate。
+
+
+## 2026-11-07 固定 `L=8` 乘性观测的共享 log-Yeo–Johnson 诊断
+
+- **编号：** `log_yj_multiplicative_observation_levels_20261107_v1`。
+- **类型：** 纯合成 CPU 分布诊断；不是 SAR 影像实验或模型结果。
+- **协议：** `Y=sN`、`N~Gamma(8, scale=1/8)`；五档信号强度等权参与共享 `lambda` 拟合；每档另有独立校准样本及 5 组留出评估样本。评估集不用于拟合 `lambda` 或标准化量。
+- **观察：** 共享 `lambda=1.2217133`；所有信号档的 25 个留出配对结果平均 `ΔD=−0.00634053`，每档 5/5 重复均为负，但改善幅度随信号强度变化。
+- **产物：** [协议](../../experiments/synthetic_cpu/log_yj_multiplicative_observation_levels_20261107_v1/protocol.md)、[脚本](../../experiments/synthetic_cpu/log_yj_multiplicative_observation_levels_20261107_v1/run_cpu_experiment.py)、[结果](../../experiments/synthetic_cpu/log_yj_multiplicative_observation_levels_20261107_v1/results.json)、[报告](../../experiments/synthetic_cpu/log_yj_multiplicative_observation_levels_20261107_v1/report.md)、[运行清单](../../experiments/synthetic_cpu/log_yj_multiplicative_observation_levels_20261107_v1/manifest.json)。
+- **边界：** 不代表真实 SAR、项目表示域或 C3-A 效果；不据此迁移变换。未读取项目影像/指标或 confirmation/test 载荷，无 GPU、训练、模型评价或项目测试。
+
+## 非实验性元数据路线审查 — SEN12MS 作者相关维护仓库（2026-11-07）
+
+- **记录：** 检查公开仓库入口、README 工具说明与目录名称，评估 ROI 地图 Notebook 是否能支持 C1 train/development 地理交叉。
+- **观察：** 尚未建立角色隔离的一对一场景—坐标映射；未打开 split 清单内容、Notebook 内容/输出或 GeoTIFF。
+- **证据：** [路线审查报告](../../experiments/data_audits/sen12ms_author_repo_crosswalk_route_20261107_v1/report.md)、[维护仓库](https://github.com/schmitt-muc/SEN12MS)。
+- **边界：** 没有坐标、影像、测量结果、确认/测试载荷访问；不改变 C1/C2/C3 gate。
+
+
+## SAR 指标已知样例 CPU 核验（2026-11-07）
+
+- **编号：** `metric_known_case_cpu_20261107_v1`。
+- **问题：** 项目常用指标在完全匹配、已知偏置/幅值变化、TBR 中位数为零及 C3-A 输出裁剪条件下，是否符合其实现公式？
+- **协议：** 仅由脚本生成 64×64 与 4×6 浮点数组；固定 `[0,1]` data range、ratio epsilon `1e-8`、ENL epsilon `1e-12`；25 条预设断言；CPU/NumPy/OpenCV。
+- **结果：** 25 条通过。EPI 对正幅值缩放不变；边缘强度比检测到 0.5 缩放。ratio 的约 `4.05e-8` 偏差与 denominator epsilon 一致。C3-A 裁剪后手算 PSNR 与公共函数一致。只将 SSIM 小图的 `ValueError` 提示改为中文；指标数值实现未改。
+- **隔离：** 未访问项目载荷、模型/检查点、confirmation/test 或既有结果；未使用 GPU、未训练。
+- **产物：** [报告](../../experiments/diagnostics/metric_known_case_cpu_20261107_v1/report.md)、[协议](../../experiments/diagnostics/metric_known_case_cpu_20261107_v1/protocol.md)、[源码](../../experiments/diagnostics/metric_known_case_cpu_20261107_v1/run_cpu_audit.py)、[结果](../../experiments/diagnostics/metric_known_case_cpu_20261107_v1/results.json)、[清单](../../experiments/diagnostics/metric_known_case_cpu_20261107_v1/manifest.json)。
+- **解释边界：** 合成算术合同核验，不验证指标的物理含义或 ROI 适用性，不推进 C1/C2/C3 gate。
+
+
+## 输出裁剪边界偏差合成诊断（2026-11-07）
+
+- **编号：** `clip_boundary_bias_cpu_20261107_v1`。
+- **问题：** `[0,1]` 区间投影如何影响预测误差、PSNR、裁剪率和均值偏差？
+- **协议：** 7 个目标亮度×3 档高斯噪声；每档 500,000 个固定种子样本；共 21 个组合和 45 次断言；NumPy CPU。
+- **结果：** 对所有组合，裁剪后的平方误差不大于裁剪前。边界目标在 `σ=0.05` 时裁剪约一半样本，PSNR 上升约 3 dB，但引入约 ±0.02 的有方向偏差。
+- **隔离：** 只用脚本生成的标量样本；未访问项目数据、模型/检查点、confirmation/test 或既有结果；未训练或使用 GPU。
+- **产物：** [报告](../../experiments/synthetic_cpu/clip_boundary_bias_cpu_20261107_v1/report.md)、[协议](../../experiments/synthetic_cpu/clip_boundary_bias_cpu_20261107_v1/protocol.md)、[源码](../../experiments/synthetic_cpu/clip_boundary_bias_cpu_20261107_v1/run_cpu_experiment.py)、[manifest](../../experiments/synthetic_cpu/clip_boundary_bias_cpu_20261107_v1/manifest.json)。
+- **边界：** 标量合成诊断，不可外推为 SAR 噪声或模型表现；不改变 C3-A 冻结裁剪规则或任何 gate。
+
+
+## RSDM/LSIR 作者稿与官方来源路径补查（2026-11-07）
+
+- **问题：** IEEE/DOI 之外是否存在新的官方作者预印本路径？
+- **结果：** 项目既有记录已审阅 ResearchGate 作者稿；本轮 arXiv 官方域名搜索未命中精确标题，直接 Search/API 页面请求受限。没有新增一手正文。
+- **结论：** 作者稿方法记录保留为作者报告级先例；正式 IEEE 版本与 DOI 仍开放。搜索未命中不作为不存在预印本的证据。
+- **隔离：** 未重开作者稿、未访问项目/confirmation/test 数据、没有训练或 GPU。详见[来源审计](../../experiments/literature_audits/region_specific_sar_jdsr_source_recheck_20261107_v1/report.md)。
+
+
+## ICSP 2024 SAR 扩散超分出版方摘要与 PDF 路线审计（2026-11-07）
+
+- **问题：** IEEE 摘要可支持哪些 SAR 扩散超分先例事实？能否取得全文核对实验协议？
+- **来源：** IEEE Xplore 官方摘要；官方 PDF `stamp.jsp` 路线无法读取。
+- **结果：** 摘要描述残差预测、MSTAR/SARBake、传统指标与下游分割；全文和数据/训练协议仍未审阅。
+- **边界：** SAR 单模态超分摘要级先例，不是联合去斑、optical 引导或可复现本地基线。未访问项目/confirmation/test 数据，无 GPU。
+- **记录：** [来源审计](../../experiments/literature_audits/icsp_sar_diffusion_sr_abstract_pdf_route_20261107_v1/report.md)。
+
+
+## 解析双峰条件流求解器 CPU 探索（2026-11-07）
+
+- **主诊断：** `c3a_bimodal_flow_solver_spike_20261107_v1`。在解析双峰目标上用同一组 100,000 个初值比较 16 NFE 的 Euler16、Heun8、中点法8、RK4-4，并测 Heun 2–64 步收敛。Heun8 强分离中央谷概率为理论值约 11.6 倍；Heun32/64 接近理论与有限样本参考。无门槛、无 gate 变更。
+- **分离度补充：** `c3a_bimodal_separation_sweep_cpu_20261107_v1`。固定 `τ=0.2` 扫描 `μ/τ={1,2,4,7.5}`，比较 Heun8/32；该扫描在主结果后追加，标记为适应性探索。
+- **时间网格补充：** `c3a_bimodal_time_grid_cpu_20261107_v1`。同一强分离场、同为 8 步/16 NFE，四种简单非均匀网格均未优于均匀网格。
+- **表示尺度补充：** `c3a_representation_scale_bimodal_cpu_20261107_v1`。标量条件中心 0.5、源噪声标准差 0.1、目标模式 0.4/0.6；Heun8 中央窗质量约为理论值 2.17 倍，Heun32 接近。解析场经仓库 `sample_heun` CPU 路径与 NumPy 输出最大绝对差 `2.220e-16`；5 项定向采样器测试通过。
+- **产物：** 各实验目录的[主报告](../../experiments/synthetic_cpu/c3a_bimodal_flow_solver_spike_20261107_v1/report.md)、[分离度报告](../../experiments/synthetic_cpu/c3a_bimodal_separation_sweep_cpu_20261107_v1/report.md)、[时间网格报告](../../experiments/synthetic_cpu/c3a_bimodal_time_grid_cpu_20261107_v1/report.md)、[表示尺度报告](../../experiments/synthetic_cpu/c3a_representation_scale_bimodal_cpu_20261107_v1/report.md)及各自 protocol、JSON、stdout、环境和 SHA256 manifest。
+- **边界：** 仅解析合成标量场，不包括图像结构、神经向量场误差或真实 SAR 分布；不改变 C3-A 的冻结 Heun8、输出裁剪、协议或阶段门槛。未访问项目/confirmation/test 影像、模型、checkpoint、结果；无 GPU、无训练。
+
+
+## C1 v2 train/development 来源路径与派生输入交叉核验（2026-11-07）
+
+- **编号：** `c1_v2_train_development_source_crosswalk_20261107_v1`。
+- **问题：** 冻结 C1 v2 的 train/development sample 是否能仅凭已登记元数据连接到原始相对路径及派生 x2_light 输入来源？
+- **方法：** 仅提取 train/development 的 C1 `sample_manifest`、`group_assignment`、staging CSV、payload file manifest 对应行，以及派生 x2_light train/development `files.csv`；检查 SHA-256 绑定、`source_group_id + patch_id` 唯一性、路径父目录、SHA-512 和文件字节数。整份 split CSV 只作 SHA-256 完整性核对，其他角色行不解析路径/哈希。
+- **结果：** 1,600/200 对、92/19 组全部连接；SAR/optical 来源 SHA-512 完全匹配；3200/400 个原始模态路径的已登记官方/观测摘要一致；train/development 来源组、路径、派生 sample ID、来源哈希交集均为 0；48,739 条断言通过。
+- **解释边界：** 元数据交叉连接，不是本轮重读 PNG 后的哈希复算；不证明地理/采集独立或数据集/传感器属性，也没有把本地 `data/sar`、`data/opt` 数字文件名逐一映射到原始目录。不得读取未知角色载荷补齐映射。
+- **产物：** [审计报告](../../experiments/data_audits/c1_v2_train_development_source_crosswalk_20261107_v1/report.md)、[协议](../../experiments/data_audits/c1_v2_train_development_source_crosswalk_20261107_v1/protocol.md)、[脚本](../../experiments/data_audits/c1_v2_train_development_source_crosswalk_20261107_v1/audit_source_crosswalk.py)、[结果](../../experiments/data_audits/c1_v2_train_development_source_crosswalk_20261107_v1/results.json)、[清单](../../experiments/data_audits/c1_v2_train_development_source_crosswalk_20261107_v1/manifest.json)。
+- **隔离：** 本次只访问 split/哈希元数据，未打开图像、数组、checkpoint 或 confirmation/test 载荷；无训练/GPU，C1–C6 gate 不变。

@@ -1,0 +1,22 @@
+{
+  "实验编号": "c3a_spatial_variogram_multiscale_cpu_20261109_v1",
+  "状态": "完成",
+  "开始时间_UTC": "2026-11-09T04:49:24.422450+00:00",
+  "结束时间_UTC": "2026-11-09T04:49:26.354927+00:00",
+  "运行命令": "python experiments/synthetic_cpu/c3a_spatial_variogram_multiscale_cpu_20261109_v1/run.py",
+  "Python版本": "3.13.5",
+  "NumPy版本": "2.1.3",
+  "操作系统": "Linux-7.0.0-42-generic-x86_64-with-glibc2.43",
+  "设备": "CPU；脚本未导入 PyTorch，也未调用 GPU",
+  "随机种子": 20261109,
+  "协议_SHA256": "f036baa2e9fced01f3075dcec79a6a9f914f0ac0521b4bb35920d66a2fe67a73",
+  "脚本_SHA256": "3049d32b8e38d63b6944b8ccd753be4d5f00fc2cab7e7299f392beccd3c8eb21",
+  "结果_SHA256": "f10c44d72f0e905b139cdc8ac4d49fb8c7cfb348834223b7e1ca09443f1bcae9",
+  "逐重复CSV_SHA256": "8511deb28d2620af67bfb046d109571471a5081ccfee64c42efe17323de2823a",
+  "项目数据访问": false,
+  "模型或检查点访问": false,
+  "确认集载荷访问": false,
+  "测试载荷访问": false,
+  "训练或推理": false,
+  "备注": "纯合成空间相关场评分诊断；不改变 C3-A v3 或任何阶段 gate。"
+}

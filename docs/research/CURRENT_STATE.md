@@ -1,6 +1,482 @@
-# 当前状态——权威快照（2026-11-07）
+# 当前状态——权威快照（2026-11-09）
+
+## 2026-11-09 C1 地理元数据出现新候选路线，文件级映射未证实
+
+- SEN12MS 作者论文与维护仓库描述了 georeferenced GeoTIFF、ROI/season/patch 命名，以及作者版分类训练清单和 ROI 地图工具；这些信息提供了潜在跨版本元数据路线，但不是 C1 v2 的文件级交叉表。
+- 本地仅核对 train/development staging manifest 与路径名；未读取影像/GeoTIFF、测试列表或 notebook 输出。公开训练清单页面未显示其 4.91 MB 内容，精确样本检索未取得可核验匹配，不能解释为无匹配。
+- C1 v2 仍只支持来源场景文件夹级隔离；地理、采集和 patch footprint 独立性未知。未重试受限 TUM 条目，不改 split、gate、训练状态或数据权限。详见[路线复核](../../experiments/data_audits/c1_sen12ms_georeference_crosswalk_recheck_20261109_v1/report.md)。
+
+## 2026-11-09 横纵相关轴交换 CPU 诊断
+
+- 在 24×24 logistic-normal 可分离 AR(1) 场中交换横纵相关值 0.75/0.35，按预登记协议每个真值方向生成 300 个目标、每目标 16 draws。
+- 两个真值方向的 h=1 与四尺度变差分数排序率均为 1.000，且平均分差 95% 区间下界均大于零；CRPS/整图能量排序接近 0.5。h=8 单尺度排序率为 0.593。
+- 现有评分逐边计算平方误差，在此构造中保留了方向差异，暂未发现支持改代码的证据。h=8 区分较弱；距离效用不均不代表可据单一案例调整权重。
+- 仅 NumPy CPU；独立核验 4,200 行 CSV、汇总和四项哈希。无项目数据、模型/checkpoint、confirmation/test、PyTorch、训练、推理或 GPU 访问。详见[实验报告](../../experiments/synthetic_cpu/c3a_spatial_variogram_anisotropy_cpu_20261109_v1/report.md)。
+
+## 2026-11-09 多尺度变差分数相关强度敏感性 CPU 诊断
+
+- 按预登记协议将一阶高斯相关从 0.8 扩展到 ρ={0.4,0.6,0.8,0.9}，比较 AR(1)/RBF 两种真值方向；每条件 300 个目标、每目标 16 draws。
+- 8 个条件中 7 个同时满足多尺度平均分差 95% 区间下界大于零且正确排序比例高于 0.65。唯一未达到者为 ρ=0.4、RBF 真值，排序比例 0.600；其平均差区间仍大于零。全部 h=1 排序比例为 0.463–0.550。
+- 这说明多尺度区分受相关强度与真值方向影响。结果只适用于指定的 24×24 logistic-normal AR(1)/RBF 合成场；仅支持将候选保留待进一步验证，不推广到真实 SAR、不更改 C3-A v3、评价器或任何 gate。
+- CSV、汇总和四项产物哈希独立复核通过。仅 NumPy CPU；无 PyTorch、训练、推理、GPU、项目载荷、模型/checkpoint、confirmation/test 或测试测量值访问。详见[实验报告](../../experiments/synthetic_cpu/c3a_spatial_variogram_correlation_sweep_cpu_20261109_v1/report.md)。
+
+## 2026-11-09 多尺度变差分数的远距离依赖 CPU 诊断
+
+- 按[预登记协议](../../experiments/synthetic_cpu/c3a_spatial_variogram_multiscale_cpu_20261109_v1/protocol.md)，比较一阶相关匹配为 0.8、边际相同而远距离相关不同的 AR(1)/RBF logistic-normal 场。两种真值方向各 300 个目标，每个预测集合 16 draws。
+- 单尺度 `h=1` 变差分数排序比例为 0.490/0.473；四尺度 `h={1,2,4,8}` 等权分数为 0.990/0.857，两个方向平均配对分差的 95% 区间均大于零。结果符合预登记的合成诊断判据。
+- 结论只适用于该尺寸、两个可分离协方差核及有限 draw 数；不表示真实 SAR/模型分布结论，不改变 C3-A v3 或 gate。未访问项目载荷、模型/checkpoint、confirmation/test，无 GPU。
+- 记录：[实验报告](../../experiments/synthetic_cpu/c3a_spatial_variogram_multiscale_cpu_20261109_v1/report.md)。
+
+## 2026-11-09 C3-A 评价器终端进度提示中文化
+
+- 将 `scripts/evaluate_c3a_multisample.py` 中 SAR-only baseline 的一条英文进度提示改为中文；不涉及评价公式、协议、数据、训练或设备行为。
+- `python -m py_compile scripts/evaluate_c3a_multisample.py` 通过，随后删除了本轮专用临时编译缓存。
+- **下一步：** C3-A 评价器仍需有效冻结 run 与 `best.pt` 才能评价；训练继续暂停，不使用随机权重，不读取确认/测试载荷。
+
+## 2026-11-09 IOP 联合去斑/超分线索的作者仓储路线补查
+
+- 对 *Frequency-enhanced diffusion prior network for joint SAR image despeckling and super-resolution* 使用精确题名检索 `edu.cn` 页面、机构仓储与 arXiv，没有找到新的可读取一手全文或可验证作者稿；仍只见已有 ResearchGate 摘要条目。
+- 没有获得新的方法、数据划分、代码或实验事实；摘要内容维持二手证据，不据此更新技术新颖性或性能结论。此有界检索不证明其他位置不存在作者稿。
+- 详见[来源复核报告补充](../../experiments/literature_audits/frequency_enhanced_sar_jdsr_source_check_20261107_v1/report.md)。不改变 v1.8、阶段 gate、训练状态或数据权限。
+
+## 2026-11-09 C3-A 开发集 CPU 验证权重预检
+
+- 仅检查 `checkpoints/`、`experiments/`、`outputs/`、`weights/` 下路径和文件元数据，未发现带 C3-A/phase-C3 标识的权重或正式训练 run 目录。现有 `scripts/evaluate_c3a_multisample.py` 要求 run manifest、固定输入 manifest 与 `checkpoints/best.pt`，因此当前没有可识别的权重可用于开发集 CPU 验证。
+- 未加载随机/无关权重，未读取 development 图像或确认/测试载荷及测量值，也未训练或使用 GPU。训练暂停和 C3-A gate 不变，质量判断仍未知。
+- 记录：[CPU 验证权重预检](../../experiments/diagnostics/c3a_cpu_evaluation_checkpoint_preflight_20261109_v1/report.md)。
+
+## 2026-11-09 PCSDD 复数 SAR 扩散去斑全文审查
+
+- 审阅作者公开的 CC BY 4.0 全文，并以 IEEE 官方 DOI 记录核对论文身份。PCSDD 在复数 SLC 上结合各向异性 PDE 漂移与学习型 score 修正，使用 blind-spot 自监督、强度域 Gamma 似然及 ENL/边缘相关约束；实验报告 Gaofen-3 C 波段 SLC、1 m 分辨率。
+- 这是复数 SAR 去斑的相邻先例，不涉及超分观测算子、光学引导或错配回退。其表示域不同于本地 normalized 8-bit PNG/noisy pseudo-target，不能直接作为本地物理模型。正文对 blind-spot 掩码 `M` 的符号约定内部不一致，不能独立确认无中心像素泄漏声明；不据此推断实际代码发生泄漏。正式 IEEE 全文页面自动访问受限；作者公开全文的版本上传关系、代码和场景级 split 细节未核实。
+- 不改变研究总纲 v1.8、C2/C3/C4 gate、C3-A v3、训练暂停状态或数据权限。没有运行代码、读取项目载荷或使用 GPU。
+- 记录：[全文审查报告](../../experiments/literature_audits/pcsdd_complex_diffusion_despeckling_fulltext_20261109_v1/report.md)。
+
+## 2026-11-09 候选分布评分工具单图像 CPU 耗时诊断
+
+- 按固定协议，对 `[16,256,256]` 合成集合逐项预热 1 次、计时 7 次：逐像素 CRPS 中位数 16.700 ms、归一化整图能量分数 7.183 ms、邻接变差分数 14.568 ms；逐次记录共 21 条且分数均有限。首次执行遇到仓库导入路径错误，已查明并修复运行器路径后，用同一命令完成运行。
+- 结果仅描述单台当前主机、单张合成图幅的评分代码耗时；不外推整套开发集、GPU 或模型端到端时间，也不决定真实 draw 数或运行预算。没有读取项目载荷、模型、checkpoint、confirmation/test 或任何实测输出；C3-A v3 与阶段 gate 不变。
+- 新实验目录共 12,952 字节；已清理本轮生成的评分模块与运行器 `.pyc`。分区复核可用 `21,056,819,200` 字节（19.61 GiB，使用率 95.8%）；未删除数据、历史结果或 checkpoint。
+- 记录：[协议、脚本、结果和运行 manifest](../../experiments/synthetic_cpu/c3a_distribution_metric_runtime_cpu_20261109_v1/)。
+
+## 2026-11-09 RSDM/LSIR 作者/机构全文路线有界补查
+
+- 对既有 SAR-only 区域专用扩散联合超分/去斑线索，按精确题名、作者及 DOI 搜索北京化工大学与中国科学院空天信息创新研究院官方域名，未找到可核验作者页或机构全文。索引再次显示此前审阅过的同一 ResearchGate 作者稿，未形成独立来源。
+- 正式 IEEE 版本与作者稿对应、方法协议和代码来源仍未核实；不再重复 DOI、IEEE、Crossref、arXiv 或该 ResearchGate 入口。未更改新颖性主张、C1–C6 gate 或训练状态。记录：[来源复查](../../experiments/literature_audits/region_specific_sar_jdsr_source_recheck_20261107_v1/report.md)。
+
+## 2026-11-09 多样本评分量隔离原型与 C1 官方地图路线复核
+
+- 按未启用的补充设计实现纯 NumPy CPU 评分工具[distribution_metrics.py](../../scripts/distribution_metrics.py)，提供逐像素 CRPS、按像素数归一化的整图能量分数、水平/垂直邻接变差分数；输入限实数 `[0,1]` 图像，检查维度、有限值与范围，不自动裁剪。未接入 C3-A v3 或正式 evaluator。
+- 新增 10 项定向 CPU 用例，覆盖手算已知值、精确集合零分数、空集合、维度错配、NaN、越界值和无邻接对；测试 10/10 通过，两个 Python 文件 `py_compile` 通过。固定种子的 5×7×9 随机合成数组与独立向量化公式对照通过，三项分数最大绝对差为 `2.776e-17`。实现和测试不导入 PyTorch，不读取项目图像、模型、checkpoint、confirmation/test 载荷或测量值。
+- 重新查阅 SEN12MS 作者仓库公开记录时，搜索索引中的官方 issue #5 报告 ROI 概览 Notebook 在不同运行环境下绘图位置不一致；网页正文未能直接打开。此线索削弱以该地图图示作坐标交叉映射的可信度，但不提供 C1 坐标或身份交叉表。train/development 的地理、采集和 patch footprint 独立性仍未知；不再重试同一 Notebook/TUM 入口。
+- 评分工具仅是隔离的候选公式原型和软件已知案例验证，不是本地生成模型评价，不决定 draw 数、阈值、gate 或阶段资格。训练/GPU 继续暂停；C3-A v3、C2/C3 gate、数据权限不变。
+- 本轮只新增轻量源码、测试和研究记录；已清理本轮生成的 2 个 Python 编译缓存，没有删除数据、历史实验或 checkpoint。最后一次分区读数可用 `21,058,465,792` 字节（19.61 GiB，使用率 95.8%）。
+- 记录：[补充评价设计](C3A_DISTRIBUTION_EVALUATION_ADDENDUM_DESIGN_20261109.md)、[决策 D-2026-11-09-006](DECISION_LOG.md)、[C1 地理路线审查](../../experiments/data_audits/c1_geospatial_crosswalk_route_20261107_v1/report.md)。
+- **下一步：** 继续寻找有新源码、冻结协议或一手 train/development 元数据支持的 CPU 工作；不得把候选评分原型当正式评价协议，也不得重试已受限元数据端点。
+
+## 2026-11-09 多样本分布评价、图像空间依赖与样本数纯 CPU 诊断
+
+- 在 v1.8 生效后，完成三项预登记的纯合成 CPU 实验。二维双峰已知分布实验显示：均值塌缩点的总体均值误差为 0，但能量分数为 3.0910、成对距离与模态支持率均为 0；真实抽样能量分数为 1.8094、支持率为 0.9704。矩匹配单峰高斯能量分数为 1.9378，模态支持率为 0.5072。样本数实验在 100 次重复中比较 N=4–256：能量分数正确排序比例达到预登记 0.90 描述阈值时，矩匹配高斯为 N=32、0.8/0.2 偏置双峰为 N=16。32×32 归一化图像域案例中，同边缘但空间依赖错误的 Gamma 乘性样本，其逐像素 CRPS 配对差为 −0.0000128±0.0001670，而整图能量与邻接变差分数分别高 0.0051899 和 0.0044720。
+- 解释仅限指定合成分布、样本数和评价量。结果说明点估计、分布形状、模态质量与集合大小需要分开报告；不构成真实 Flow/Diffusion 校准、SAR 物理一致性、C3-A 阶段证据或模型 draw 数建议。
+- C3-A v3、训练配置、C2/C3 gate 和所有阶段资格均未改变。训练/GPU 继续暂停；没有访问项目影像、模型、checkpoint、confirmation/test 载荷或测试测量值。
+- 逐重复结果与运行清单的 SHA-256 核验通过；本轮新增合成产物共 284,563 字节，清理了本轮生成的 3 个 Python 编译缓存，没有删除数据、历史结果或 checkpoint。最新空间读数为 21,044,301,824 字节可用（19.60 GiB，已用 90.7%）。
+- 记录：[分布评价量诊断](../../experiments/synthetic_cpu/c3a_distribution_metric_sanity_cpu_20261109_v1/report.md)、[样本数敏感性诊断](../../experiments/synthetic_cpu/c3a_distribution_draw_count_cpu_20261109_v1/report.md)、[图像空间依赖指标诊断](../../experiments/synthetic_cpu/c3a_image_distribution_metrics_cpu_20261109_v1/report.md)。
+- **设计产物：** 已形成[C3-A 多样本分布评价补充设计](C3A_DISTRIBUTION_EVALUATION_ADDENDUM_DESIGN_20261109.md)，明确候选分数、数据边界和恢复训练后需冻结的项目。该设计稿不启用新协议。
+- **文献核验：** 已读取 CRPS、能量分数及变差分数的两篇一手来源全文，确认能量分数对部分相关失配可能不够敏感，变差分数虽适当但非严格适当；相应局限已写入设计、综述与风险记录。来源审查：[报告](../../experiments/literature_audits/proper_scoring_rules_multisample_eval_20261109_v1/report.md)。
+- **下一步：** 训练仍暂停；继续寻找有直接源码/协议依据的非 GPU 工作。真实生成分布评价要等用户恢复训练并另行冻结补充评价协议后进行。
+
+## 2026-11-09 v1.8 正式采纳并完成规范同步
+
+- 用户于 2026-11-09 明确批准采纳 v1.8 候选并授权同步 `AGENTS.md`、`README.md`。正式总纲、代理规范、README、候选快照、差异与采纳记录已完成同步。
+- 对照 v1.7 与完整候选的实际文本差异，确认差异稿覆盖首页版本状态、第 1、7、8.3、9、12、15 节，并说明对历史实验、未来实验及论文的影响。v1.8 将 SAR 两阶段潜扩散超分列入先前工作，并区分单次 draw、像素均值点估计和样本分布评价。
+- 本次审阅的 B1/B1R/B1F、source-aligned B1 v2、Phase 1-R/S/T 结果仍按各自报告标记为历史失败/未晋级或停止；未改变数值、协议、gate 或当前阶段资格。论文旧 pilot 的 claim audit 已存在，未重复读取结果表或编辑稿件。
+- 对 IOP DOI `10.1088/1361-6501/ae8686` 的新检索仍只返回摘要级二手线索，没有获得可验证的一手全文；不更新文献事实或新颖性判断。
+- v1.8 是当前正式总纲。采纳不改变任何阶段 gate、数据权限或当前训练暂停状态；未启动训练/GPU，也未读取 confirmation/test 载荷或测试测量值。
+- **下一步：** 继续按 v1.8 和用户指示推进不依赖 GPU 的研究；训练保持暂停。
+
+## 2026-11-07 ICSP 2024 作者主页全文路线仍未取得正文
+
+- IEEE 官方记录仍提供摘要级证据。新增检查的作者 ResearchGate 论文页明确标注无全文，只提供向作者请求的入口；本次未发送请求。NUDT 官方域名的精确检索也未找到可验证作者稿。
+- 本次没有获得新方法/实验信息，故证据级别、摘要边界及 C1–C6/gate 均不变。继续训练暂停；未访问项目或 confirmation/test 载荷、模型或 GPU。
+- 空间复核：项目分区可用 20,336,058,368 字节（约 18.94 GiB，96%）；Amieva 与 ICSP 两个审查目录磁盘占用约 28 KB。空间读数波动原因未知；本轮没有可确认安全的清理对象，不删除数据、历史结果或 checkpoint。
+- 详见[访问路线补充记录](../../experiments/literature_audits/icsp_sar_diffusion_sr_abstract_pdf_route_20261107_v1/report.md)。
+
+## 2026-11-07 Amieva 论文机构仓储全文补充审查完成
+
+- 直接读取该论文已发表版 PDF 正文；后续复访超时。正文确认其为 Sentinel-1 IW→SM、跨模式 SAR-only 非生成式联合超分/去斑先例，整景 5/2/3 划分，test 为 3 幅整景。
+- 关键边界：作者先在完整影像集合上计算每 band 的 0.1/99.9 百分位，再划分场景；这意味着预处理使用了保留场景的像素值分布，但现有证据不证明 test 标签训练或按 test 指标选模。Lee-filtered 跨模式参考未被证明无噪声。
+- 更新的是既有文献条目与新补充审查，不改变 v1.7、候选 v1.8、C1–C6、C2/C3-A gate 或训练状态。训练仍暂停；本轮未访问项目/confirmation/test 载荷、模型或 GPU。
+- 记录：[全文补充审查](../../experiments/literature_audits/amieva_direct_fulltext_followup_20261107_v1/report.md)；此前索引摘录报告保留为历史。
+
+## 2026-11-07 IOP SAR 联合去斑/超分论文线索完成有界复核
+
+- 新发现题名直接涉及 SAR 联合去斑与超分的 2026 IOP DOI 线索 `10.1088/1361-6501/ae8686`。IOP 页面受 `robots.txt` 限制，DOI/Crossref 工具入口不可读；当前仅取得 ResearchGate 摘要级二手记录，没有全文。
+- 将其保留为高相关待核实线索，不将二手摘要中的方法、数据集或指标写成事实。候选 v1.8 已据此更新；v1.7、C1–C6、gate、训练状态均不变。
+- 见[来源审查报告](../../experiments/literature_audits/frequency_enhanced_sar_jdsr_source_check_20261107_v1/report.md)。不重复本轮受限入口；若今后出现可验证作者稿再继续。
+
+## 2026-11-07 空间复核与训练进程检查
+
+- 最新分区可用空间读数为 16,142,368,768 字节（约 15.03 GiB，使用率 97%）；此前同日最低观测为 13,211,639,808 字节。只读目录统计：仓库约 12.96 GB，其中 `data/` 约 9.43 GB、`experiments/` 约 1.72 GB、`checkpoints/` 约 234 MB、`weights/` 约 216 MB。
+- 本轮相关 Gamma 实验目录约 59.5 KB；本轮唯一清理项是自己生成的 11,580 字节编译缓存。其余数据、历史实验和 checkpoint 均无安全清理依据，未删除。
+- 只读检查未发现仓库工作目录下的 C2/C3-A 训练或多样本评价入口进程。可用空间此前在 13–23 GB 间波动，原因未知，不能归因于本轮。
+
+## 2026-11-07 draw 间相关性对多样本均值收益的影响已完成 CPU 诊断
+
+- 预登记共同 Gamma 分量实验 45/45 个条件通过。K=8 时，ρ=0/0.25/0.5/0.9/1 的经验 PSNR 增益范围分别为 9.025–9.050、4.619–4.646、2.478–2.503、0.396–0.401、0 dB。结论限于该合成构造，不测量模型 draw 的相关性。见[实验报告](../../experiments/synthetic_cpu/c3a_correlated_draw_mean_cpu_20261107_v1/report.md)。
+- 这一结果补强了 v1.8 候选中的报告边界：记录 draw 间关系，并将均值点估计与单次输出/生成分布分开。现有 C3-A 评价器、冻结协议和 gate 不变。
+- 仅 NumPy CPU 合成计算；没有项目载荷、模型、checkpoint、confirmation/test 访问，也没有训练或 GPU。
+- 实验目录清理编译缓存后为 58,570 字节；本轮仅删除自己生成的 11,580 字节 `.pyc`。实验记录阶段的一次空间读取为 17,690,406,912 字节可用（约 16.49 GiB，使用率 97%）；随后读数继续波动，最新状态见上节。没有其他确认安全的清理候选。
+- **下一步：** 训练继续暂停；推进剩余可由静态源码、冻结协议或不触碰保留载荷的 CPU 方法验证回答的问题。
+
+## C3-A 多样本评价器与冻结协议相符 — 2026-11-07
+
+- 只读核对 protocol v3 与 evaluator：每个 draw 独立算标量指标，再汇总逐身份指标和逐像素标准差；不计算均值图质量、分布距离或 draw 相关系数，且输出不保留预测图。该范围符合冻结协议，不是实现缺陷。
+- 四个 draw 的标准差只能描述当前设置下的采样变化；不能证明 draw 独立或分布已校准。未来如增加均值图/分布/依赖评价，须另行预登记，不能回写 C3-A v3。
+- 详见[源码与协议审查](C3A_MULTI_SAMPLE_DEPENDENCE_AUDIT_20261107.md)；不改变现有训练、代码、协议或 gate。
+
+## v1.8-proposed 候选总纲与逐节差异已备妥 — 2026-11-07
+
+- 候选[总纲](RESEARCH_CHARTER_REVISION_PROPOSAL_20261107.md)和[逐节差异稿](RESEARCH_CHARTER_CHANGELOG_20261107.md)已完成，等待用户审阅。拟议内容仅更新 SAR 潜扩散超分先例和单 draw、像素均值点估计、生成分布三类评价边界，并记录 draw 间相关性对均值收益的限制。
+- v1.7 继续是唯一正式版本；本轮没有改正式总纲、`AGENTS.md` 或 `README.md`，也没有改变任何 gate、阶段资格、数据保护状态或训练状态。
+- **下一步：** 按用户要求维持训练暂停，继续仅做有依据且不依赖 GPU 的工作；候选审阅/批准前不作规范同步。
+
+## 2026-11-07 SAR 潜扩散超分全文复核与多样本均值 CPU 诊断
+
+- 直接读取 OpenReview 作者稿全文，并核实 MONTI 官方页面将该论文列为录用、非归档。论文是 SAR-only 的“结构超分→条件潜扩散散斑增强”两阶段先例；未测试 optical 引导，也未与本项目完整联合/级联矩阵匹配比较。完整 train/validation 场景分配与代码版本仍开放。见[全文报告](../../experiments/literature_audits/monti_two_stage_sar_sr_20261107_v2/report.md)。
+- 按冻结 CPU 合成协议核验 `Gamma(L,1/L)` 多样本像素平均：9 个 `L×K` 条件全部通过；K=4 的 PSNR 增益约 +6.0 dB、K=8 约 +9.0 dB，经验 ENL 随 K 增长。此结果只说明独立 Gamma 玩具模型中的点估计/分布差异，不代表本地 SAR 或生成模型。见[实验报告](../../experiments/synthetic_cpu/c3a_sample_mean_variance_cpu_20261107_v1/report.md)。
+- 静态确认 C3-A 评价器对每个 draw 单独计算指标，再汇总指标及采样波动；它不把预测影像先逐像素平均。无需改代码或冻结协议。C2 gate、C3-A 协议和 v1.7 总纲均未改变。
+- 用户要求训练暂停；检查未发现 C2/C3-A 训练入口进程。本轮仅 CPU/文献与合成随机数，没有项目数据、模型、confirmation/test 载荷、训练或 GPU 计算。
+- **下一步：** 继续仅处理有新证据支持且不依赖 GPU 的研究/软件工作；模型质量判断仍待用户恢复训练后按冻结协议执行。
+
+## 2026-11-07 无 GPU 正式预检和合成输入路径修正
+
+- 级联、SFT 与正式测试套件现在先核验冻结授权，再检查 CUDA；MMCANetV2 validation evaluator 先核验 checkpoint 与 validation 输入哈希绑定，再检查 CUDA。正式模型执行仍维持 CUDA-only。
+- C2 合成审计单测修正清单标记；`infer_v4` 来源缺失/全零光学测试通过 CPU 测试替身运行，不改变生产设备合同。授权前置也覆盖随机状态初始化。定向共 73 项：72 项通过；唯一失败是历史 B1 产物源文件哈希与当前工作树不一致。详情见[CPU 核验报告](FORMAL_PREFLIGHT_CPU_AUDIT_20261107.md)。
+- SEN12TS 元数据补充测试使用已安装 `rasterio` 的环境后 4 项通过；未安装依赖、未读取像素。没有训练、使用 GPU、读取 confirmation/test 载荷或改变任何 gate。
+- 清理了本轮创建的 16 个 `/tmp/jdsr_*_20261107.log` 日志、6 个仅含合成夹具的 pytest 临时目录及临时指针；没有删除项目数据、历史实验或 checkpoint。清理后首读可用空间 16.76 GiB，最终复测 16.67 GiB；最后 3 个临时目录的字节数未单独测量，不能归因清理释放量；本轮空间读数从 19.01 GiB 变为 16.67 GiB，波动来源未知。
+- **下一步：** 训练继续暂停；继续处理可由源码、固定协议或安全合成输入独立验证的新问题。C1 数字 PNG 来源映射仅在出现新的一手 train/development 专属元数据时恢复；模型质量判断待用户恢复训练。
+
+## 2026-11-07 C2 全 development 对比差 CPU 诊断完成；gate 不变
+
+- 按冻结 v5 协议对四种退化条件的全部 development 输入进行 CPU 推理：800 条条件—样本、19 个来源组、3,200 次前向；逐样本和来源组汇总、源码/工件及输出哈希复核通过。没有训练、CUDA、选模、confirmation/test 载荷访问或 gate 晋级。
+- 零目标背景中位数每条件 1–2/200。matched−SAR-only 来源组等权均值对比误差差在 x2_light、x2_severe、x4_light 分别为 −0.000191、−0.000939、−0.000862；x4_severe 为 +0.000677。该量是表示域目标—背景对比误差，development 已用于训练/选择，故仅作描述；不代表整体 optical utility 或独立泛化。
+- C2 v2 原 fail-closed 结果和未判定 gate 保持不变。详见[协议](../../protocols/mmcanet_phase_c2/c2_all_development_contrast_cpu_20261107_v5.json)、[报告](../../experiments/diagnostics/c2_all_development_contrast_cpu_20261107_v5/report.md)及 D-2026-11-07-049。
+
+## 2026-11-07 SAR 条件 Flow 的 SAR-to-optical 一手先例已登记
+
+- OpenReview ICLR 2026 ML4RS Workshop 全文使用 SAR 条件潜空间 flow 生成 optical，IEEE Xplore 同题名记录标为 2026-10-12 Early Access。该方向收窄通用 SAR 条件 flow/结构保持新颖性，但任务输出为 optical，与本项目 SAR 输出 JDSR 不同；IEEE 期刊全文及版本对应仍未核实。
+- 不改变 C2 gate、C3-A 冻结协议或阶段资格；训练仍暂停。详见[审查报告](../../experiments/literature_audits/sar_conditioned_flow_sar_to_optical_review_20261107_v1/report.md)及 D-2026-11-07-050。
+
+## C1 v2 train/development 来源交叉核验 — 2026-11-07
+
+- 仅用冻结清单及派生 x2_light train/development 的 CSV/JSON 元数据，将 1,600/200 对、92/19 个来源组按 `source_group_id + patch_id` 逐样本连接；SAR/optical 来源 SHA-512 全部匹配。3,200/400 个模态路径在哈希绑定的 payload file manifest 中唯一对应，记录的官方/观测哈希与文件字节数一致；主断言 48,739 条通过。详见[审计报告](../../experiments/data_audits/c1_v2_train_development_source_crosswalk_20261107_v1/report.md)。
+- 可追溯相对路径位于清单标签 `ROIs1158_spring`、`ROIs2017_winter` 下，并按场景号分到 `s1_N` / `s2_N` 文件夹。train/development 的来源组、路径、派生 `sample_id` 和来源哈希交集均为 0。这证明清单间的场景组隔离和派生输入来源连接，不证明地理/轨道/时间独立、像素无重叠或具体数据集/传感器属性。
+- 未建立本地原始 `data/sar`、`data/opt` 数字 PNG 名称到这些相对路径的逐文件映射；这条边界仍开放。此次只读 CSV/JSON/哈希元数据，没有打开图像、数组、checkpoint、confirmation/test 载荷；未训练、未用 GPU。最终核对审计输入与产物摘要均匹配。
+- 进一步将 3,600 个允许角色来源 SHA-512 与仓库既有上游哈希交叉表连接，精确命中为 0；无法由该表恢复本地数字 PNG 名称。此次只复用元数据，不能据零命中推断像素不同或排除重编码内容。详见[数字 PNG 映射审计](../../experiments/data_audits/c1_v2_numeric_png_source_crosswalk_20261107_v1/report.md)。
+- **空间快照：** 2026-11-07 16:14（中国标准时间）项目分区可用 21,993,185,280 字节（20.48 GiB）；本次核验窗口内读数曾在 18.96–21.13 GiB 间波动，原因未知。本轮新增审计产物约 15 KB，未发现可安全清理候选，未删除任何文件。
+
+## 暂停训练期间的双峰流 CPU 方法探索 — 2026-11-07
+
+- 用解析双峰条件流完成等速度场调用数求解器压力诊断、分离度扫描和时间网格比较；见[主报告](../../experiments/synthetic_cpu/c3a_bimodal_flow_solver_spike_20261107_v1/report.md)、[分离度补充](../../experiments/synthetic_cpu/c3a_bimodal_separation_sweep_cpu_20261107_v1/report.md)与[网格补充](../../experiments/synthetic_cpu/c3a_bimodal_time_grid_cpu_20261107_v1/report.md)。均为合成 Level 0 结果，不形成模型质量、物理一致性或晋级证据。简单非均匀网格未改善强分离解析场。
+- 又在 `[0,1]` 表示尺度和 `noise_sigma=0.1` 下完成标量双峰核验；Heun 8 步中央窗质量约为理论值 2.17 倍，Heun 32 步接近理论/独立样本参考。用同一速度场经仓库 `sample_heun` CPU 运行，输出与独立 NumPy 更新最大绝对差 `2.220e-16`；采样器定向测试 5 项通过。见[表示尺度与实现核验报告](../../experiments/synthetic_cpu/c3a_representation_scale_bimodal_cpu_20261107_v1/report.md)。
+- 主压力、分离度扫描、时间网格和表示尺度脚本分别通过 30、23、22、16 条断言；7 个本轮 Python 脚本语法检查通过，52 个记录文件未发现行尾空格；各实验清单输入/产物摘要均匹配。未访问项目影像、模型权重、confirmation/test 载荷或历史结果；CUDA 设备不可见，没有训练。
+- 这些解析压力测试不改变冻结的均匀 Heun 8 步、输出裁剪、训练协议或任何阶段 gate。C3-A 训练按用户要求暂停；继续做静态代码、协议和可独立验证的 CPU 工作。2026-11-07 最后复核时项目分区可用 17,952,563,200 字节（约 16.72 GiB，97%）；没有删除文件。项目整体研究目标未完成，当前不提交/推送。
+
+## 修正 SSIM 尺寸异常的中文提示 — 2026-11-07
+
+- 将 `Early-FusionCascadeJDSR/eval_metrics.py` 的 SSIM 小尺寸 `ValueError` 文案改为“SSIM 输入图像尺寸不得小于 11×11”，遵守项目中文终端输出要求；只改文案，不改公式、阈值或指标定义。
+- TDD 红灯确认原英文文案不满足断言；绿灯后，指标已知样例 25 条断言和既有 `tests/test_evaluator.py` 的 26 项均通过。详见[核验记录](../../experiments/diagnostics/metric_known_case_cpu_20261107_v1/report.md)。
+- 未访问项目影像、模型、checkpoint、confirmation/test 载荷；未使用 GPU 或训练。整体研究目标未完成，不提交或推送。
+
+
+## ICSP 2024 SAR 扩散超分官方摘要核验 — 2026-11-07 14:40（中国标准时间）
+
+- 已核对 IEEE 官方摘要：该文是 SAR 单模态扩散超分，包含残差预测，报告 MSTAR/SARBake 传统指标和下游分割评价；它不构成联合去斑或 optical 先例。
+- 官方 PDF 直连不可访问，数据划分、退化、训练预算和分割评估协议仍开放；不将摘要的性能结论作为本地证据。详见[来源审计](../../experiments/literature_audits/icsp_sar_diffusion_sr_abstract_pdf_route_20261107_v1/report.md)。
+- 综述相关小节已译为中文，矩阵和扩散可行性说明同步。没有访问项目影像、模型、checkpoint、confirmation/test 载荷；无训练/GPU。项目分区可用 16,327,155,712 字节（15.21 GiB）。
+
+
+## RSDM/LSIR 作者稿与 arXiv 来源路径边界 — 2026-11-07 14:31（中国标准时间）
+
+- 项目旧文献记录已审阅 ResearchGate 作者稿并描述其 SAR-only 联合 ×4 扩散方法与无参考评价；本轮没有重开作者稿。DOI/IEEE 正式来源和作者稿版本对应关系仍未验证。
+- 新增 arXiv 官方域名精确标题/缩写检索未得到匹配稿；直接官方搜索页与 export API 受限。此为有界检索未命中，不证明不存在预印本。详见[来源复核](../../experiments/literature_audits/region_specific_sar_jdsr_source_recheck_20261107_v1/report.md)。
+- 文献综述、扩散可行性、研究缺口与矩阵已统一为作者稿级证据，不将 DOAJ 摘要冒充正式论文全文。此修订收窄“无 SAR-only 联合扩散先例”的说法，不改变 C1–C6 gate。
+- 本轮仅访问公开文献检索与项目既有研究文档；未读项目载荷、模型、checkpoint、confirmation/test；没有训练或使用 GPU。项目分区可用 10,747,113,472 字节（10.01 GiB）。
+
+
+## 无 GPU 输出裁剪边界偏差诊断 — 2026-11-07 14:24（中国标准时间）
+
+- 完成 21 种目标亮度×噪声条件的纯 NumPy CPU 合成对照，每种噪声生成 500,000 个样本，共 45 次断言。对 `[0,1]` 内真值，裁剪逐样本不增加平方误差。
+- 目标为 0/1、噪声标准差 0.05 时，裁剪比例分别为 50.0324%/49.9676%，PSNR 分别上升 +2.9976/+3.0231 dB，同时均值偏差分别为 +0.019956/−0.019941。详情见[报告](../../experiments/synthetic_cpu/clip_boundary_bias_cpu_20261107_v1/report.md)。
+- 解释限于标量加性高斯合成；不代表 C3-A 模型输出或 SAR 噪声。保留现有裁剪比例记录；不改冻结推理裁剪、正式指标或阶段 gate。没有访问项目影像、模型、checkpoint、confirmation/test 载荷；没有训练或使用 GPU。
+- **空间：** 本实验目录约 17,521 字节（不含 manifest）；项目分区当时可用 17,005,416,448 字节（15.84 GiB）。只清理本实验由 `py_compile` 生成的缓存。整体研究目标未完成，不提交或推送。
+
+
+## 无 GPU SAR 指标已知样例与 C3-A 评价路径核验 — 2026-11-07 14:15（中国标准时间）
+
+- 纯 CPU 合成[实验报告](../../experiments/diagnostics/metric_known_case_cpu_20261107_v1/report.md)完成 25 条预设断言：PSNR/SSIM 完全匹配、常量偏置、EPI 对幅值缩放的敏感性、ENL、TBR 中位数零值策略、ratio epsilon，以及 C3-A 裁剪后 PSNR 与公共实现一致。
+- 一个直接观察是：预测振幅缩至一半时 EPI 相关仍为 1，而边缘强度比为 0.5；仅看 EPI 会漏掉幅值变化。ratio 精确匹配的 `~4.05e-8` 小偏差与分母 `1e-8` epsilon 公式一致。未发现覆盖范围内需修复的指标算术问题。
+- 未读取项目影像/数组、模型、checkpoint、既有结果、confirmation/test 载荷；未导入 PyTorch 或使用 GPU；仅将 SSIM 尺寸异常提示改为中文；指标公式、阈值、协议和 gate 未变。训练暂停继续生效。
+- **磁盘：** 指标核验目录约 15,056 字节（不含 manifest）；本轮结束复查项目分区可用 17,005,416,448 字节（15.84 GiB）。仅删除本实验由 `py_compile` 生成的缓存。
+
+## RSDM/LSIR 生成式 SAR 联合恢复 DOI 一手来源复核 — 2026-11-07 13:51（中国标准时间）
+
+- 附件要求继续核实 SAR 联合去斑/超分及生成式先例。对 10.1109/JSTARS.2026.3655710 的新一轮复核取得 DOAJ 的题名、卷页和摘要线索，但 IEEE Xplore/DOI/Crossref 入口没有给出可读取的正式正文。详见[一手来源复核记录](../../experiments/literature_audits/region_specific_sar_jdsr_source_recheck_20261107_v1/report.md)。
+- 将其保留为可能直接涉及 SAR-only 生成式联合恢复的高优先级开放线索；不把二手摘要作为正式事实/结果，也不声称该领域不存在相关先例。现有文献矩阵的开放状态保持，不改变 C1–C6 gate。
+- 用户要求训练暂停；本次只进行公开文献检索，没有访问项目数据、checkpoint、confirmation 内容或 test 数据，没有运行 GPU。
+- **空间：** 13:51 分区可用 13,305,946,112 字节（约 12.39 GiB，98%）。本次只新增轻量文献记录，无数据下载；不清理归属不明或历史文件。
+
+## C1 一手 ROI 地图入口复核 — 2026-11-07 13:33（中国标准时间）
+
+- 作者维护的 SEN12MS README 指出概览 notebook 会将 ROI 绘制到世界地图；SEN12MS 原始论文说明相关数据有地理参考。Notebook 页面存在，但正文未加载，原始文件请求未取到；没有获得坐标表，也没有验证跨版本 ROI/patch 对应关系。详见[C1 路线复核](../../experiments/data_audits/c1_geospatial_crosswalk_route_20261107_v1/report.md)。
+- C1 train/development 地理/采集交叉映射仍未解决；不重复同一 notebook/TUM 获取路径，不用目录编号替代空间证据。训练继续暂停，只推进可独立完成的无 GPU 工作。
+- **空间与交付：** 13:33 项目分区可用 10,920,935,424 字节（约 10.17 GiB，使用率 98%）。新增文件仅为轻量记录与 CPU 数值实验；本轮未发现可安全删除且确认由本轮生成的其他中间文件，不清理用户/历史文件。整体目标未完成，不提交或推送。
+
+## 无 GPU 求解器计算预算比较与 v1.7 数据边界 — 2026-11-07 13:27（中国标准时间）
+
+- 完成纯 NumPy CPU 解析高斯流对照：Euler 16 步、Heun 8 步、显式中点法 8 步、经典 RK4 4 步，均为每样本 16 次速度场调用；三个目标/源标准差比共 12 组。中点法在比值 0.25 时误差最低；RK4 在比值 1 和 2 时最低；Euler 在三种比值下误差最大。Heun 结果与此前独立步数实验逐条件完全一致。
+- **解释范围：** 仅说明在已知解析的一维高斯速度场上，等 RHS 调用预算下求解器排序会随方差比而变；不代表神经速度场、SAR 图像质量或实际 GPU 延迟。冻结 C3-A 的 Heun 8 步设置、协议与 gate 均不变。
+- 用户最新 AGENTS.md 明确：总纲为 v1.7；C1 v2 有 1,600/200/200 个 train/development/confirmation 样本、92/19/20 个来源组；confirmation 已于 2026-11-05 访问并用于访问后描述性复核，现永久封存，不能用于调参、选模或晋级；C1 v2 没有独立 test 角色。此次 CPU 合成实验未访问任何项目载荷或封存内容。
+- C1 地理/采集交叉映射仍待新的可核验一手资料；C2 gate 与 C3-A 模型效果尚未验证。训练按用户要求暂停，继续推进不依赖 GPU 的来源核对与独立软件/方法问题。
+- **空间与交付：** 13:27 项目分区可用 17,978,875,904 字节（约 16.74 GiB，使用率 97%）。未删除任何既存、历史或归属不明文件；整体研究目标仍在进行，本轮不提交或推送。
+
+## 无 GPU 解析高斯流求解误差实验 — 2026-11-07 10:22（中国标准时间）
+
+- 完成 `c3a_gaussian_conditional_flow_solver_20261107_v1`：纯 NumPy 合成一维条件高斯流，200,000 个样本，比较 8/16/32/64 步 Heun 在三个目标/源标准差比（0.25、1、2）下的端点误差，共 12 组。8 步归一化端点 RMSE 分别为 0.021147、0.001295、0.009586；三个条件下误差均随步数增加而下降。
+- **解释范围：** 解析速度场已知时，积分离散误差会随方差比而变；这是数值求解器诊断，不是神经速度场近似误差，也不代表 SAR 图像质量。结果不支持修改 C3-A 冻结的 8 步设置、协议或阶段 gate。
+- 仅 CPU/NumPy；未导入 PyTorch、未启动训练/GPU、未读取项目数据、模型、checkpoint、项目结果或 confirmation/test 载荷。协议、代码、逐组数据和环境见[实验目录](../../experiments/synthetic_cpu/c3a_gaussian_conditional_flow_solver_20261107_v1/)。
+- C1 地理/采集交叉表仍未解决；C2 gate 与 C3-A 模型效果仍待后续获准的模型评价/训练。训练按用户要求暂停。
+- **空间与交付：** 10:22 项目分区可用 18,239,188,992 字节（约 17.0 GiB，使用率 97%）。未清理归属不明或历史产物；当前工作区有大量既存改动，整体研究目标未完成，本轮不提交或推送。
+
+## 无 GPU 前置工作核验与暂停状态 — 2026-11-07 10:01（中国标准时间）
+
+- C3-A 续训绑定缺失路径已修复；新回归与续训 CPU 合成用例共 16 项通过，`py_compile` 和 `git diff --check` 通过。源码改动仅一行路径替换；未训练、未启动 GPU。
+- C1 train/development 路径格式、C2 writer、C3-A 目标/采样、续训状态、取数角色边界等静态审查均已记入本日研究记录；没有改变研究 gate。两个 Gamma/log-Yeo–Johnson 纯合成 CPU 对照也已完成，但不能外推到真实 SAR。
+- **未完成项：** C1 地理/采集交叉映射仍无一手对应表；C2 gate 和 C3-A 模型效果需模型评价/训练。用户要求训练暂停，故本轮不继续这些 GPU 任务。
+- **磁盘/提交：** 10:01 项目分区剩余 `18,095,988,736` 字节（16.85 GiB，使用率 91.3%）；本轮只保留轻量记录并清理了本轮临时编译缓存。工作区存在其他既存改动，整体研究目标未完成，本轮不提交或推送。
+
+## C3-A 角色限定取数边界核对 — 2026-11-07 09:51（中国标准时间）
+
+- C3-A runner 只构造和核验 train/development；SAR-only 包装器只加载 LR 与 pseudo-target。confirmation 需要底层类显式授权，而 runner 未授权；续训绑定也拒绝 confirmation/test/optical 访问标记。详见[角色访问审查](C3A_DATA_ACCESS_ROLE_AUDIT_20261107.md)。
+- 本轮只读源码并查看角色过滤规则，没有读取任何影像/数组、confirmation/test 路径或项目结果；没有运行训练、GPU、模型评价或测试，也没有代码改动。
+- C3-A 的软件前置审查当前未发现其他已证实缺口；训练仍按用户要求暂停，真实模型质量仍未知。
+- **磁盘与工作区：** 项目所在分区剩余 `18,172,370,944` 字节（16.92 GiB，使用率 91.3%）；本轮只生成轻量报告/回归文件并清理本轮 `/tmp` 编译缓存，未删除归属不明内容。整体工作区有大量既存改动，本轮未提交或推送。
+
+## 修复 C3-A 续训绑定源码路径 — 2026-11-07 09:47（中国标准时间）
+
+- **发现并修复：** 续训代码摘要清单引用了不存在的 `MMCANet/src/MMCANetV2/phase_c2_matched.py`；实际导入模块为 `MMCANetV2/phase_c2_matched.py`。旧路径会在续训绑定阶段稳定触发 `FileNotFoundError`。现已改为实际源码路径，并增加路径可解析回归。
+- **验证：** 在 `AISAR` 且隐藏 GPU 的环境下，`tests/test_c3a_resume_code_hashes.py` 与 `tests/test_c3a_training_resume.py` 共 16 项通过；两处 Python 文件 `py_compile` 通过。未运行训练、GPU 或模型评价，未打开已有 checkpoint。
+- **续训审查：** 固定学习率协议无 scheduler；checkpoint 保存并恢复模型、optimizer、epoch/best 状态和全局/专用 RNG，且绑定协议、代码、环境和固定输入。详见[审查报告](C3A_RESUME_BINDING_AUDIT_20261107.md)。
+- 用户要求的训练暂停继续生效；这次修复只解除一个续训准备阶段的路径错误，不启动或恢复训练。
+
+## C3-A 流目标/采样协议静态核对 — 2026-11-07 09:37（中国标准时间）
+
+- 冻结 C3-A v1 的 `x0` 源分布、线性插值、速度目标、均值 MSE、逐样本固定噪声、8 步/16 次调用 Heun 及最终评价裁剪，均与当前源码路径一致；未发现需改代码的具体偏差。详见[C3-A 静态审查](C3A_FLOW_OBJECTIVE_STATIC_AUDIT_20261107.md)。
+- 这是协议—实现一致性证据，不是训练收敛或模型质量证据。训练继续暂停，C2 gate 未判定，C3-A 质量未知；本轮没有运行代码、测试、GPU、训练或评价。
+
+## C1 命名格式补充与 C2 写入路径静态审查 — 2026-11-07 09:27（中国标准时间）
+
+- **C1 元数据补充：** train/development 的 1,600/200 个样本、92/19 个来源组与文件路径已按角色限定核对；路径形式与 SEN12MS 作者仓库 README 示例相容。该相容性不能证明场景编号、坐标或 patch footprint 一一对应，地理/采集独立仍未知。详见[C1 路线审查补充](../../experiments/data_audits/c1_geospatial_crosswalk_route_20261107_v1/report.md)。
+- **C2 写入路径审查：** 冻结矩阵与 development 输入绑定先于模型评价，常规 runner 拒绝已有输出目录，结果文件使用独占创建。未发现需改代码的具体问题；C2 gate 仍未判定。详见[C2 静态审查](C2_SCREEN_WRITER_STATIC_AUDIT_20261107.md)。
+- **纯合成结果核验：** 固定 `L=8` 的乘性观测实验脚本编译通过，JSON 中 5 档信号、25 组留出结果与报告表格逐项数目一致；不构成本地数据或 C3-A 质量证据。
+- 用户要求暂停训练继续生效。本轮未运行训练、GPU、模型评价或项目测试；未读取影像、模型结果或 confirmation/test 载荷。C1/C2/C3-A 阶段结论均未改变。
+
+## 共享 log-Yeo–Johnson 乘性观测诊断与 C1 仓库路线复核 — 2026-11-07 09:05（中国标准时间）
+
+- **纯合成观测实验：** 固定 `L=8`，对 `Y=sN`、`s∈{0.01,0.03,0.1,0.3,1}`，仅用五档等权训练混合拟合一个共享 `lambda=1.2217133`，再以独立校准集和五组留出样本比较。留出 `ΔD=D(log-YJ)−D(log-only)` 的五档等权均值为 `−0.00634053`，每档均为 5/5 次负差；改善幅度随信号强度变化。详见[协议与报告](../../experiments/synthetic_cpu/log_yj_multiplicative_observation_levels_20261107_v1/report.md)。
+- 该对照只说明固定 Gamma 模型与合成信号网格下的条件分布形状；不代表真实 SAR 或项目表示域。结合前一项 Gamma 乘子实验，只能说 log-YJ 在这两种合成设置中降低经验 KS 距离，不能据此移植到 C3-A。
+- **代码静态审查：** C3-A 训练入口、目标集读取、C2 固定输入生成器与退化预处理在当前核验范围内符合冻结的数据域/变换合同；训练入口包含 loss、梯度与参数有限性检查。没有找到足以支持代码修改的缺口，本轮未改模型或训练器。
+- **C1 元数据：** SEN12MS 作者相关维护仓库的 README 指向 ROI 地图 Notebook，但目前没有可确认的 train/development 专属坐标交叉表。仅查入口/说明/目录名；未开 split 清单内容、Notebook 输出、GeoTIFF 或任何影像。详见[路线审查](../../experiments/data_audits/sen12ms_author_repo_crosswalk_route_20261107_v1/report.md)。地理/采集/footprint 独立性仍未知。
+- 用户要求的训练暂停继续生效；本轮无 GPU、训练、模型评价、项目测试或项目数据载荷访问。C2 gate、C3-A 结果和阶段资格未改变。
+- **磁盘：** 08:51 至 09:05 可用空间从 `20,657,430,528` 降至 `18,089,914,368` 字节（约 16.85 GiB，97% 使用）；两项纯合成实验及文档均为轻量产物，无法解释约 2.4 GiB 波动。未清理归属不明文件。
+
+## log-Yeo–Johnson Gamma 变换纯合成 CPU 对照完成；训练继续暂停 — 2026-11-07 08:51（中国标准时间）
+
+- 完成独立拟合/评估的纯合成对照：`N ~ Gamma(L, scale=1/L)`，`L=1,2,4,8`；每个 L 使用 100,000 个拟合样本及 5 组各 100,000 个独立评估样本，Yeo–Johnson 的 `lambda` 仅由拟合样本确定。
+- 20 组配对评估中，log-Yeo–Johnson 相对 log-only 的标准正态 KS 距离差 `ΔD` 等权平均为 `−0.040896`；四个 L 的平均差均为负，且各自 5/5 次重复均为负。逐组结果、偏度、超额峰度及 Gamma 样本矩见[实验报告](../../experiments/synthetic_cpu/log_yj_gamma_normality_20261107_v1/report.md)。
+- 该观察仅说明所设定的抽象 Gamma 边际分布在本模拟中更接近标准正态；它不是 SAR 物理模型、项目数据、C3-A 质量或变换迁移效果证据。没有将其移入项目代码或冻结协议。
+- 本轮只生成合成随机数；未读取项目影像、项目模型结果或封存数据，未导入 PyTorch/CUDA，也未运行训练、模型评价或项目测试。用户要求的训练暂停继续生效；C2 gate 与 C3-A 效果状态不变。
+- **磁盘：** 08:45 至 08:51 可用空间由 `23,313,403,904` 降至 `20,657,430,528` 字节（约 19.24 GiB，96% 使用）；本实验目录只有轻量脚本、JSON、Markdown 和终端日志，无法解释该变化。没有删除归属不明文件。
+
+## DiffusionSAR 一手全文审查收窄宽泛去斑主张；训练继续暂停 — 2026-11-07 08:29（中国标准时间）
+
+- University of Twente 仓储中的 2024 TGRS 期刊最终版全文已核实：DiffusionSAR 是以带斑 SAR 观测为条件的 DDPM 去斑；合成训练从 Sentinel-2 参考图生成 Gamma speckle，并含 log-Yeo–Johnson 变换与多时相 SAR 微调路径。它不做 SAR 超分，也没有 inference-time optical 条件。
+- 该工作收窄“条件扩散 SAR 去斑”“Gamma speckle 扩散”宽泛新颖性表述，但不验证本地联合去斑/超分、optical 增益、失配回退或 C1 8-bit 表示域。该全文还存在 real data 被称作 single-look intensity 与 SLC 的术语不一致；本项目不推断其产品类型。
+- 审查报告、manifest、相关工作矩阵及研究记录已更新，详见[全文审查](../../experiments/literature_audits/diffusionsar_conditional_sar_despeckling_fulltext_20261107_v1/report.md)。没有移植该论文变换，没有改模型、代码、协议或 gate。
+- 本轮未读项目图像、checkpoint、预测、指标或 confirmation/test 载荷；未训练、未调用 GPU、未评价模型。此前终端显示历史 confirmation 汇总文字的事件仍按 D-2026-11-07-025 隔离。
+
+## 历史 confirmation 汇总文字终端暴露并隔离；训练继续暂停 — 2026-11-07 08:20（中国标准时间）
+
+- 为同步 C1 地理元数据路线审查而执行的跨文档检索，终端至少显示一行历史 confirmation 汇总文字。该文字不复制、不引用、不复核，也不用于分析、选模、调参或阶段判断；事件已记录于 D-2026-11-07-025 及[隔离报告](../../experiments/diagnostics/confirmation_summary_text_exposure_20261107_v1/report.md)。
+- 没有打开 confirmation/test 影像、数组、预测、checkpoint 或逐样本结果文件。此事件不改变数据角色封存状态或任何实验 gate；后续不对研究记录执行宽范围统计词检索。
+- 用户要求暂缓训练，本轮没有 GPU 或训练操作。C1 的 SEN12MS 地理元数据候选路线仍未验证编号对应；C2 gate 未判定，C3-A 效果未知，B1 `not_promoted / stop_at_b1`，B2/B3 关闭。
+- **磁盘：** 08:20 复测可用 20,705,497,088 字节（约 19.28 GiB，96% 使用），较 08:09 增加约 2.33 GiB；变化来源未知，本轮只新增轻量文档，不清理归属不明文件。
+
+## 找到 C1 地理元数据候选路线；编号对应仍待验证，训练继续暂停 — 2026-11-07 08:09（中国标准时间）
+
+- 一手 SEN12MS 论文明确说明其沿用 SEN1-2 的同一批随机 ROI 和季节定义，并提供地理参考 GeoTIFF；这是可继续核验 C1 来源场景地理元数据的候选路线，不代表已得到坐标映射。
+- 论文没有承诺两版数据的 ROI 子目录数字编号逐一相同；两版保留场景数量与筛选/镶嵌/patch 处理也不同。因此不从相同数字推断位置，不据此声称地理、采集或 patch footprint 独立。详见[交叉映射路线审查](../../experiments/data_audits/c1_geospatial_crosswalk_route_20261107_v1/report.md)。
+- 本轮只读官方论文、作者仓库说明和冻结 C1 v2 train/development 来源组元数据；未读取项目影像、模型、checkpoint、结果、confirmation/test 载荷或 SEN12MS GeoTIFF。未运行训练、GPU 或评价。
+- C1 仍仅支持来源组及文件身份互斥已核；C2 gate 未判定，C3-A 模型效果未知；B1 `not_promoted / stop_at_b1`，B2/B3 关闭。所有协议与阶段资格不变。
+- **磁盘：** 2026-11-07 08:09 分区可用 18,199,506,944 字节（约 16.95 GiB，97% 使用）。本轮仅新增轻量报告与清单，无可安全清理的大型任务产物；不处理归属不明文件。
+
+## 乘性噪声 SDE 文献审查与纯合成对照完成；训练继续暂停 — 2026-11-07 07:51（中国标准时间）
+
+- 审查了 2025 ICMLA 会议版全文。该工作以几何布朗运动和对数正态乘性噪声为模型，实验使用 CelebA 与 UC Merced Land Use 的合成噪声图像，没有真实 SAR 实验；它不研究光学引导、SAR 联合超分或本项目任务。详见[全文审查](../../experiments/literature_audits/multiplicative_noise_sde_fulltext_20261107_v1/report.md)。
+- 完成 `L=8` 下 Gamma 与均值保持对数正态乘子的 CPU 纯合成对照，匹配均值 1 和方差 0.125。500,000 个随机数中，偏度分别为 0.712660 与 1.098361，99 分位数分别为 2.004759 与 2.093239。此结果只说明两种随机分布不等价，不判断哪种更符合真实 SAR。实验材料见[报告](../../experiments/diagnostics/multiplicative_noise_distribution_cpu_20261107_v1/report.md)及 `results.json`。
+- 本轮只读检查 `SarConditionalFlow`、`sample_heun` 的张量契约和 `_run` 资源预检顺序；在所查看范围内没有发现需另行修改的明确缺陷。运行器先核验冻结协议与 CUDA 资源，再读取输入载荷；本轮没有调用运行器。
+- 未访问项目影像、checkpoint、真实逐样本结果或确认/测试载荷；未运行训练、GPU 评价或 CUDA。C2 gate、C3-A 协议、模型与阶段资格均未改变；C3-A 模型效果仍未知。
+- **磁盘：** 2026-11-07 07:51 项目分区可用 23,162,810,368 字节（约 21.57 GiB，96% 使用），较 07:49 减少约 1.70 GiB。07:48–07:51 余量多次快速波动，原因未知；本轮两个新目录合计仅 15,639 字节。仅清理了本轮创建的 `/tmp/multiplicative_noise_distribution_cpu_20261107_v1` 字节码缓存（879,605 字节）；未删除归属不明内容。
+
+
+## C3-A 固定训练尺寸合成 CPU 核验通过；训练继续暂停 — 2026-11-07 07:02（中国标准时间）
+
+- 按冻结 C3-A 的 `batch_size=4`、`base_channels=16`、`time_dimension=64` 和 256×256 空间尺寸，用纯合成 CPU 张量完成一次前向、反向、Adam 参数更新及 8 步 Heun 采样；全部有限且输出尺寸正确，耗时 4.627 秒。CUDA 不可见、未初始化。证据见[核验报告](../../experiments/diagnostics/c3a_full_resolution_cpu_smoke_20261107_v1/report.md)及其 `manifest.json`。
+- 未打开项目影像、checkpoint、原始 confirmation/test 载荷、逐样本指标、预测或结果文件；阶段条款检索误显示的历史汇总文字单独按 D-2026-11-07-022 隔离。冻结协议、模型代码、数据划分和阶段门槛均未修改。此项只补足真实训练尺寸的软件检查，不构成模型质量、训练收敛或 C3 晋级证据。
+- GCOANet 专利来源审计报告已改为简体中文；没有取得全文，也没有新增方法结论。DiSpeckle 的摘要级线索已在 2026-10-30 登记，本轮检索未提供新的全文证据，不重复登记。
+- 阶段条款检索命令的匹配上下文曾在终端显示一段历史确认阶段汇总文字。该文字已按 D-2026-11-07-022 隔离，不引用、不复算、不用于决策；没有读取原始确认/测试载荷或逐样本结果。
+- **磁盘：** 2026-11-07 07:07（中国标准时间）项目分区可用 24,807,886,848 字节（约 23.10 GiB），较上一检查回升约 3.84 GiB；本轮文件规模很小，波动原因未知，不清理归属不明文件。已清理本轮 `/tmp/c3a_full_resolution_cpu_smoke_20261107_v1` 编译缓存 885,499 字节。
 
 > 项目文档标题、正文和面向用户的终端摘要使用简体中文；代码/API、路径、配置键和标准术语按原文保留。研究总纲 v1.7 已获用户批准并生效。历史记录保留原貌，当前事实以本快照和对应运行证据为准。
+
+## 无 GPU 文献审查完成；训练继续暂停 — 2026-11-07 06:23（中国标准时间）
+
+- 阅读 FlowSGS 与 FMPS 一手全文并更新相关工作矩阵、研究缺口及生成方法可行性记录。通用 flow 逆问题、后验采样和速度场条件化已有直接先例；本项目 C3-A 的 SAR 任务条件监督 flow 问题仍不同，文献不构成本地效果证据。
+- 未更改 v1.7、协议、划分、实验 gate 或模型代码；未运行训练、GPU 评价或本地数据访问。C1 地理/采集交叉表仍缺，C2 gate 未判定，C3-A 模型效果未知。
+- 本轮误将研究记录中历史 confirmation 汇总文字带入终端输出，按 D-2026-11-07-019 隔离；不引用、不复算、不用于决策，未读取原始载荷或逐样本结果。
+- **磁盘：** 06:23 项目分区可用 18,224,091,136 字节（16.97 GiB），临时分区可用 7,938,600,960 字节（7.39 GiB）。近期波动来源不明，不清理归属不明文件。
+
+## C3-A v3 多次采样 bootstrap 配置已修复；训练继续暂停 — 2026-11-07 06:11（中国标准时间）
+
+- 冻结 v3 的 bootstrap 配置位于 `metrics`，评价器原先在整轮采样后读取不存在的 `statistics` 字段；同时 per-metric seed 偏移未预登记。现在协议加载时校验 v3 指标列表、repeats、唯一 seed 和预期组数；汇总统一使用冻结 seed，并要求来源组覆盖与 `data.source_group_count=19` 一致。冻结协议 v3 未修改。
+- 纯合成输入覆盖 19 个来源组、10 个 bootstrap 指标、10,000 次和 seed `20261106`；少一组时 fail-closed。`tests/test_c3a_multisample_eval.py` **31 项通过**，相关脚本和测试 `py_compile` 通过。没有运行模型训练或评价，也没有读取真实结果、confirmation/test 载荷。
+- 详见 D-2026-11-07-018 与[C3-A 合同核验报告](../../experiments/diagnostics/c3a_v3_bootstrap_contract_cpu_20261107_v1/report.md)。历史 confirmation 汇总文字暴露仍按 D-2026-11-07-015 隔离，不作分析。
+- **磁盘：** 清理本轮约 6 MiB pytest/编译临时目录；新报告与 manifest 合计约 24 KiB。05:42 可用 19.48 GiB，06:01 可用 14.64 GiB，减少约 4.83 GiB，无法由本轮产物解释；不删除来源不明文件。
+- 06:11 复测可用 20,777,160,704 字节（约 19.35 GiB），较 06:01 回升约 4.71 GiB；短时变化原因未知。未清理任何无法归属文件。
+- **阶段：** C1 官方元数据路线未取得地理/采集交叉表；C2 gate 未判定；C3-A 模型效果仍未知。用户要求暂缓训练，当前 CPU 合同核验完成；恢复训练前按冻结协议重新做资源与磁盘预检。
+
+## C2 screen 与 confirmation bootstrap 合同均已绑定 — 2026-11-07 05:49（中国标准时间）
+
+- **Screen 统计修复：** C2 v2 汇总器对 `cluster_unit`、组权重、interval、正组比例定义 fail-closed，且要求每个摘要实际来源组数等于冻结 `cluster_count=19`。三组 `+3 dB` 与一组 `−1 dB` 的 toy case 得来源组等权 `+1 dB`、patch 等权 `+2 dB`；10,000 次 bootstrap、seed `20261030` 的区间和重复输出符合合同。配对器 control 来源组错配合成用例拒绝输入。
+- **Confirmation 统计修复：** 确认输入/评价共用的协议校验现在绑定 `source_group_id`、20 组、组内先均值后组间等权、10,000 次、seed `20261104` 与 paired 95 percentile 区间。六项统计字段漂移合成回归通过。
+- **CPU 验证：** screen/执行两文件 24 项通过；confirmation/screen 三文件全量回归 **46 项通过**；6 个相关 Python 文件 `py_compile` 通过。运行仅涉及合成数组/临时 JSON 与 source manifest；未读取真实模型结果、confirmation/test 载荷或逐样本指标，没有 GPU、训练、评价或 gate 改动。详见 D-2026-11-07-016、D-2026-11-07-017、[screen 报告](../../experiments/diagnostics/c2_source_group_bootstrap_synthetic_20261107_v1/report.md)与[confirmation 报告](../../experiments/diagnostics/c2_confirmation_statistics_contract_20261107_v1/report.md)。
+- **旧 confirmation 协议：** 源码哈希与当前实现不匹配，相关哈希覆盖组件又已更新；不重跑旧协议。未来如恢复 confirmation，需要新版本协议和仍合格的独立样本。
+- **下一步：** C3-A v3 统计字段代码核对已由 D-2026-11-07-018 完成；用户暂停期间不启动训练或 GPU 评价。较早研究记录终端输出的历史 confirmation 汇总文本暴露已按 D-2026-11-07-015 登记，未用于判断。
+
+## C2 来源组 bootstrap 合同已 fail-closed；继续无 GPU 工作 — 2026-11-07 05:42（中国标准时间）
+
+- C2 v2 汇总器先前只消费冻结协议中的 bootstrap 次数和 seed，忽略 `cluster_unit`、组权重、区间、正组比例定义及来源组数。现已加入语义字段校验，并要求每个 condition/contrast/metric 的实际来源组数与冻结 `cluster_count=19` 一致；冻结 JSON、有效统计行为和 C2 gate 均未修改。
+- CPU 合成样例中，三条 `+3 dB` 组内 patch 与一条 `−1 dB` 单 patch 得到来源组等权 `+1 dB`、patch 等权 `+2 dB`；冻结 10,000 次 bootstrap、seed `20261030` 得到 95% 区间 `[-1.0, 3.0] dB`，同 seed 重复一致。19 组合成汇总器和 control 来源组身份拒绝用例通过。
+- C2 screen 与执行两份定向测试共 **24 项通过**；三个相关 Python 文件 `py_compile` 通过。证据见 D-2026-11-07-016 与[合成核验报告](../../experiments/diagnostics/c2_source_group_bootstrap_synthetic_20261107_v1/report.md)。没有运行训练/GPU/正式评价或读取项目载荷及真实指标。
+- 较早的宽范围检索在研究记录中显示历史 confirmation 汇总文字，已按 D-2026-11-07-015 记录；未用于任何分析或阶段决策。后续继续只按明确路径读取代码/协议元数据及合成输入。
+- **空间与下一步：** 清理本轮 `py_compile` 缓存约 1.0 MiB 和三处 pytest 合成临时目录约 6.8 MiB；05:42 项目分区可用 20,911,620,096 字节（约 19.48 GiB）。下一项只读 C2 confirmation 统计字段代码合同，不读取结果或载荷，也不执行旧协议。
+
+## C2 bootstrap 合同核对继续；记录一次历史汇总文字暴露 — 2026-11-07 05:09（中国标准时间）
+
+- 用户要求暂缓 GPU 训练，继续无需 GPU 的工作。当前仅审查 C2 来源组等权 bootstrap 的实现与纯合成验证，不读取真实逐样本指标、confirmation/test 载荷或历史结果文件。
+- 为定位统计合同执行的宽范围 `rg` 意外在 `research_hypotheses.md`、`PROJECT_FACTS.md`、`DECISION_LOG.md` 的终端匹配中显示历史 confirmation 汇总数值。该文本按潜在暴露记录在 D-2026-11-07-015；不使用或引用，不作调参、选模或 gate 判断。未打开 confirmation/test 载荷或逐样本结果文件，当前 C2 gate 和阶段状态不变。
+- 后续只用已知路径读取实现/测试源，并用人工构造的来源组差值核验组内先平均、组间等权、bootstrap 重采样单位及固定 seed。训练、GPU 等待器和正式评价继续暂停。
+
+## C1 官方地理/采集交叉表仍未取得；继续无 GPU 工作 — 2026-11-07 05:04（中国标准时间）
+
+- 公开官方路线复查未找到场景到坐标、采集日期或 patch footprint 的映射：TUM MediaTUM 1436631 再次 HTTP 429；可访问的 ISPRS 原始论文页面仅确认 282,384 对及全球/季节覆盖，本次 PDF 直连超时。没有把非原始论文资料当作交叉表证据。详见[C1 官方元数据路线复查](C1_OFFICIAL_METADATA_ROUTE_RECHECK_20261107.md)。
+- C1 v2 结论仍为来源文件夹和完整文件身份互斥已核，地理/采集/精细空间独立未知。既有 C1 身份审计已覆盖 train/development 官方 SHA-512 交集，不重复执行。
+- **磁盘波动：** 05:04 分区可用 18,320,011,264 字节（约 17.06 GiB），较 04:54 的 27,450,200,064 字节（约 25.56 GiB）减少约 8.50 GiB。两次之间只清理本轮产生的小型 Python 编译缓存，仓库没有相应大型输出；原因未知，不清理归属不明内容。
+- 用户仍要求暂停训练。本轮只进行官方页面检索、源码/协议/合成测试工作；无训练、GPU 评价、confirmation/test 载荷或真实逐样本指标访问。
+
+## C2 确认判定阈值协议绑定修复；不重跑旧确认协议 — 2026-11-07 04:54（中国标准时间）
+
+- **代码问题与修复：** `_decide` 原先只读取四项冻结 PSNR 阈值中的一项，另三项 bootstrap/置换下界写死为 `0`。现在全部从 `decision_rule.qualification` 读取，并保留 `_gt` 对应的严格 `>`。当前冻结值均为 `0.0`，本次不会改变其数值决策；它修正了代码对未来版本化阈值的不一致。
+- **CPU 验证：** 三个新增参数化回归先按预期失败，旧实现忽略合成阈值仍判定达标；修复后，确认指标文件全量 16 项与 C2 严格/诊断 2 项共 **18 项通过**。阈值边界等于合成观测值时仍按严格大于判定。相关脚本/测试 `py_compile` 通过；没有读取真实确认集结果。
+- **冻结边界：** 确认协议的 `implementation_sha256` 固定了七个源码组件；当前工作树其中五项哈希与旧协议不符，因此旧协议实现校验将拒绝重跑。本轮不改旧协议 JSON，不重放确认集、不回写既有结果。阈值修复仅作为后续版本化实现，若未来实际执行，必须另有匹配协议和仍合格的独立确认样本。
+- **访问披露：** 先前宽范围检索可能展示了历史 test/confirmation 摘要文本，已按 D-2026-11-07-012 披露；本轮不使用该文本。没有读取图像/NPY、checkpoint、预测或逐样本实验指标，也未启动 CUDA/训练/评价。
+- **空间快照：** 2026-11-07 04:54 分区可用 27,450,200,064 字节（约 25.56 GiB），较 04:24 增加约 4.06 GiB，变化来源未确认；未清理未知文件。
+
+## C2 零背景 TBR 合同核对完成；训练仍暂停 — 2026-11-07 04:32（中国标准时间）
+
+- **指标合同：** C2 v2 将 `undefined_metric_policy` 冻结为 `fail_entire_evaluation`；共享 TBR 函数在背景中位数为零/过小时拒绝计算，严格 C2 评价也必须失败。单独的非门槛诊断才会将 median TBR 标记为不可用。因此未发现代码与协议不符，不改 gate、不加 epsilon、不删样本。细节见[C2 零背景合同核查](C2_ZERO_BACKGROUND_METRIC_CONTRACT_AUDIT_20261107.md)。
+- **未来确认指标：** 一次性确认协议使用分母无关的目标—背景均值对比误差保留零背景样本；合成输入验证显示实现与合同一致。这不回写 C2 v2 gate，也不是确认集结果或调参授权。
+- **CPU 验证：** C2 v2 严格 fail-closed/非门槛诊断 2 项测试通过；确认指标零背景合成测试 1 项通过。加上本轮数据读取/生成器测试共 9 项通过、1 项 CUDA 用例未运行；相关文件编译检查通过。没有训练、模型评价、生成数据或访问项目影像/模型产物。
+- **文本暴露披露：** 一次较宽的 `rg` 检索覆盖了 `docs/research/EXPERIMENT_REGISTRY.md`，匹配摘要进入被截断输出；无法确认是否含历史 test/confirmation 指标摘要。按保守原则记作可能的摘要文本暴露，不据此分析或调参；没有打开底层逐样本结果、影像、NPY、checkpoint。此前累计 `test_set_accessed=true`、`test_set_used=false` 标记不变；本轮 confirmation 影像/指标载荷未访问。
+- **空间与阶段：** 04:24 项目分区可用 23,088,676,864 字节（约 21.50 GiB），较 04:20 快照少约 4.16 GiB，原因未知；未清理来源不明文件。C2 gate 未判定，C3-A 训练继续按用户要求暂停。
+
+## C2 工作流终端报错中文化；训练仍暂停 — 2026-11-07 04:20（中国标准时间）
+
+- 将 C2 固定输入生成器与数据读取器中的项目自定义异常消息统一为中文，保留 `train`、`development`、`confirmation`、`sample ID`、API/config 标识及 `[0,1]` 等标准记法；没有改变协议、数据处理或运行行为。
+- 测试断言先改为中文并按预期变红，代码更新后，C2 数据读取器和固定生成器 CPU 合成回归共 **6 项通过，1 项 CUDA 端到端用例按选择条件未运行**；4 个相关 Python 文件 `py_compile` 通过。测试没有生成 C2 固定输入或读取项目影像/模型数据。
+- 用户要求暂停训练。本轮没有启动训练、GPU 评价或生成流程；确认集/test 载荷仍未访问。
+- 仅删除本轮 pytest 临时目录及编译缓存；未触碰仓库数据、历史结果、checkpoint 或归属不明文件。04:20 的分区读数为 25.66 GiB，04:24 复测为 21.50 GiB，约 4.16 GiB 下降原因未知。
+
+## C1 来源链更正与 C2 退化生成协议绑定修复 — 2026-11-07 04:06（中国标准时间）
+
+- **C1 来源：** 冻结 train/development 3,600 个影像文件的官方 TUM 条目与逐文件 SHA-512 来源链已由协议和暂存 manifest 核实。旧 `fixed_*2k` 零精确匹配只适用于旧文件，不适用于 C1 v2；地理/采集独立仍未知。详见 D-2026-11-07-009 与[C1 来源链核查](C1_OFFICIAL_SOURCE_METADATA_AUDIT_20261107.md)。
+- **C2 代码修复：** 固定退化生成器此前允许 `--seed` 偏离冻结协议的 `degradation_seed_base=20261032`，且代码中的四组倍率/Gamma 参数未与协议字段比对。现在两者都在 CUDA 检查、输出目录创建和影像读取前验证；冻结 JSON、有效条件、退化公式及 gate 均未改变。详见 D-2026-11-07-010 与[C2 核查记录](C2_FIXED_GENERATION_PROTOCOL_BINDING_20261107.md)。
+- **CPU 验证：** 两项新错配回归先按预期因旧代码先报 CUDA 不可用而失败；修复后 3 个 CPU 定向用例全部通过，生成器与测试 `py_compile` 通过。运行只创建临时 CSV/JSON；没有固定输入生成、模型/数据载荷访问或 CUDA 初始化。
+- **阶段与资源：** 用户要求继续暂停训练、GPU 等待器和正式评价；C2 gate 未判定、C3-A 尚无真实模型效果，B1/B2/B3 状态不变。04:03 快照显示项目分区可用 20,664,102,912 字节（约 19.24 GiB），比 03:46 少约 6.35 GiB；本轮只产生小型临时测试文件与 Markdown，原因未知。仅清理本轮生成的编译缓存和测试临时目录，释放 1,855,322 字节；没有安全证据支持清理其他内容。
+
+## C1 v2 train/development 官方来源链已核实；地理/采集独立仍未知 — 2026-11-07 03:46（中国标准时间）
+
+- 冻结 C1 v2 协议绑定 TUM MediaTUM 条目 1436631 与官方 SHA-512 文件索引；2026-10-31 暂存 manifest 记录 train/development 共 3,600 个影像文件、1,600/200 个身份、92/19 个来源组及逐文件字节数/SHA-512 核验完成。官方来源链证据见[暂存运行清单](../../experiments/data_staging/c1_v2_train_development_20261031_parallel_v1/manifest.json)、[获取清单](../../data/derived/c1_v2_train_development_20261031_v1/acquisition_manifest.json)和[来源链核查](C1_OFFICIAL_SOURCE_METADATA_AUDIT_20261107.md)。
+- 旧 `fixed_train_dev2k` / `fixed_val_dev2k` 的 3,600 文件哈希交叉审计为零字节级匹配，只适用于该历史输入范围，不适用于 C1 v2 train/development。`./data/` 数字命名 2,000 对仍未映射到 C1 v2 清单。
+- 已核实官方文件身份不等于地理/采集独立：坐标、日期、轨道和 patch footprint 交叉表仍缺，仍只报告来源场景文件夹级互斥。TUM 在线路线本轮 HTTP 429 不影响保留的逐文件获取记录。决策更正见 D-2026-11-07-009。
+- C2 gate 未判定，C3-A 仍无真实模型效果证据；按用户要求继续暂停训练、GPU 等待器和正式评价。本轮只核对仓库内协议、代码与 manifest 元数据，未读取影像载荷。
+- **空间快照：** 2026-11-07 03:46（中国标准时间）项目分区可用 27,488,403,456 字节（约 25.59 GiB）。本轮只增加轻量 Markdown；没有安全可清理候选，未删除文件。
+
+## C1 官方数据来源交叉表仍未取得；训练继续暂停 — 2026-11-07 03:32（中国标准时间）
+
+> 历史结论更正：本节当时遗漏了 2026-10-31 C1 v2 train/development 的官方条目获取和逐文件 SHA-512 暂存记录。关于该冻结载荷来源链的“不确认”说法已由上方 03:46 快照及 D-2026-11-07-009 修订；本节仍成立的限制是坐标、采集和 footprint 交叉表未取得，不能声称地理/采集独立。
+
+- 公开一手论文确认 SEN1-2 发布论文中的数据规模、传感器、2017 四季 ROI 目录和 patch 步长；正文没有逐 ROI/patch 到坐标、采集日期或产品 ID 的清单。官方 TUM 记录及 OAI-PMH 入口本轮返回 HTTP 429。具体证据和边界见[C1 来源元数据核查](C1_OFFICIAL_SOURCE_METADATA_AUDIT_20261107.md)。
+- 当时的结论未确认本地 PNG 或冻结 C1 v2 来自 SEN1-2，也未改变“来源场景文件夹互斥已核、地理/采集独立未知”的判断；这部分来源判断现由 D-009 限定范围。记录中未访问本地数据载荷。
+- 当时 C2 gate 未判定、C3-A 尚无真实模型效果证据；用户要求暂停训练，没有启动 GPU 训练、等待器或正式评价。
+- **空间快照：** 2026-11-07 03:34（中国标准时间）项目分区可用 20,671,397,888 字节（约 19.25 GiB），较 03:29 读数减少约 5.88 GiB。当时只新增轻量文档，变化来源未知；没有可安全归属的清理候选，未删除文件。
+
+## C3-A 数值域代码合同核对完成；冻结训练保持暂停 — 2026-11-07 03:25（中国标准时间）
+
+- 只读检查 C3-A 固定输入、条件上采样、流训练路径、速度场输出、Heun 积分和评价裁剪边界。LR 有限非负且允许高于 1，target 固定在 `[0,1]`；条件不裁剪、速度场不加 sigmoid、积分期间不裁剪，最后只在评价边界裁剪并另记 raw 越界比例，均与冻结协议一致。
+- 未发现可由代码/协议直接证明的数值域 bug；不改输入缩放、损失、网络输出或协议。已有 CPU 合成测试定义覆盖上述边界，本轮没有重跑测试、没有读取 run/checkpoint/数据载荷，也没有训练或初始化 GPU。结论只说明合同一致，不代表 Flow 收敛或模型质量。
+- 详见[C3-A 数值域合同审计](C3A_NUMERIC_DOMAIN_CONTRACT_AUDIT_20261107.md)。C3-A 实际质量仍需真实训练和 development 评价；按用户要求继续暂停。C2 gate 未判定，B1/B2/B3 状态及 H1/Q1 不变。
+- **空间快照：** 2026-11-07 03:29（中国标准时间）项目分区可用 26,983,944,192 字节（约 25.12 GiB）。比一分钟前读数少约 0.38 GiB，本轮新增主要为轻量 Markdown，变化来源不明；没有安全可清理候选，未删除任何文件。
+
+## 旧版论文 pilot 与现阶段证据静态核对完成；训练继续暂停 — 2026-11-07 03:17（中国标准时间）
+
+- [静态审计记录](PAPER_CLAIM_EVIDENCE_AUDIT_20261107.md)确认 `paper/MMCANet/` 是 2026 年 7 月的旧 pilot 草稿，所述 1,900/100 文件级协议不等于冻结 C1 v2 的 1,600/200/200 来源组划分。该草稿可保留作历史材料，不能作为当前方法、效果或 gate 证据；论文文件未跟踪，本轮未编辑。
+- 当前 C2 gate 仍因正式指标 fail-closed 而未判定；C2 v4 是失败选样的 CPU 描述诊断。C3-A 实际训练/评价仍按用户要求暂停，没有新模型效果证据；H1/Q1 和所有晋级状态不变。
+- **访问边界披露：** 静态定位旧稿时被动看到了其中生成的历史 100 样本 test 汇总表。本轮未打开底层图像、NPY、逐图 CSV 或冻结 C1 v2 confirmation/test 载荷，未复算、调参或用该汇总更新判断；发现后停止检查表中数值。按保守边界披露该摘要暴露，后续不以旧 100 样本集合调参或选模。
+- 旧稿方法实现与配置、旧 run 完整复现链、引用原文以及是否另制中文稿尚未核验；不把它们写作当前事实。下一项无 GPU 工作转为检查 C3-A 的输入数值域与模型输出参数化是否一致，只用代码、冻结协议和合成 CPU 输入。
+
+## C2 零背景对比差 CPU 描述诊断完成；训练继续暂停 — 2026-11-07 02:59（中国标准时间）
+
+- **诊断协议与结果：** 按独立冻结的 [v4 协议](../../protocols/mmcanet_phase_c2/c2_zero_background_contrast_cpu_20261107_v4.json)，只分析原 C2 v2 fail-closed 记录中的 6 条“条件×样本”development 案例，来自 2 个来源组。仅使用 4 个控制（matched/permuted/missing/SAR-only），严格加载 8 个已有 best checkpoint，并在 CPU 上完成 24 次前向；实际仅读取这 6 条记录及冻结置换 donor 所需的 24 个 development 数组。报告、逐样本结果、配对差和 manifest 见[运行目录](../../experiments/diagnostics/c2_zero_background_contrast_cpu_20261107_v4/)。
+- **结果边界：** 所有案例的目标背景中位数 TBR 均保持 `null`，状态为 `undefined_target_zero_background_median`；未加 epsilon。matched−SAR-only 的均值/中位数对比绝对误差差值分别为：x2_light −0.000569/−0.001011、x2_severe −0.006447/−0.007495、x4_light −0.003836/+0.003685、x4_severe +0.008148/−0.005016。负值仅表示该选中样本的候选误差较低；每条件只有 1–2 条且总计 2 个来源组、来自既有指标失败选样，不能解释为总体效用或泛化证据。C2 gate 仍未判定，H1/Q1 不更新。
+- **实现与验证：** `C2MatchedJoint` 仅移除 CUDA-only 前置检查，网络计算、参数、state dict 和 GPU 路径未改；新增两个倍率的 CPU 前向和缺失 optical 合成测试。C2 CPU runner 边界测试与模型 CPU 测试共 10 项通过，相关文件 `py_compile` 通过。v4 manifest 记录 24 次前向全部成功、8 个 checkpoint 身份、24 个数组 SHA-256，且协议/模型/runner 哈希复核一致。按用户暂停要求未运行 GPU 回归。
+- **失败尝试保留：** v1/v2 在数组读取前因 manifest/空值假设停止；v3 读取首例的 4 个 development 数组并加载 8 个 checkpoint 后，被原模型 CUDA-only 检查拒绝，成功前向 0 次。三次失败目录均保留，访问标记已按实际执行更正；未读取 train、confirmation/test 载荷或相应指标。
+- **资源与阶段：** v4 CPU 运行约 1.11 秒，目录约 52 KiB；未训练、未初始化 CUDA。用户仍要求先做无 GPU 工作，C3-A 训练/等待器/正式评价暂停；B1 仍为 `not_promoted / stop_at_b1`，B2/B3 关闭，C4/C5/C6 不提前执行。下一项转为无 GPU 的论文主张—证据静态核对。
+
+## 无 GPU 表示域范围审计与裁剪分解完成；训练继续暂停 — 2026-11-07 02:13（中国标准时间）
+
+- **数值域审计：** 按冻结 C3-A `x2_light` 输入，在 CPU 上核验 train 1,600 个身份/92 个来源组和 development 200 个身份/19 个来源组，仅读取各自 `lr` 与 `target` 数组并逐文件校验 SHA-256。来源组等权统计显示 SAR LR 中 21.57%/22.16% 像素大于 1；按模型实际 `bilinear(align_corners=false)` 上采样后，条件中 14.94%/15.29% 像素大于 1。noisy pseudo-target 中约 1.23%/1.28% 像素恰为 1，约 1.73%/1.72% 大于等于 0.99。目标与条件的逐样本 MAE 来源组均值约 0.1451/0.1454。完整逐身份数值见[审计报告](../../experiments/diagnostics/c3a_representation_range_audit_20261107_v1/report.md)与 `per_sample.csv`。
+- **解释边界：** 以上是归一化 8-bit PNG 派生表示域统计，不代表定标幅度/强度/功率、真实散射体饱和或物理散斑性质。它说明未来总裁剪比例需要区分下界与上界越界，但不支持立即改变模型、损失、裁剪规则或任何 gate。
+- **方法/代码改进：** 保留尚未运行的多次采样协议 v2，新增 [v3 协议](../../protocols/mmcanet_phase_c3a/multi_sample_stability_c1_v2_20261105_v3.json)：在原 PSNR/SSIM/EPI、采样和选模规则不变的前提下，记录 raw 输出低于 0 和高于 1 的比例，并按来源组汇总。代码校验两比例之和等于原总裁剪比例；v3 SHA-256 为 `ee83e2cb4dadea7d4fca6576e479d2922d70df44935f1be51116add26e06016c`。v2 原件保留，v2/v3 结果目录均不存在。
+- **CPU 验证：** 多次采样评价器及协议定向测试 30 项通过；C3-A 范围审计脚本、评价器和测试文件 `py_compile` 通过。合成用例覆盖下界、上界和 0/1 边界，并验证不一致比例 fail-closed。未训练、未加载 checkpoint、未运行正式评价或 GPU 查询；confirmation/test/optical 载荷均未读取。
+- **资源：** 范围审计开始/结束分区可用空间分别为 25,526,722,560 / 24,977,276,928 字节；本轮没有清理数据或历史产物，仅新增轻量 CSV/JSON/Markdown 与脚本。
+- **阶段状态与下一步：** 用户要求继续暂停训练，不启动训练、GPU 等待器或正式评价。C3-A 效果仍未知；C2 gate 未判定，B1 为 `not_promoted / stop_at_b1`，B2/B3 关闭，C4/C5/C6 不提前执行。训练恢复后才按原 C3-A v1 训练协议和新的描述性评价 v3 继续，不改变 checkpoint 选择或晋级门槛。实现依据与差异见[更新记录](../../experiments/diagnostics/c3a_representation_range_audit_20261107_v1/protocol_update.md)。
+
+## 无 GPU 文献与 C1 v2 元数据审计完成；训练继续暂停 — 2026-11-07 01:47（中国标准时间）
+
+- **文献：** 核验 ICML 2026 MS-Flow 和 2026-10-10 提交的 UAV SAR 扩散后验成像预印本，更新两条矩阵记录及研究边界。通用流逆问题和生成式 SAR 回波观测一致性不再作为宽泛新颖性；两篇论文都不提供本地 noisy PNG JDSR 或 optical utility 证据。见 D-2026-11-07-002。
+- **拆分身份：** 只读 C1 v2 `sample_manifest.csv` 划分元数据。train/development/confirmation 为 1,600/200/200 个身份、92/19/20 个来源组；角色来源组互斥。train/development 的 SAR/optical 路径、选择哈希及官方文件哈希均无交集。一个 `scene_id+patch_id` 数值组合跨两个 season root 重复，但其 source group、路径和文件哈希均不同；根因是数值 ID 非全局身份键。详见[拆分身份审计](../../experiments/data_audits/c1_v2_split_identity_metadata_20261107_v1/report.md)。
+- **证据边界：** 该元数据复核支持来源场景文件夹及文件身份互斥，不证明地理/采集独立或无局部空间重叠。确认集成员元数据仅用于 split-integrity audit；没有打开 confirmation/test/optical/SAR 影像或测量载荷，也没有访问模型、checkpoint 或启动 GPU 工作。
+- **来源元数据路线：** 本轮尝试访问 [TUM 官方数据记录](https://mediatum.ub.tum.de/1436631)，服务返回 HTTP 429；[官方论文页面](https://isprs-annals.copernicus.org/articles/IV-1/141/2018/index.html)可核对论文书目信息，但本轮未取得 scene ID 到坐标/采集时间的交叉表。未取得不代表其他权威路线不存在；当前不据此推断地理或时间独立。
+- **阶段状态：** C3-A 训练/development 评价继续按用户要求暂停并未运行；C2 gate 未判定，B1 `not_promoted / stop_at_b1`，B2/B3 关闭，C4/C5/C6 不提前执行。Q1–Q6/H1–H6 无更新。
+- **资源：** 2026-11-06 17:47:14 UTC 可用 19,134,029,824 字节；17:48:53 UTC 复测为 27,069,890,560 字节（25.21 GiB）。不足两分钟增加约 7.39 GiB，仓库没有对应的大型本任务产物，来源未知；不清理来源不明内容。本轮仅新增轻量文档。
+
+## 无 GPU 文献边界审查完成；训练按用户要求暂停 — 2026-11-07 01:21（中国标准时间）
+
+- **文献发现：** 核验 ICML 2026 的 MS-Flow 流轨迹多重射击逆问题方法，以及 2026-10-10 提交的 UAV SAR 扩散后验回波成像预印本；相关工作矩阵新增两行，151 行增至 153 行。
+- **方法边界：** 一般流式逆问题和生成式 SAR 回波观测一致性已有先例。两篇来源均不直接验证本地 8-bit SAR 栅格去斑/超分、noisy pseudo-target、optical utility 或错配可靠性；详见 D-2026-11-07-002 和[文献审计](../../experiments/literature_audits/sar_echo_and_flow_trajectory_prior_art_20261107_v1/report.md)。
+- **阶段边界：** C3-A 训练与 development 评价仍未运行并按用户要求暂停；C2 gate 未判定，B1 为 `not_promoted / stop_at_b1`，B2/B3 关闭。Q1–Q6 和 H1–H6 无更新，不启动 C4/C5/C6。
+- **访问与资源：** 本轮没有访问本地影像、模型或 checkpoint，没有读取 confirmation/test/optical 载荷，也没有运行代码或实验。项目分区当前可用空间须以新快照记录；之前的 21.57 GiB 数值已过时。
 
 ## C3-A CPU 续训保护与定向回归完成；训练保持暂停 — 2026-11-07 00:59（中国标准时间）
 

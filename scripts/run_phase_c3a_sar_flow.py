@@ -344,7 +344,7 @@ def _resume_code_hashes() -> dict[str, str]:
         "scripts/run_phase_c3a_sar_flow.py",
         "MMCANetV2/phase_c2_data.py",
         "MMCANetV2/phase_c2_runner.py",
-        "MMCANet/src/MMCANetV2/phase_c2_matched.py",
+        "MMCANetV2/phase_c2_matched.py",
     )
     return {path: sha256_file(REPOSITORY_ROOT / path) for path in paths}
 
