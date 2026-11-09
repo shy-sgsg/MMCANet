@@ -1,5 +1,9 @@
 # 研究假设
 
+## 2026-11-09 新生成式先例不更新 H1–H6
+
+CODSR 研究自然图像单步扩散超分，条件 Flow Matching 贝叶斯论文研究模拟式参数后验；二者均未比较 SAR 重建中的匹配 optical 与 SAR-only，也未检验本地 SAR 观测一致性或错配回退。因此它们只收窄通用方法新颖性，不支持或反驳 H1–H6。各假设仍须由对应本地冻结协议回答。见[一手审查](../../experiments/literature_audits/flow_and_one_step_sr_prior_art_20261109_v1/审查报告.md)。
+
 ## 已知分布的评价量诊断不更新 H1–H6 — 2026-11-09
 
 二维双峰和归一化图像域 CPU 实验确认，均值误差、能量分数、逐像素 CRPS、模态统计及空间变差可揭示所设候选分布的不同失配；集合大小影响有限样本比较稳定性。它们未使用本地数据、模型或 SAR 物理表示，也没有测试光学效用、训练泛化、观测一致性或回退。因此不支持或反证 H1–H6，不改变 C2/C3 gate、C3-A v3、训练暂停或阶段资格。真实 Flow/Diffusion 输出的样本分布及 draw 相关性仍开放。见[二维评价量诊断](../../experiments/synthetic_cpu/c3a_distribution_metric_sanity_cpu_20261109_v1/report.md)、[样本数诊断](../../experiments/synthetic_cpu/c3a_distribution_draw_count_cpu_20261109_v1/report.md)与[图像域诊断](../../experiments/synthetic_cpu/c3a_image_distribution_metrics_cpu_20261109_v1/report.md)。

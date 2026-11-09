@@ -1,5 +1,9 @@
 # 总研究计划
 
+## 2026-11-09 一手生成式先例复核
+
+已核验 CODSR（CVPR 2026）与条件 Flow 贝叶斯后验论文（AISTATS 2026）。研究主张须排除通用单步扩散超分、区域先验激活和后验 Flow 采样的宽泛新颖性；任务特定问题仍为 optical 对 SAR 联合恢复的增量价值、SAR 输出分布质量、观测相容性与错配回退。此文献更新不改变 C1–C6 顺序、任何晋级门槛或训练状态。详见[来源审查](../../experiments/literature_audits/flow_and_one_step_sr_prior_art_20261109_v1/审查报告.md)。
+
 ## 2026-11-09 已知后验统计评价与 Flow 控制先例
 
 补查 ICLR 2026 的精确后验统计基准及 ICML 2026 MPC-Flow。前者提供以精确后验样本检查分布质量的通用方法，后者说明 Flow 逆问题推理控制及超分已有通用先例；MPC-Flow 本轮仅有出版方摘要级证据。新增六维稀疏高斯混合 CPU 诊断后，精确后验在闭式 CRPS 与边际覆盖检查中优于预设的欠/过分散与均值塌缩预测。该实验属于评价方法验证，不是 SAR 模型结果，也不改变阶段顺序、资格或 gate。C3-A 真实模型质量、SAR 表示域观测似然与光学增量效用仍待各自合规证据。见[文献审查](../../experiments/literature_audits/posterior_sampling_statistical_benchmark_20261109_v1/报告.md)及[CPU 诊断](../../experiments/synthetic_cpu/posterior_score_calibration_cpu_20261109_v1r1/报告.md)。

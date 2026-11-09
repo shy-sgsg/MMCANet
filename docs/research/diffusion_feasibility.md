@@ -1,5 +1,9 @@
 # 本项目的扩散方法可行性
 
+## 2026-11-09 新增单步扩散与后验 Flow 先例
+
+CODSR 已在自然图像真实超分中实现单步扩散、梯度区域自适应生成先验和低质量输入特征调制；条件 Flow Matching 也已有面向模拟式贝叶斯后验采样的理论与实验工作。这些先例收窄通用机制的新颖性，但没有验证 SAR 表示域、去斑/超分联合任务、匹配 optical 增益、错配回退或本地观测似然。故它们不提高或降低本地 Flow/Diffusion 的可行性证据，也不触发模块移植、协议变更或 gate 晋级。来源与证据等级见[审查报告](../../experiments/literature_audits/flow_and_one_step_sr_prior_art_20261109_v1/审查报告.md)。
+
 ## 2026-11-09 已知图像分布下的多样本评价量检查
 
 纯合成 `[0,1]` 图像域 Gamma 边缘构造显示，逐像素 CRPS 能区分均值塌缩和乘性噪声过分散，却不能识别每个像素边缘分布相同、空间依赖错误的共享随机因子候选；归一化整图能量分数和邻接变差分数在该已知案例中可识别该差异。二维双峰诊断同时表明，样本数会影响有限集合分数的波动。评分规则一手来源指出，能量分数虽具适当性，对部分相关结构失配的敏感性可能有限；变差分数对相关结构更敏感，但不是严格适当分数，故不能单独验证完整联合分布。结果只验证指标实现/解释的玩具已知案例，不是扩散或流模型效果、SAR 物理证据、样本校准或推荐 draw 数。C3-A v3 和所有 gate 不变。详见[评分规则来源核验](../../experiments/literature_audits/proper_scoring_rules_multisample_eval_20261109_v1/report.md)、[图像域指标诊断](../../experiments/synthetic_cpu/c3a_image_distribution_metrics_cpu_20261109_v1/report.md)、[二维分布诊断](../../experiments/synthetic_cpu/c3a_distribution_metric_sanity_cpu_20261109_v1/report.md)和[样本数诊断](../../experiments/synthetic_cpu/c3a_distribution_draw_count_cpu_20261109_v1/report.md)。

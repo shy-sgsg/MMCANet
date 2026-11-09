@@ -1,5 +1,11 @@
 # 当前状态——权威快照（2026-11-09）
 
+## 2026-11-09 单步扩散超分与后验 Flow 新先例复核
+
+- 已核对 CODSR 的 CVPR 2026 官方记录与作者全文，以及 AISTATS 2026 条件 Flow Matching 后验论文的 PMLR 记录和 OpenReview 全文。两者分别收窄自然图像单步扩散/区域先验与通用后验 Flow 的宽泛新颖性，不涉及 SAR 联合去斑超分、匹配 optical 增益或本地观测模型。详见[中文审查报告](../../experiments/literature_audits/flow_and_one_step_sr_prior_art_20261109_v1/审查报告.md)。
+- 未访问项目数据、模型、checkpoint 或 confirmation/test 载荷；未训练、未推理、未使用 GPU。H1–H6、C2/C3/C4 gate、C3-A v3、数据权限和训练暂停均不变。
+- **下一步：** 继续只做新的一手来源、train/development 专属元数据或有直接源码/冻结协议依据的 CPU 工作；本地模型效果仍等待训练恢复和合规权重。
+
 ## 2026-11-09 已知后验评分诊断与 Flow 逆问题文献补查
 
 - 核对 ICLR 2026 的 DPS 统计基准全文与 ICML 2026 MPC-Flow 出版方摘要。前者以精确 Lévy 后验样本作分布级对照；后者扩大了通用 Flow 逆问题推理控制的先例范围。MPC-Flow 本轮仅摘要级证据，未取得 PDF 正文；两者均不提供本地 SAR、光学引导或本地表示域似然证据。审查记录：[文献报告](../../experiments/literature_audits/posterior_sampling_statistical_benchmark_20261109_v1/报告.md)。

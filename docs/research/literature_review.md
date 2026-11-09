@@ -1,5 +1,9 @@
 # 初步文献综述
 
+## 通用后验 Flow 与单步扩散超分先例 — 2026-11-09
+
+CODSR 是 CVPR 2026 的自然图像单步扩散超分工作：论文提出梯度图驱动的区域自适应生成先验激活、低质量输入特征调制和文本区域对齐；训练使用自然图像与合成 Real-ESRGAN 退化。它收窄“单步扩散超分”及“区域自适应先验”这类宽泛新颖性，但未处理 SAR、配对 optical、去斑或 SAR 观测模型。Zhai、Jeong 与 Ročková 的 AISTATS 2026 工作在模拟式贝叶斯推断中，用联合数据/参数 Flow Matching 生成后验样本并讨论可信集；它收窄通用条件 Flow 后验采样的新颖性，但不是图像恢复或 SAR 工作。二者均不构成本地方法效果、光学增量或物理观测证据，不改变假设状态与 gate。详见[一手来源审查](../../experiments/literature_audits/flow_and_one_step_sr_prior_art_20261109_v1/审查报告.md)。
+
 ## RSDM/LSIR 作者与机构公开稿路线补查 — 2026-11-09
 
 按精确题名、作者姓名与 DOI 检索北京化工大学及中国科学院空天信息创新研究院官方域名，未获得可验证作者页或机构全文。公开搜索索引再次显示既有 ResearchGate 作者稿，但它不是新的独立来源；不据此确认上传身份或正式版对应关系。维持现有证据等级：该工作是作者稿报告的 SAR-only 联合超分/去斑先例，IEEE 正式版本对应、精确数据协议及代码仍开放。详见[来源路线补查记录](../../experiments/literature_audits/region_specific_sar_jdsr_source_recheck_20261107_v1/report.md)。

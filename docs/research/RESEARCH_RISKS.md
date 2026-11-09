@@ -1,5 +1,9 @@
 # 研究风险与证据边界
 
+## 2026-11-09 通用生成机制先例不可外推为 SAR 方法证据
+
+CODSR 的单步扩散、梯度区域先验激活与 LQ 特征调制均在自然图像超分语境下验证；条件 Flow Matching 贝叶斯后验工作针对模拟式推断。它们限制宽泛新颖性措辞，但不能支持本地 SAR 任务可行性、匹配 optical 的增益、SAR 观测一致性或光学错配安全性。未经本地任务匹配实验，不得据此移植模块或推断有效。来源与限制见[审查报告](../../experiments/literature_audits/flow_and_one_step_sr_prior_art_20261109_v1/审查报告.md)。
+
 ## 2026-11-09 通用后验/控制结果不可外推为 SAR 物理证据
 
 ICLR 2026 的已知后验统计基准使用离散 Lévy 先验与线性逆问题；MPC-Flow 本轮只核验到出版方摘要。二者不能证明本地 normalized-PNG/noisy-pseudo-target 具有可用后验似然，也不能证明 Flow 推理控制适用于 SAR 斑点、光学引导或亮散射体。已完成的六维高斯混合 CPU 评分实验仅验证该合成后验下的 CRPS/边际覆盖行为；严禁把它描述成真实 SAR 校准、生成模型结果或 C3-A 晋级证据。MPC-Flow 正文未读取，细节只能在获得新可读一手来源后补核。见[文献审查](../../experiments/literature_audits/posterior_sampling_statistical_benchmark_20261109_v1/报告.md)及[CPU 诊断](../../experiments/synthetic_cpu/posterior_score_calibration_cpu_20261109_v1r1/报告.md)。

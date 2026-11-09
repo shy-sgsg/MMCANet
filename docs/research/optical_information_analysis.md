@@ -1,5 +1,9 @@
 # 光学信息效用分析
 
+## 2026-11-09 新单步扩散与后验 Flow 文献不构成 optical utility 证据
+
+CODSR 的条件包括低质量图像与文本区域提示；条件 Flow 后验工作以观测数据推断统计参数。两者都没有测试 SAR 输出任务中的匹配 optical 与 SAR-only 对照，也没有评估光学错配时的回退。因此它们不支持或反驳 Q1/Q2、H1/H2；本地 C2 gate 与 optical-conditioned C3-B 资格保持原状。见[来源审查](../../experiments/literature_audits/flow_and_one_step_sr_prior_art_20261109_v1/审查报告.md)。
+
 ## SAR-only 联合恢复论文全文不提供 optical utility 证据 — 2026-11-07
 
 Amieva 等人的研究使用 Sentinel-1 IW 输入与 SM 参考，不使用 optical，也没有 matched/permuted optical 对照。它既不支持也不反证 Q1/Q2；本地 C2 gate 仍未判定，训练暂停状态不变。它只收窄相关 SAR 联合恢复的宽泛新颖性措辞，不能替代本地匹配基线。见 D-2026-11-07-055 与[全文审查](../../experiments/literature_audits/amieva_direct_fulltext_followup_20261107_v1/report.md)。

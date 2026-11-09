@@ -1,5 +1,14 @@
 # 实验登记
 
+## 一手文献审查：单步扩散超分与后验 Flow（2026-11-09；非模型实验）
+
+- **审查编号：** `flow_and_one_step_sr_prior_art_20261109_v1`。
+- **问题：** CODSR 与模拟式贝叶斯 Flow Matching 对本项目生成方法新颖性和可行性判断的边界是什么？
+- **来源：** CVPR 2026 CODSR 官方记录与 arXiv 作者全文；AISTATS 2026 PMLR 记录与 OpenReview 全文。
+- **结论：** 通用单步扩散超分、梯度区域先验激活和条件 Flow 后验采样均已有先例。未发现这些来源涉及 SAR JDSR、匹配 optical 增益、SAR 表示域似然或错配回退。
+- **隔离：** 仅读论文；未访问项目数据、模型/checkpoint、confirmation/test 载荷或测量值，无训练/推理/GPU。
+- **产物：** [审查报告](../../experiments/literature_audits/flow_and_one_step_sr_prior_art_20261109_v1/审查报告.md)。不构成实验结果，不更新 H1–H6 或任何 gate。
+
 ## 已知稀疏混合后验下的分布评分校准诊断 — 2026-11-09（纯合成 CPU 方法实验）
 
 - **编号/协议：** `posterior_score_calibration_cpu_20261109_v1r1`；[预登记协议](../../experiments/synthetic_cpu/posterior_score_calibration_cpu_20261109_v1r1/预登记协议.md)、[脚本](../../experiments/synthetic_cpu/posterior_score_calibration_cpu_20261109_v1r1/run.py)、[定向公式检查](../../experiments/synthetic_cpu/posterior_score_calibration_cpu_20261109_v1r1/test_run.py)。
