@@ -1,0 +1,37 @@
+{
+  "结论": "通过",
+  "检查范围": "协议、运行清单、固定输入元数据、checkpoint 结构和合成零输入输出尺寸",
+  "仓库提交": "b17d229b9c03b928010b0b80601281df3a734e5f",
+  "Python 版本": "3.13.7",
+  "PyTorch 版本": "2.8.0+cu128",
+  "CUDA 运行时版本": "12.8",
+  "CUDA_VISIBLE_DEVICES": "已由命令设为空字符串",
+  "CUDA 是否初始化": false,
+  "C3-A 协议 SHA-256": "147c361b3e91bc4cd8d76ce5c464ad9d2137f2d06b38f31a0bc7c7a7e93101a7",
+  "C3-A 入口绑定协议": "147c361b3e91bc4cd8d76ce5c464ad9d2137f2d06b38f31a0bc7c7a7e93101a7",
+  "C1 来源清单 SHA-256": "6a278e97c161164d9440b5388c5b3fcda87746a56e26adfb7cdf658b94924e57",
+  "固定输入元数据哈希": {
+    "train": {
+      "manifest_sha256": "64d335f06812859b96b884a5583092df76dd4b6fa181c3a842b18ed5d3bf6eeb",
+      "files_csv_sha256": "97f35201125dcb3830e9d0583d3350159f0d6757056c7acf13c4c1a0910466ad"
+    },
+    "development": {
+      "manifest_sha256": "de3101a78105c05653b9779342cabe98d61a9cddac6153b25a7d6347d0ef0da9",
+      "files_csv_sha256": "70d762015b2b16a604d381758091ae3d282526a7137e9de51c6db827b60f2839"
+    }
+  },
+  "基线运行状态": "complete",
+  "基线最优轮次": 30,
+  "基线模型参数量": 96209,
+  "checkpoint SHA-256": "8255b5229ca1e041cb59aed582d794bb67afdbe1601b6f4dc425c43ce27f7165",
+  "checkpoint 严格加载": "通过",
+  "合成零输入输出尺寸": [
+    1,
+    1,
+    256,
+    256
+  ],
+  "合成零输入输出有限": true,
+  "C3-A Flow 运行目录已存在": false,
+  "读取数组载荷": false
+}

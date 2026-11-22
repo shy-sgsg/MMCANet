@@ -1,0 +1,5 @@
+在仓库根目录执行：
+
+CUDA_VISIBLE_DEVICES='' /home/shy/anaconda3/envs/AISAR/bin/python experiments/code_audits/c3a_baseline_checkpoint_contract_20261122_v1/核验.py
+
+脚本仅读取冻结协议、C1 来源清单元数据、train/development 固定输入的 manifest.json 与 files.csv、C2 基线运行清单和 checkpoint；不会打开任何 NPY/PNG 数组，不会初始化 CUDA。

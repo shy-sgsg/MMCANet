@@ -1,5 +1,13 @@
 # 决策记录
 
+## D-2026-11-22-003 — 确认 C3-A 冻结 SAR-only 基线 checkpoint 可严格加载
+
+- **问题。** C3-A 冻结筛选的同身份 SAR-only 基线是否与现有 C2 checkpoint 和固定输入元数据一致？
+- **证据。** C3-A 协议 SHA-256 为 `147c361b3e91bc4cd8d76ce5c464ad9d2137f2d06b38f31a0bc7c7a7e93101a7`，与本地 runner 绑定一致；train/development `manifest.json` 与 `files.csv` 哈希匹配 C2 基线清单。C2 checkpoint SHA-256 为 `8255b5229ca1e041cb59aed582d794bb67afdbe1601b6f4dc425c43ce27f7165`；CPU `weights_only=True` 加载及 96,209 参数模型的 `strict=True` 加载通过，全零输入输出有限且尺寸为 `[1,1,256,256]`。
+- **决定。** 确认现有 checkpoint 可作为冻结 C3-A 筛选的结构匹配 SAR-only 基线；这不代表重新计算基线开发指标，不是 Flow 模型结果，不改变任何 gate。训练暂停期间不启动训练。
+- **范围。** 仅读协议、运行/固定输入元数据和 checkpoint；未读 NPY/PNG 数组，未初始化 CUDA，未访问 confirmation/test 载荷。审查的 C3-A runner/model 属于未提交本地工作树，哈希见[核验清单](../../experiments/code_audits/c3a_baseline_checkpoint_contract_20261122_v1/验证清单.json)，不包含在本次审计提交中。
+- **产物。** [核验报告](../../experiments/code_audits/c3a_baseline_checkpoint_contract_20261122_v1/报告.md)、[脚本](../../experiments/code_audits/c3a_baseline_checkpoint_contract_20261122_v1/核验.py)、[结果](../../experiments/code_audits/c3a_baseline_checkpoint_contract_20261122_v1/stdout.txt)。
+
 ## D-2026-11-22-001 — 关闭受限 LMMSE 理论核验并保持 C3-A 待训练
 
 - **问题。** 是否继续扩大随机平移 LMMSE 合成研究，或进入下一轮真实模型实验？

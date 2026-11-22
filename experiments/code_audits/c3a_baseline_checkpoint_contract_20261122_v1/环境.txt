@@ -1,0 +1,8 @@
+操作系统：Linux
+Python：3.13.7（AISAR 环境）
+PyTorch：2.8.0+cu128
+PyTorch CUDA 运行时：12.8
+设备访问：命令将 CUDA_VISIBLE_DEVICES 设为空字符串；本项检查仅在 CPU 执行
+仓库 HEAD：b17d229b9c03b928010b0b80601281df3a734e5f
+工作区状态：C3-A runner 与模型代码来自未提交的本地工作树；代码哈希见验证清单
+磁盘：检查开始时所在分区可用约 9.5 GiB；本记录仅含小型文本/脚本文件

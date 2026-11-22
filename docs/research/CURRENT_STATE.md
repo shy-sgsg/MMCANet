@@ -1,5 +1,9 @@
 # 当前状态——权威快照（2026-11-22）
 
+## 2026-11-22 C3-A 基线 checkpoint 合同 CPU 核验完成
+
+冻结 C3-A 协议、train/development 固定输入元数据与既有 C2 SAR-only `best.pt` 哈希匹配；checkpoint 在 AISAR PyTorch 环境 CPU `weights_only=True` 加载，并由匹配配置以 `strict=True` 加载成功。全零合成输入输出尺寸/有限性通过。未读取数组载荷、未初始化 CUDA、未访问 confirmation/test；C3-A Flow checkpoint 仍不存在，训练暂停和所有 gate 不变。详见[核验报告](../../experiments/code_audits/c3a_baseline_checkpoint_contract_20261122_v1/报告.md)。
+
 ## 2026-11-22 C-Transition 第一阶段审查完成；训练仍暂停
 
 - **理论：** LMMSE 复数/零耦合/零平移/极端平移/近奇异协方差/低高噪声边界测试与原回归共 18 项通过；v1r2 临时最小副本完成 30 条件×50,000 的 CPU 软件烟测。理论状态为 `THEORY_VERIFIED_WITHIN_ASSUMPTIONS`，不证明真实 optical utility。

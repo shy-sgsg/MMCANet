@@ -1,5 +1,12 @@
 # 实验登记
 
+## C3-A 基线 checkpoint 合同 CPU 核验（2026-11-22）
+
+- **编号：** `c3a_baseline_checkpoint_contract_20261122_v1`；[报告](../../experiments/code_audits/c3a_baseline_checkpoint_contract_20261122_v1/报告.md)、[验证清单](../../experiments/code_audits/c3a_baseline_checkpoint_contract_20261122_v1/验证清单.json)。
+- **方法：** 屏蔽 CUDA 后，核对冻结协议与 runner 绑定、C1 来源清单哈希、train/development 固定输入 manifest/CSV 哈希、C2 SAR-only checkpoint 哈希；以 `weights_only=True` 加载 checkpoint，并以 `strict=True` 装载 96,209 参数的同配置 C2 模型。
+- **结果：** 所有哈希和结构检查通过；全零输入输出 `[1,1,256,256]` 且有限；CUDA 未初始化。正式 C3-A Flow 运行目录不存在。
+- **解释边界：** 只证明元数据合同与基线权重结构兼容，不重算开发指标、不评价图像质量，不代表 Flow 训练结果。未读取数组载荷或 confirmation/test 载荷；训练暂停和 C2/C3 gate 不变。被审查 C3-A 代码是本地未提交版本，哈希见清单。
+
 ## 2026-11-22 LMMSE 边界核验与 C-Transition 准备度审查
 
 - **边界验证编号：** `optical_shift_frequency_lmmse_boundary_cpu_20261122_v1`；[报告](../../experiments/synthetic_cpu/optical_shift_frequency_lmmse_boundary_cpu_20261122_v1/报告.md)、[清单](../../experiments/synthetic_cpu/optical_shift_frequency_lmmse_boundary_cpu_20261122_v1/验证清单.json)。
