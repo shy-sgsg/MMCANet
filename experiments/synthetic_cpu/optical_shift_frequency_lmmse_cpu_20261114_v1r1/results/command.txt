@@ -1,0 +1,1 @@
+/home/shy/anaconda3/envs/AISAR/bin/python experiments/synthetic_cpu/optical_shift_frequency_lmmse_cpu_20261114_v1r1/run_monte_carlo.py

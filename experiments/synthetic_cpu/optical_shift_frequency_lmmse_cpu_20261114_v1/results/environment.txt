@@ -1,0 +1,8 @@
+运行设备：CPU
+Python：3.13.7
+NumPy：2.3.4
+操作系统：Linux-7.0.0-43-generic-x86_64-with-glibc2.43
+处理器架构：x86_64
+逻辑 CPU 数：12
+Git HEAD：8a022bfd6ea1064823bd41f28a94c7202cb46237
+工作区是否有既存修改：True

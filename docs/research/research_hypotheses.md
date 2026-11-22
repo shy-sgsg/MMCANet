@@ -1,5 +1,9 @@
 # 研究假设
 
+## 2026-11-14 频率分辨平移模型的合成核验不更新 H1–H6
+
+30 条件、1,500 万样本的复高斯单频实验支持随机高斯全局平移下的解析 LMMSE 风险差实现及预登记频率趋势，仅适用于该模型。未使用 SAR/optical 项目数据或网络，故不支持或反证 optical 增量、生成模型效用、观测一致性、可靠性回退或联合/级联比较；H1–H6、C2/C3 gate 与训练状态不变。详见 D-2026-11-14-018 和[核验报告](../../experiments/synthetic_cpu/optical_shift_frequency_lmmse_cpu_20261114_v1r2/results/报告.md)。
+
 ## 2026-11-09 新生成式先例不更新 H1–H6
 
 CODSR 研究自然图像单步扩散超分，条件 Flow Matching 贝叶斯论文研究模拟式参数后验；二者均未比较 SAR 重建中的匹配 optical 与 SAR-only，也未检验本地 SAR 观测一致性或错配回退。因此它们只收窄通用方法新颖性，不支持或反驳 H1–H6。各假设仍须由对应本地冻结协议回答。见[一手审查](../../experiments/literature_audits/flow_and_one_step_sr_prior_art_20261109_v1/审查报告.md)。

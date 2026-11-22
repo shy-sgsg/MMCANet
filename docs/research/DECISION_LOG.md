@@ -1,5 +1,13 @@
 # 决策记录
 
+## D-2026-11-14-018 — 纯合成核验支持受限 LMMSE 推导，不推进研究 gate
+
+- **问题。** 随机全局高斯平移下，频率分辨光学增量 LMMSE 推导和实现是否与独立数值核对相符？
+- **证据。** 运行前冻结 `optical_shift_frequency_lmmse_cpu_20261114_v1r2`；30 个条件×500,000 个复高斯样本。逐条件 SAR-only MSE、联合 MSE、风险差均在 5 个 Monte Carlo 标准误内（最大 3.235）；30 个理论联合风险与协方差矩阵解相符；各向同性、各向异性预登记趋势通过。v1 与 v1r1 的汇总字段错误已作为失败记录保留，v1r2 仅修复读取字段。
+- **决定。** 仅认为固定复高斯单频假设下的闭式风险差及实现得到数值核验。结果不外推至真实 SAR/光学图像、空间 speckle、局部配准误差或非线性网络，不支持/反证 H1–H6，不改变 C2/C3 gate；当前没有理由在已重复使用的 development cohort 上追加频率 screen。
+- **范围。** 纯 CPU/NumPy；未训练、未使用 CUDA、未读取项目 SAR/optical、checkpoint、split 载荷或 confirmation/test。提权 AISAR 环境 CUDA 可用；本次按 CPU 冻结协议执行，不能将训练暂停解释为 CUDA 不可用。
+- **产物。** [冻结协议](../../experiments/synthetic_cpu/optical_shift_frequency_lmmse_cpu_20261114_v1r2/protocol.md)、[运行器](../../experiments/synthetic_cpu/optical_shift_frequency_lmmse_cpu_20261114_v1r2/run_monte_carlo.py)、[报告](../../experiments/synthetic_cpu/optical_shift_frequency_lmmse_cpu_20261114_v1r2/results/报告.md)、[manifest](../../experiments/synthetic_cpu/optical_shift_frequency_lmmse_cpu_20261114_v1r2/results/manifest.json)。
+
 ## D-2026-11-09-022 — 收窄通用生成式方法的新颖性表述
 
 - **问题：** 单步扩散超分、区域化生成先验和条件 Flow 后验采样是否可作为宽泛的新颖性主张？

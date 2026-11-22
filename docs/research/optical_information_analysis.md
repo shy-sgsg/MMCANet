@@ -1,5 +1,9 @@
 # 光学信息效用分析
 
+## 2026-11-14 随机平移频率分辨 LMMSE 推导的合成数值核验
+
+冻结的纯合成协议在 30 个复高斯单频条件上各采样 500,000 次。经验 SAR-only MSE、联合 MSE 和风险差都满足 5 个 Monte Carlo 标准误界限（最大 3.235）；独立协方差矩阵解与闭式风险一致；各向同性随频率不增、各向异性方向排序均符合预声明规则。两个早期运行版本在汇总字段名上失败，均保留；v1r2 仅修复读取字段并完整通过。此结果验证[既有推导](#frequency-resolved-linear-utility-under-random-residual-translation-2026-10-25)的公式实现，不检验本地图像、H1/H2、配准分布或非线性模型，也不改变 C2/C3 gate。实验全程只用 CPU/NumPy，没有读取任何项目载荷或 confirmation/test。详见 D-2026-11-14-018 与[运行报告](../../experiments/synthetic_cpu/optical_shift_frequency_lmmse_cpu_20261114_v1r2/results/报告.md)。
+
 ## 2026-11-09 新单步扩散与后验 Flow 文献不构成 optical utility 证据
 
 CODSR 的条件包括低质量图像与文本区域提示；条件 Flow 后验工作以观测数据推断统计参数。两者都没有测试 SAR 输出任务中的匹配 optical 与 SAR-only 对照，也没有评估光学错配时的回退。因此它们不支持或反驳 Q1/Q2、H1/H2；本地 C2 gate 与 optical-conditioned C3-B 资格保持原状。见[来源审查](../../experiments/literature_audits/flow_and_one_step_sr_prior_art_20261109_v1/审查报告.md)。

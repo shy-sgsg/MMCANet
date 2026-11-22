@@ -1,0 +1,35 @@
+{
+  "protocol_id": "optical_shift_frequency_lmmse_cpu_20261114_v1",
+  "status": "failed",
+  "start_time_utc": "2026-11-13T23:11:48.368947+00:00",
+  "protocol_sha256": "48e04bf8661dbff6a62d8ad9de9fb70c525e3fbabc626098e728b22b17e74ad1",
+  "model_sha256": "8f9ad8b2514a852adaed5cdd562405f1fab83e101322c0f0b3674e379a386ad6",
+  "runner_sha256": "cb40658deab80f623b32d6eccfaaf285a757c420a7a04f608fe0f39ff1a2f6ef",
+  "git": {
+    "head": "8a022bfd6ea1064823bd41f28a94c7202cb46237",
+    "dirty": true
+  },
+  "device": "CPU",
+  "cuda_used": false,
+  "training_run": false,
+  "project_payload_accessed": false,
+  "confirmation_payload_accessed": false,
+  "test_payload_accessed": false,
+  "parameter_config": {
+    "signal_power": 1.0,
+    "sar_transfer": 1.0,
+    "sar_noise_power": 0.7,
+    "optical_coupling": 0.8,
+    "optical_noise_power": 0.5
+  },
+  "samples_per_case": 500000,
+  "batch_size": 50000,
+  "base_seed": 20261114,
+  "condition_count": 30,
+  "expected_sample_total": 15000000,
+  "monte_carlo_standard_error_limit": 5.0,
+  "command": "/home/shy/anaconda3/envs/AISAR/bin/python experiments/synthetic_cpu/optical_shift_frequency_lmmse_cpu_20261114_v1/run_monte_carlo.py",
+  "end_time_utc": "2026-11-13T23:11:50.325002+00:00",
+  "error_type": "KeyError",
+  "error": "'sigma'"
+}

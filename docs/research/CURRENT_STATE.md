@@ -1,5 +1,9 @@
 # 当前状态——权威快照（2026-11-09）
 
+## 2026-11-14 未知平移下频率分辨 LMMSE 纯合成核验完成
+
+固定复高斯单频模型的 30 个条件、共 1,500 万样本均完成；每条件经验 SAR-only MSE、联合 MSE 和风险差均在预登记的 5 个 Monte Carlo 标准误内，最大为 3.235；30 个条件的协方差矩阵解一致性和预登记频率趋势检查通过。v1、v1r1 因结果字段名不一致在汇总阶段失败，清单与产物保留；修正后的 v1r2 完整通过。此结果只核验理想化模型公式/实现，不是本地 SAR–optical 效用证据，不支持 H1–H6，不改变 C2 gate 或 C3-B 资格。全程只用 CPU/NumPy，未读取项目载荷、checkpoint、confirmation/test，未训练。提权 AISAR 环境 CUDA 可见且可用；本实验按冻结的 CPU 协议运行，并非 CUDA 不可用。详见 D-2026-11-14-018 与[核验报告](../../experiments/synthetic_cpu/optical_shift_frequency_lmmse_cpu_20261114_v1r2/results/报告.md)。
+
 ## 2026-11-09 单步扩散超分与后验 Flow 新先例复核
 
 - 已核对 CODSR 的 CVPR 2026 官方记录与作者全文，以及 AISTATS 2026 条件 Flow Matching 后验论文的 PMLR 记录和 OpenReview 全文。两者分别收窄自然图像单步扩散/区域先验与通用后验 Flow 的宽泛新颖性，不涉及 SAR 联合去斑超分、匹配 optical 增益或本地观测模型。详见[中文审查报告](../../experiments/literature_audits/flow_and_one_step_sr_prior_art_20261109_v1/审查报告.md)。

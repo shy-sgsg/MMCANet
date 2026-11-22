@@ -1,5 +1,13 @@
 # 实验登记
 
+## 未知高斯平移下频率分辨 LMMSE 公式核验（2026-11-14，纯合成 CPU，非门槛）
+
+- **编号：** `optical_shift_frequency_lmmse_cpu_20261114_v1r2`；[运行前冻结协议](../../experiments/synthetic_cpu/optical_shift_frequency_lmmse_cpu_20261114_v1r2/protocol.md)。
+- **设计与结果：** 30 个各向同性/各向异性频率条件，每条件 500,000 个复高斯样本，共 15,000,000 个；每条件 SAR-only MSE、联合 MSE、风险差均通过 5 个 Monte Carlo 标准误规则，最大 3.235。理论联合风险与独立协方差矩阵 Schur 补核对通过；频率和各向异性方向预登记趋势通过。
+- **版本记录：** v1 与 v1r1 均完成采样但在汇总/报告因读取 `sigma` 而失败，失败清单保留；v1r2 修复字段后成功，科学参数与判定规则未变。9 项定向测试通过。
+- **解释边界：** 只核验理想化复高斯单频模型公式/实现，不是 SAR 物理观测或本地 optical utility 证据，不更新 H1–H6，也不改变任何 gate。仅 CPU/NumPy；未读取项目图像、split 载荷、checkpoint、confirmation/test，未训练。
+- **产物：** [报告](../../experiments/synthetic_cpu/optical_shift_frequency_lmmse_cpu_20261114_v1r2/results/报告.md)、[逐条件结果](../../experiments/synthetic_cpu/optical_shift_frequency_lmmse_cpu_20261114_v1r2/results/cases.csv)、[manifest](../../experiments/synthetic_cpu/optical_shift_frequency_lmmse_cpu_20261114_v1r2/results/manifest.json)；决策 D-2026-11-14-018。
+
 ## 一手文献审查：单步扩散超分与后验 Flow（2026-11-09；非模型实验）
 
 - **审查编号：** `flow_and_one_step_sr_prior_art_20261109_v1`。

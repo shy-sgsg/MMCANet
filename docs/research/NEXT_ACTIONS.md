@@ -1,5 +1,13 @@
 # 下一步行动
 
+## 2026-11-14 频率分辨 LMMSE 纯合成核验已完成
+
+- [x] 冻结 30 个复高斯单频条件，运行 15,000,000 个 CPU 样本；经验误差、独立协方差矩阵解和频率趋势规则全部通过，最大误差为 3.235 个 Monte Carlo 标准误。
+- [x] 为趋势汇总和报告读取字段增加回归测试；9 项定向测试通过。保留 v1、v1r1 两个汇总失败版本及清单，以 v1r2 唯一新结果目录完成运行。
+- **解释边界：** 仅验证固定理想化模型的解析式和数值实现，不代表真实 SAR/光学数据或模型结论；不支持/反证 H1–H6，不推进 gate。项目载荷、checkpoint、confirmation/test 均未访问；未训练。CUDA 当前可见可用，本次使用 CPU 是冻结协议选择。
+- **后续：** 继续只做训练暂停期间可独立完成的审计与方法工作。真实图像频率效用/配准实验仍须先解决来源与配准依据并冻结合格的新协议；不得在已重复使用的 development cohort 追加 screen。
+- **记录：** D-2026-11-14-018；[协议](../../experiments/synthetic_cpu/optical_shift_frequency_lmmse_cpu_20261114_v1r2/protocol.md)、[运行器](../../experiments/synthetic_cpu/optical_shift_frequency_lmmse_cpu_20261114_v1r2/run_monte_carlo.py)、[报告](../../experiments/synthetic_cpu/optical_shift_frequency_lmmse_cpu_20261114_v1r2/results/报告.md)、[逐条件结果](../../experiments/synthetic_cpu/optical_shift_frequency_lmmse_cpu_20261114_v1r2/results/cases.csv)。
+
 ## 2026-11-09 单步扩散与后验 Flow 先例已核验
 
 - 新增 CODSR 与条件 Flow 贝叶斯后验一手来源审查，并更新文献综述、相关工作矩阵、方法可行性、研究缺口、主计划、风险、假设状态及实验/决策记录。

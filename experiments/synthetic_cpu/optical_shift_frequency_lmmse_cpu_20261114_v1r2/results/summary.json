@@ -1,0 +1,22 @@
+{
+  "condition_count": 30,
+  "samples_per_case": 500000,
+  "total_generated_samples": 15000000,
+  "maximum_standardized_error_by_metric": {
+    "sar_mse": 2.4067331213686516,
+    "joint_mse": 2.7264312350925874,
+    "gain": 3.2346456811784536
+  },
+  "all_monte_carlo_checks_within_five_standard_errors": true,
+  "frequency_trend_checks": {
+    "isotropic_frequency_curves_nonincreasing": true,
+    "zero_shift_curve_constant": true,
+    "zero_frequency_shift_invariant": true,
+    "anisotropic_direction_order": [
+      "x 最低",
+      "对角居中",
+      "y 最高"
+    ]
+  },
+  "interpretation_scope": "仅验证理想化复高斯单频 LMMSE 模型的数值实现。"
+}
