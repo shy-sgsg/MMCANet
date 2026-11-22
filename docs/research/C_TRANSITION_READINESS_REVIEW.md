@@ -71,7 +71,7 @@
 | 资源门槛 | CUDA；至少 3 GiB 空闲显存；不得有并行 GPU 训练 |
 | 运行目录 | `experiments/phase_c3a_sar_only_flow_c1_v2_20261105_v1`；只能新建唯一输出，不覆盖已有结果 |
 
-检查点状态：该 C3-A 运行目录和有效 `best.pt` 当前不存在；既有确定性 SAR-only baseline `experiments/phase_c2_c1_v2_20261031_v1/matrix/runs/x2_light__sar_only/checkpoints/best.pt` 存在，SHA-256 为 `8255b5229ca1e041cb59aed582d794bb67afdbe1601b6f4dc425c43ce27f7165`。本轮只读取该固定 baseline 文件的大小和 SHA-256 以核验身份，没有加载权重参数。训练入口的协议/hash/preflight/resume 契约已按当前工作区代码和定向测试审查；现有工作区中的 C3-A 相关 CPU 定向测试 **82 项通过**，未读取项目图像。这些 C3-A 实现和测试改动在本任务开始前已存在，本次提交不包含它们；该回归结果针对当时的工作区快照，不是本次提交单独可复现的测试集。
+检查点状态：该 C3-A 运行目录和有效 `best.pt` 当前不存在；既有确定性 SAR-only baseline `experiments/phase_c2_c1_v2_20261031_v1/matrix/runs/x2_light__sar_only/checkpoints/best.pt` 存在，SHA-256 为 `8255b5229ca1e041cb59aed582d794bb67afdbe1601b6f4dc425c43ce27f7165`。本准备度审查的初次状态检查只读取该固定 baseline 文件的大小和 SHA-256；随后独立的 CPU 合同核验加载了 checkpoint，并由匹配模型配置以 `strict=True` 成功加载，详见[C3-A 基线 checkpoint 合同核验](../../experiments/code_audits/c3a_baseline_checkpoint_contract_20261122_v1/报告.md)。训练入口的协议/hash/preflight/resume 契约已按当前工作区代码和定向测试审查；现有工作区中的 C3-A 相关 CPU 定向测试 **82 项通过**，未读取项目图像。这些 C3-A 实现和测试改动在本任务开始前已存在，本次提交不包含它们；该回归结果针对当时的工作区快照，不是本次提交单独可复现的测试集。
 
 ### 训练与评价当前状态
 
