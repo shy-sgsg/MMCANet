@@ -1,5 +1,14 @@
 # 实验登记
 
+## 2026-11-22 LMMSE 边界核验与 C-Transition 准备度审查
+
+- **边界验证编号：** `optical_shift_frequency_lmmse_boundary_cpu_20261122_v1`；[报告](../../experiments/synthetic_cpu/optical_shift_frequency_lmmse_boundary_cpu_20261122_v1/报告.md)、[清单](../../experiments/synthetic_cpu/optical_shift_frequency_lmmse_boundary_cpu_20261122_v1/验证清单.json)。
+- **结果：** 原测试与新增边界测试 18/18 通过；v1r2 临时最小副本以 30×50,000 CPU 样本完成小规模软件烟测，全部 5SE 检查通过，协议/模型/runner 哈希匹配历史 manifest。
+- **边界：** 烟测补入当时未被历史 manifest 绑定的中文 CLI 解析器；输出仅核验链路和字段，不重跑正式规模。无项目载荷或 confirmation/test 访问、无训练或 GPU 模型评价；独立 C3-A 状态审计只核对了确定性 baseline 的文件大小/SHA-256，没有加载 checkpoint 权重。
+- **回审修复：** C1 train/development 交叉核验脚本现在检测到已有 `results.json` 即先失败，防止覆盖历史审计结果；新增保护单测通过。审计输入清单仍保留在本地，不随本次提交发布。
+- **解释：** `THEORY_VERIFIED_WITHIN_ASSUMPTIONS`；不验证 optical utility、真实配准或物理一致性，不改变任何阶段 gate。
+- **C-Transition readiness：** [审查报告](C_TRANSITION_READINESS_REVIEW.md)记录 C1 新独立 development 阻塞、C3-A 冻结方案和训练/资源状态；这是准备审查，不是训练结果。
+
 ## 未知高斯平移下频率分辨 LMMSE 公式核验（2026-11-14，纯合成 CPU，非门槛）
 
 - **编号：** `optical_shift_frequency_lmmse_cpu_20261114_v1r2`；[运行前冻结协议](../../experiments/synthetic_cpu/optical_shift_frequency_lmmse_cpu_20261114_v1r2/protocol.md)。

@@ -1,0 +1,5 @@
+执行环境：/home/shy/anaconda3/bin/python
+Python 版本：3.13.5
+操作系统：Linux-7.0.0-42-generic-x86_64-with-glibc2.43
+依赖：Python 标准库 csv、hashlib、json、pathlib；未导入 PyTorch/CUDA。
+设备：CPU；本审计不执行模型计算。

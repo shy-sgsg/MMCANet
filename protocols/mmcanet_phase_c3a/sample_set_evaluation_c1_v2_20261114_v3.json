@@ -1,0 +1,121 @@
+{
+  "format": "c3a_sample_set_evaluation_protocol_v3",
+  "protocol_id": "c3a_sample_set_evaluation_c1_v2_20261114_v3",
+  "status": "prospective_not_yet_used_for_model_evaluation",
+  "title_zh": "C3-A 多次生成评价补充协议（区分有限集合与底层分布评分）",
+  "objective_zh": "分别报告 K 个输出作为有限经验分布时的 plug-in 分数，以及 K 个 IID draw 估计其底层生成分布评分时的 fair 无偏估计；像素均值、单次 draw 和样本离散度继续分别报告。",
+  "supersession": {
+    "c3a_v3_path": "protocols/mmcanet_phase_c3a/multi_sample_stability_c1_v2_20261105_v3.json",
+    "c3a_v3_sha256": "ee83e2cb4dadea7d4fca6576e479d2922d70df44935f1be51116add26e06016c",
+    "prior_supplement_v1_path": "protocols/mmcanet_phase_c3a/sample_set_evaluation_c1_v2_20261114_v1.json",
+    "prior_supplement_v1_sha256": "9ce71b5f268e1a85b0532cda24a86c9c8bd6b6e5d6701b460ce48ddc1d9b20bb",
+    "prior_supplement_v2_path": "protocols/mmcanet_phase_c3a/sample_set_evaluation_c1_v2_20261114_v2.json",
+    "prior_supplement_v2_sha256": "0dfe4e1f5e1e1ac9aa26f148903356f7f82652ec0b4b86485536825cb3cb3be1",
+    "relationship": "仅供未来模型评价使用；v1、v2、C3-A v3、原 checkpoint 选择规则、历史运行和阶段 gate 均保持原样。本版增加成对的 plug-in/fair 评分对象，不把两者混为一个指标，也不据此重新选 checkpoint。"
+  },
+  "training_binding": {
+    "path": "protocols/mmcanet_phase_c3a/sar_only_flow_c1_v2_20261105_v1.json",
+    "sha256": "147c361b3e91bc4cd8d76ce5c464ad9d2137f2d06b38f31a0bc7c7a7e93101a7",
+    "expected_run": "experiments/phase_c3a_sar_only_flow_c1_v2_20261105_v1",
+    "checkpoint": "checkpoints/best.pt",
+    "checkpoint_selection": "只沿用冻结 C3-A v1 原先固定噪声、来源组等权 development PSNR 选择；本补充不重选 checkpoint。"
+  },
+  "implementation_binding": {
+    "scoring_module_path": "MMCANetV2/phase_c3a_sample_set.py",
+    "scoring_module_sha256": "54160fb077e9930ddb598db13b3aafe756bab862c51a470a1f0501a45cb1db28",
+    "meaning": "固定本协议定义的点均值、样本离散度、经验集合评分、IID fair 估计及来源组等权汇总实现；任何实现改动均需新版本协议。"
+  },
+  "data": {
+    "source_manifest_path": "protocols/mmcanet_phase_c1/v2/source_group_split_20261028_v1/sample_manifest.csv",
+    "source_manifest_sha256": "6a278e97c161164d9440b5388c5b3fcda87746a56e26adfb7cdf658b94924e57",
+    "fixed_input_root": "data/derived/c2_fixed_inputs_c1_v2_20261031_v1/x2_light/development",
+    "role": "development",
+    "sample_count": 200,
+    "source_group_count": 19,
+    "payload_arrays_read": ["sar_lr", "noisy_pseudo_target"],
+    "optical_payload_read": false,
+    "train_payload_read": false,
+    "confirmation_payload_accessed": false,
+    "test_set_accessed": false,
+    "test_set_used": false
+  },
+  "sampling": {
+    "draws_per_identity": 4,
+    "seed": 20261105,
+    "draw_indices": [0,1,2,3],
+    "noise_seed_rule": "沿用冻结 C3-A v3：SHA-256(seed NUL sample_id NUL draw_index)，取摘要前 8 字节并映射为 torch.Generator seed。",
+    "sampler": "沿用冻结 C3-A v1 的 8 步 Heun ODE，每步两次速度场评估，noise_sigma=0.1；每个样本固定 draw 顺序 0 至 3。",
+    "iid_assumption": "fair 评分解释要求同一身份、同一条件下各 draw 是来自相同条件生成分布的独立随机样本；独立 base-noise seed 是其模拟机制。若实现或采样器造成 draw 依赖，则 fair 分数不再按底层 IID 分布无偏估计解释。",
+    "evaluation_domain": "每次 raw 输出先按冻结规则裁剪到 [0,1]；所有图像评分在裁剪后的表示域计算。"
+  },
+  "objects": {
+    "single_draw": {
+      "metrics": "沿用 C3-A v3 每次 draw 的 PSNR、SSIM、EPI、边缘强度比及原始输出上下界越界比例。",
+      "interpretation": "单次随机生成结果；保留身份及 draw 编号。"
+    },
+    "pixel_mean_point_estimate": {
+      "definition": "按 draw_index 顺序对四个最终 [0,1] 输出以 float64 累加并除以 4。",
+      "metrics": ["PSNR", "SSIM", "EPI", "边缘强度比"],
+      "paired_reference": "同身份冻结 noisy pseudo-target，并复用 C3-A v3 为该身份构造的固定边缘掩膜。",
+      "interpretation": "单独的像素均值点估计；不称为单次生成、代表性 draw 或分布评价。"
+    },
+    "sample_set_distribution": {
+      "energy_score": {
+        "distance": "d(a,b)=sqrt(mean((a-b)^2))，按图像维数缩放的欧氏距离。",
+        "empirical_plugin": "ES_plugin=mean_k d(x_k,y) - 0.5*mean_{k,l} d(x_k,x_l)，包含 K×K 有序配对及零对角；解释为有限经验分布评分。",
+        "underlying_iid_fair": "ES_fair=mean_k d(x_k,y) - 0.5/[K(K-1)]*sum_{k!=l}d(x_k,x_l)，K>1；解释为 IID draw 对底层分布总体 energy score 的无偏估计。",
+        "implementation": "MMCANetV2.phase_c3a_sample_set.energy_score 与 fair_energy_score_iid。",
+        "direction": "均越低越好；fair 有限样本估计可为负值。"
+      },
+      "spatial_variogram_score": {
+        "power": 0.5,
+        "offsets_yx": [[0,1],[1,0],[1,1],[1,-1],[0,2],[2,0]],
+        "empirical_plugin": "对每个偏移和有效像素对计算 (mean_k z_k-z_y)^2，再对通道、像素对及六个偏移等权平均；解释为有限经验分布评分。",
+        "underlying_iid_fair": "对每个偏移及像素对计算 mean_k(z_k-z_y)^2 - [2K(K-1)]^-1*sum_{k!=l}(z_k-z_l)^2，再按相同方式等权平均；IID draw 下是底层 variogram score 的无偏估计。等价于 plugin 减去 draw 间 z 的样本方差/K。",
+        "implementation": "MMCANetV2.phase_c3a_sample_set.variogram_score 与 fair_variogram_score_iid。",
+        "direction": "均越低越好；fair 有限样本估计可为负值。"
+      },
+      "pixelwise_spread": {
+        "name": "平均逐像素样本标准差",
+        "definition": "在 K 个最终 [0,1] draw 上逐通道、逐像素按 ddof=1 计算标准差，再对所有通道/像素等权平均。",
+        "interpretation": "只描述有限 draw 的离散度；不等同校准或不确定性。"
+      },
+      "aggregation": "先按身份分别算各对象，再在来源场景组内取均值、对 19 个来源组等权；如使用区间，使用同身份、同来源组配对的组级 bootstrap。插件与 fair 两列不得合并或互相替代。",
+      "claim_limit": "四个 draw 下所有集合评分只作描述性补充。两类分数均不能单独证明后验校准、干净 SAR 分布真实性或物理相容性；fair 解释还依赖 IID 假设。"
+    }
+  },
+  "synthetic_validation": {
+    "protocol": "protocols/mmcanet_phase_c3a/sample_set_finite_ensemble_c1_v2_20261114_v1.json",
+    "sha256": "65894ad90426664af75f9959f0be38fec88bb71520f8ae5cc3defcd99c19ec02",
+    "report": "experiments/synthetic_cpu/c3a_sample_set_finite_ensemble_bias_cpu_20261114_v1/报告.md",
+    "summary": "在预登记 12,000 次高斯能量分数模拟中，K=4、8 的 plug-in 最低分预测均为欠离散 0.75，fair 最低分预测均为校准；K=4 与 K=8 的 plug-in 欠离散预测相对校准差异 95% 区间均低于零，fair 差异区间均高于零。16×16 AR(1) 空间 variogram 案例在两种分数、K=4/8 下最低分预测均为校准。该合成结果触发双 estimand 前瞻报告，但不用于模型选择或 gate。"
+  },
+  "resources": {
+    "current_work": "只完成过独立合成 CPU 诊断；不代表对 C3-A 模型运行补算。",
+    "future_model_evaluation_requires_completed_c3a_v1_run": true,
+    "training_started_by_this_protocol": false
+  },
+  "selection_or_gate_change": false,
+  "confirmation_payload_accessed": false,
+  "test_set_accessed": false,
+  "test_set_used": false,
+  "literature": [
+    {
+      "title": "Fair Scores for Ensemble Forecasts",
+      "authors": "David B. Ferro",
+      "venue_year": "Quarterly Journal of the Royal Meteorological Society, 140(683), 2014",
+      "doi": "10.1002/qj.2270",
+      "url": "https://doi.org/10.1002/qj.2270",
+      "supports": "公平评分的选择依赖 ensemble 被解释为经验分布还是 IID 底层分布样本。"
+    },
+    {
+      "title": "Variogram-Based Proper Scoring Rules for Probabilistic Forecasts of Multivariate Quantities",
+      "authors": "Michael Scheuerer; Thomas M. Hamill",
+      "venue_year": "Monthly Weather Review, 143(4), 2015",
+      "doi": "10.1175/MWR-D-14-00269.1",
+      "url": "https://doi.org/10.1175/MWR-D-14-00269.1",
+      "supports": "variogram score 对相关结构敏感，有限集合抽样误差可能影响排序。"
+    }
+  ],
+  "created_utc": "2026-11-14T00:00:00Z"
+}

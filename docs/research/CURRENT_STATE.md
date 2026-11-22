@@ -1,4 +1,13 @@
-# 当前状态——权威快照（2026-11-09）
+# 当前状态——权威快照（2026-11-22）
+
+## 2026-11-22 C-Transition 第一阶段审查完成；训练仍暂停
+
+- **理论：** LMMSE 复数/零耦合/零平移/极端平移/近奇异协方差/低高噪声边界测试与原回归共 18 项通过；v1r2 临时最小副本完成 30 条件×50,000 的 CPU 软件烟测。理论状态为 `THEORY_VERIFIED_WITHIN_ASSUMPTIONS`，不证明真实 optical utility。
+- **数据：** C1 v2 固定 1,600/200/200 对、92/19/20 个来源组，131 组全部已分配；development 已复用，confirmation 曾被描述性访问后永久封存；数字编号本地 2k PNG 未建立来源映射。新独立 development 需要未使用且可核验的新来源组与映射依据。
+- **C3-A：** 冻结 SAR-only Flow 配置和 v3 评价方案已核对；有效 Flow `best.pt` 不存在，SAR-only baseline 存在。C3-A 定向 CPU 回归 82 项通过；本轮无训练或真实模型评价。
+- **资源/权限：** CUDA 可用；本轮提权快照为 RTX 3050 Laptop、4,096 MiB 总显存、1,971 MiB 空闲、98% 利用率，低于冻结方案 3 GiB 空闲门槛。用户要求的训练暂停仍生效。
+- **审计保护：** C1 train/development 交叉核验脚本遇到已有 `results.json` 时会先失败，拒绝覆盖归档结果；新增保护测试通过。相关脚本依赖本地受控元数据，不能从本次 Git 提交独立重跑。
+- **决定与下一步：** 不运行训练、不进入光学条件 C3-B。训练授权恢复且 GPU 资源门槛满足后，优先原样执行冻结 C3-A SAR-only 探索筛选；正式 optical/频率泛化仍需新独立 development。完整审查见[准备度报告](C_TRANSITION_READINESS_REVIEW.md)，边界测试见[核验记录](../../experiments/synthetic_cpu/optical_shift_frequency_lmmse_boundary_cpu_20261122_v1/报告.md)。
 
 ## 2026-11-14 未知平移下频率分辨 LMMSE 纯合成核验完成
 

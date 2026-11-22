@@ -1,0 +1,78 @@
+{
+  "审计编号": "c1_v2_numeric_png_source_crosswalk_20261107_v1",
+  "状态": "既有精确哈希交叉表未能恢复数字 PNG 映射",
+  "核验时间": "2026-11-07T16:07:01+08:00",
+  "代码版本": "19772c7",
+  "工作区含未提交修改": true,
+  "审计范围": "仅连接冻结 C1 train/development 来源 SHA-512 与历史来源哈希表；不读取影像或其他角色路径/哈希",
+  "输入元数据SHA256": {
+    "冻结 C1 sample_manifest.csv": {
+      "路径": "protocols/mmcanet_phase_c1/v2/source_group_split_20261028_v1/sample_manifest.csv",
+      "SHA256": "6a278e97c161164d9440b5388c5b3fcda87746a56e26adfb7cdf658b94924e57"
+    },
+    "冻结 C1 manifest.json": {
+      "路径": "protocols/mmcanet_phase_c1/v2/source_group_split_20261028_v1/manifest.json",
+      "SHA256": "ec20d4590c45663971b1762390964168929121545380a7fbc75aae110d95718f"
+    },
+    "历史来源哈希交叉表": {
+      "路径": "experiments/data_audits/sen1_2_upstream_hash_crosswalk_20261019_v1/source_hash_matches.csv",
+      "SHA256": "af8f910775e506f0fe1cc63f731c5b70ef842ac229d88d7a28b194b67bd28549"
+    },
+    "历史交叉表生成脚本": {
+      "路径": "scripts/audit_sen1_2_upstream_hash_crosswalk.py",
+      "SHA256": "0da51190ed0e55b7b06092dd672c14dc4e39ca997d5fa370f9a25a82e9597155"
+    },
+    "历史交叉表运行清单": {
+      "路径": "experiments/data_audits/sen1_2_upstream_hash_crosswalk_20261019_v1/manifest.json",
+      "SHA256": "79860d67e60164364c0e151e8a2c721290346977db197f5ab236caea15e6c23c"
+    }
+  },
+  "训练样本数": 1600,
+  "开发样本数": 200,
+  "来源模态数": 3600,
+  "SHA512精确命中数": 0,
+  "可恢复数字PNG数": 0,
+  "完整SAR_optical配对数": 0,
+  "C1非允许角色处理规则": "仅读取 role 字段筛除；不读取其路径、样本键或哈希字段",
+  "历史表记录处理规则": "未命中只比较本地 SHA-512；只有匹配时才解析模态、历史角色、路径和上游来源",
+  "本地影像载荷访问": false,
+  "confirmation载荷访问": false,
+  "test载荷或结果访问": false,
+  "checkpoint访问": false,
+  "训练或GPU": false,
+  "阶段gate变更": false,
+  "Python语法检查": "通过",
+  "摘要核验": "C1 sample_manifest 与冻结清单一致；全部输入及产物 SHA-256 已记录",
+  "产物SHA256": {
+    "protocol.md": {
+      "SHA256": "666aa416e20c17878ad72b5a8d855d2af6539cd5ccb425a760fc2a04b2058592",
+      "字节数": 1681
+    },
+    "audit_numeric_png_crosswalk.py": {
+      "SHA256": "ae16a7abf2c17fb18971055f73999f323cfbc726382e8bb61bd4f5034ff17f59",
+      "字节数": 8804
+    },
+    "report.md": {
+      "SHA256": "6c1bb7c42359a8131fa2da75a1cba2efda7b6b8ddcb1bc68238c3438fa1f88e5",
+      "字节数": 2099
+    },
+    "command.txt": {
+      "SHA256": "e91b54ea3ea25860426efaf9693eb06b1ddd5428012f206b0b9678a3940a0bb8",
+      "字节数": 348
+    },
+    "environment.txt": {
+      "SHA256": "3ca6f316a2f67de6525dc0a852f9aedea14ab9424e2985979f7e12316d13a28a",
+      "字节数": 263
+    },
+    "results.json": {
+      "SHA256": "a5180a5c79aa6f8263a014554d28a4c76007c9a277357e6b32fd21520a892ef8",
+      "字节数": 1161
+    },
+    "stdout.txt": {
+      "SHA256": "1519dc832f83f6b6b0c763375b2e3a31efe081621c4526f7cb6f796eb10da79c",
+      "字节数": 675
+    }
+  },
+  "产物总字节数": 15031,
+  "项目分区可用字节": 20481867776
+}

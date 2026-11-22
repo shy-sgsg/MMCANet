@@ -1,5 +1,14 @@
 # 项目事实与证据分类
 
+## 2026-11-22 可核验事实更新
+
+- C1 v2 清单 SHA-256 为 `6a278e97c161164d9440b5388c5b3fcda87746a56e26adfb7cdf658b94924e57`；元数据角色数为 train 1,600/92 组、development 200/19 组、confirmation 200/20 组，131 个来源组已全部分配。该划分仅支持来源场景文件夹互斥，不证明地理、采集或精细空间独立。
+- 冻结 C3-A SAR-only Flow 协议 SHA-256 为 `147c361b3e91bc4cd8d76ce5c464ad9d2137f2d06b38f31a0bc7c7a7e93101a7`；运行目录与有效 Flow checkpoint 尚不存在。既有 SAR-only baseline SHA-256 为 `8255b5229ca1e041cb59aed582d794bb67afdbe1601b6f4dc425c43ce27f7165`。
+- 2026-11-22 LMMSE 边界回归 18 项通过；受限公式内的复数/退化边界得到数值检查，不构成 optical utility 事实。
+- 当前 8-bit 归一化表示域与 noisy pseudo-target 不提供辐射定标幅度/强度/功率事实；不得据此宣称真实 speckle 或物理一致性。
+
+依据、解释边界和下一项实验见[C-Transition 准备度审查](C_TRANSITION_READINESS_REVIEW.md)。
+
 ## 2026-11-09 研究总纲 v1.8 获批
 
 - 用户于 2026-11-09 明确批准采纳完整 `v1.8-proposed` 候选，并授权同步正式总纲、`AGENTS.md` 和 `README.md`；本次同步已完成。

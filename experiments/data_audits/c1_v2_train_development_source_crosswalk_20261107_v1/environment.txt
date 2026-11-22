@@ -1,0 +1,10 @@
+# 运行环境
+
+- 复核时间：2026-11-07T15:44:06+08:00
+- Python 可执行文件：`/home/shy/anaconda3/bin/python`
+- Python 版本：3.13.5
+- 操作系统：Linux-7.0.0-42-generic-x86_64-with-glibc2.43
+- 设备：CPU
+- 本次脚本未导入 PyTorch、未调用 CUDA/GPU
+- 输入范围：冻结 split 与派生 train/development CSV/JSON 元数据
+- 代码版本：`19772c7`；工作区含未提交修改

@@ -1,0 +1,9 @@
+python -m pytest -q tests/test_optical_shift_frequency_lmmse.py tests/test_optical_shift_frequency_lmmse_boundaries.py
+python -m py_compile scripts/cli_zh.py tests/test_optical_shift_frequency_lmmse.py tests/test_optical_shift_frequency_lmmse_boundaries.py experiments/synthetic_cpu/optical_shift_frequency_lmmse_cpu_20261114_v1r2/lmmse_shift_model.py experiments/synthetic_cpu/optical_shift_frequency_lmmse_cpu_20261114_v1r2/run_monte_carlo.py
+
+CUDA_VISIBLE_DEVICES='' /home/shy/anaconda3/envs/AISAR/bin/python -m pytest -q tests/test_phase_c3a_flow.py tests/test_c3a_training_resume.py tests/test_c3a_resume_code_hashes.py tests/test_c3a_multisample_eval.py tests/test_c3a_sample_set_scoring.py tests/test_c3a_fair_sample_set_scores.py tests/test_c3a_sample_set_supplement.py
+
+临时副本 smoke：从 30931f15dc42d02ff36ef414faf48c18ea998191 提取 v1r2 的 protocol.md、lmmse_shift_model.py、run_monte_carlo.py；复制 scripts/cli_zh.py；在临时 git 副本中执行：
+python -c "import sys,run_monte_carlo as m; sys.argv=['run_monte_carlo.py']; m.SAMPLES_PER_CASE=50000; m.BATCH_SIZE=5000; raise SystemExit(m.main())"
+
+烟测输出只保留哈希与汇总在报告/验证清单中；临时目录及其结果在执行后自动删除。

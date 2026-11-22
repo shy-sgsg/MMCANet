@@ -1,0 +1,3 @@
+# C1 v2 train/development 数字 PNG 来源交叉核验
+PYTHONPYCACHEPREFIX=/tmp/jdsr_pycache_c1_crosswalk_20261107 python -m py_compile experiments/data_audits/c1_v2_numeric_png_source_crosswalk_20261107_v1/audit_numeric_png_crosswalk.py
+python experiments/data_audits/c1_v2_numeric_png_source_crosswalk_20261107_v1/audit_numeric_png_crosswalk.py

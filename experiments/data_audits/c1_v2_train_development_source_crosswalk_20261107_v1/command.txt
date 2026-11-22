@@ -1,0 +1,13 @@
+# 历史运行命令
+
+本目录已有历史 `results.json`。为保护历史产物，脚本现在会在读取输入前拒绝重复运行。新运行须复制脚本与协议到同级的新唯一目录；不得覆盖本目录结果。
+
+```bash
+PYTHONDONTWRITEBYTECODE=1 python experiments/data_audits/c1_v2_train_development_source_crosswalk_20261107_v1/audit_source_crosswalk.py
+```
+
+# 语法检查命令
+
+```bash
+python -m py_compile experiments/data_audits/c1_v2_train_development_source_crosswalk_20261107_v1/audit_source_crosswalk.py
+```

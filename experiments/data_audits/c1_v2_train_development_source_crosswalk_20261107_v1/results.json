@@ -1,0 +1,46 @@
+{
+  "审计编号": "c1_v2_train_development_source_crosswalk_20261107_v1",
+  "状态": "完成：train/development 元数据交叉核验",
+  "审计范围": "只对 train/development 提取连接字段；其他角色仅读取 role 字段筛除；整份清单只作 SHA-256 完整性核对",
+  "source_manifest_sha256": "6a278e97c161164d9440b5388c5b3fcda87746a56e26adfb7cdf658b94924e57",
+  "C1清单摘要绑定": true,
+  "payload_file_manifest摘要绑定": true,
+  "train": {
+    "C1样本数": 1600,
+    "C1来源组数": 92,
+    "原始路径与payload记录匹配的模态文件数": 3200,
+    "C2派生输入": {
+      "样本数": 1600,
+      "source_group数": 92,
+      "sample_id数": 1600,
+      "source_group_patch键数": 1600,
+      "files_csv_sha256": "97f35201125dcb3830e9d0583d3350159f0d6757056c7acf13c4c1a0910466ad",
+      "来源SHA512连接通过": true
+    }
+  },
+  "development": {
+    "C1样本数": 200,
+    "C1来源组数": 19,
+    "原始路径与payload记录匹配的模态文件数": 400,
+    "C2派生输入": {
+      "样本数": 200,
+      "source_group数": 19,
+      "sample_id数": 200,
+      "source_group_patch键数": 200,
+      "files_csv_sha256": "70d762015b2b16a604d381758091ae3d282526a7137e9de51c6db827b60f2839",
+      "来源SHA512连接通过": true
+    }
+  },
+  "train_development来源组交集": 0,
+  "train_development原始相对路径交集": 0,
+  "train_development派生sample_id交集": 0,
+  "train_development原始模态SHA512交集": 0,
+  "所有预设断言通过": 48739,
+  "项目影像载荷访问": false,
+  "confirmation载荷访问": false,
+  "test载荷访问": false,
+  "模型或checkpoint访问": false,
+  "训练或GPU": false,
+  "本审计读取过的影像像素": false,
+  "data_sar_opt数字文件名逐文件映射": "未核验；本审计只连接冻结 C1 与派生 x2_light 清单"
+}

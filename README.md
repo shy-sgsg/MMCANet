@@ -1,5 +1,8 @@
 # JDSR / MMCANet：SAR 联合去斑与超分辨率
 
+> **当前研究状态（2026-11-22）：** C-Transition 第一阶段审查与 C3-A SAR-only Flow 冻结准备已完成；训练仍按用户要求暂停。详见[准备度审查](docs/research/C_TRANSITION_READINESS_REVIEW.md)和[当前状态](docs/research/CURRENT_STATE.md)。
+
+
 **正式研究总纲：** [v1.8 研究总纲](docs/research/RESEARCH_CHARTER.md)，于 2026-11-09 获用户明确批准。正式题目为“光学先验引导与 SAR 物理一致性约束的生成式联合去斑和超分辨率重建方法研究”。v1.8 增补 SAR 两阶段潜扩散先例，并明确单次生成、像素均值点估计和样本分布是不同评价对象；沿用冻结 C1 v2，不改变历史 gate、数据权限或训练状态。对当前 8-bit PNG 表示域实验，不作未经验证的辐射物理解释。
 
 ## 项目目标

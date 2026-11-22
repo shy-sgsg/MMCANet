@@ -1,0 +1,63 @@
+{
+  "protocol_id": "mmcanet_phase_c1_v2_sen1_2_source_grouped_20261028",
+  "version": "2.0-metadata-frozen",
+  "created_at_utc": "2026-10-28T12:44:18+00:00",
+  "status": "source-group and sample membership frozen at metadata level; image header/representation review pending",
+  "official_roots": [
+    "ROIs1158_spring",
+    "ROIs2017_winter"
+  ],
+  "source_grouping": "one official root plus matching s1_i and s2_i source folders",
+  "source_group_count": 131,
+  "paired_patch_index_count": 142506,
+  "seed": 20261028,
+  "group_assignment_rule": "Within each season root, sort source_group_id by SHA-256(PROTOCOL_ID|group|seed|source_group_id), then assign fixed role counts: spring 49/10/11 and winter 43/9/9 for train/development/confirmation.",
+  "patch_sampling_rule": "Within each assigned group, sort paired patch IDs by SHA-256(PROTOCOL_ID|patch|seed|role|source_group_id|patch_id); select the preallocated 17/18 train, 10/11 development, or 10 confirmation patches per group.",
+  "role_pair_counts": {
+    "train": 1600,
+    "development": 200,
+    "confirmation": 200
+  },
+  "role_source_group_counts": {
+    "train": 92,
+    "development": 19,
+    "confirmation": 20
+  },
+  "season_role_group_counts": {
+    "ROIs1158_spring": {
+      "train": 49,
+      "development": 10,
+      "confirmation": 11
+    },
+    "ROIs2017_winter": {
+      "train": 43,
+      "development": 9,
+      "confirmation": 9
+    }
+  },
+  "role_source_group_target_counts_by_root": {
+    "ROIs1158_spring": {
+      "train": 49,
+      "development": 10,
+      "confirmation": 11
+    },
+    "ROIs2017_winter": {
+      "train": 43,
+      "development": 9,
+      "confirmation": 9
+    }
+  },
+  "required_role_pair_counts": {
+    "train": 1600,
+    "development": 200,
+    "confirmation": 200
+  },
+  "official_checksum_index_sha256": "b371c4e3534660b4d137606f80f2585cbe5159b6266431e88279550a3357878f",
+  "image_payloads_downloaded": false,
+  "image_dimensions_and_dtype_verified": false,
+  "fine_registration_verified": false,
+  "model_selection_authorized": false,
+  "test_set_accessed": false,
+  "test_set_used": false,
+  "historical_b1_gate": "not_promoted / stop_at_b1 (unchanged)"
+}

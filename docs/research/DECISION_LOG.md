@@ -1,5 +1,19 @@
 # 决策记录
 
+## D-2026-11-22-001 — 关闭受限 LMMSE 理论核验并保持 C3-A 待训练
+
+- **问题。** 是否继续扩大随机平移 LMMSE 合成研究，或进入下一轮真实模型实验？
+- **证据。** v1r2 的协议、模型和 runner 哈希与历史 manifest 匹配；30 条件×50,000 样本的临时最小副本 smoke 全部通过 5SE；原测试与边界测试共 18 项通过。C1 v2 的 131 个来源组已全部分配，development 已复用，confirmation 曾被访问后封存。C3-A v1 配置与评价协议仍有效，但 Flow checkpoint 不存在。当前 CUDA 可见，GPU 空闲显存为 1,971 MiB，低于协议 3 GiB 门槛；用户训练暂停仍有效。
+- **决定。** 将理论工作包标记 `THEORY_VERIFIED_WITHIN_ASSUMPTIONS` 并停止扩大纯合成 LMMSE 扫描；训练未获恢复授权时不启动 C3-A。授权恢复并通过 GPU 预检后，优先按原冻结协议运行 SAR-only Flow，结果仅作复用 development 上的探索观察。新独立 development 需未用来源组及可核验身份/必要地理与配准依据；C2/C3-B gate 不变。
+- **范围。** 本轮无训练、推理、confirmation/test 载荷访问或阶段晋级。详细证据见[C-Transition 准备度审查](C_TRANSITION_READINESS_REVIEW.md)和[LMMSE 边界记录](../../experiments/synthetic_cpu/optical_shift_frequency_lmmse_boundary_cpu_20261122_v1/报告.md)。
+
+## D-2026-11-22-002 — 保护 C1 审计结果并标明本地输入依赖
+
+- **问题。** 提交 C1 来源交叉核验材料时，如何避免断链、误称可独立复现及覆盖历史审计产物？
+- **证据。** 交叉核验脚本依赖项目本地的冻结 C1、暂存、payload audit 与 x2_light train/development 元数据；数字 PNG 映射审计还依赖本地历史 `source_hash_matches.csv`。这些受控输入未随本次提交发布。代码审查发现 train/development 脚本原先无条件写入已有 `results.json`；新增测试验证在读取输入前失败。
+- **决定。** 把未提交本地材料改为路径说明并在报告中明确复现依赖；不为复现而提交样本身份清单或影像。交叉核验脚本遇到已有结果即 fail-closed；新审计须使用同级唯一目录。
+- **范围。** 只修改审计说明、结果覆盖保护和单元测试；没有读取或写入 confirmation/test 影像载荷，没有训练、模型评价或 gate 变化。
+
 ## D-2026-11-14-018 — 纯合成核验支持受限 LMMSE 推导，不推进研究 gate
 
 - **问题。** 随机全局高斯平移下，频率分辨光学增量 LMMSE 推导和实现是否与独立数值核对相符？

@@ -1,5 +1,9 @@
 # 光学信息效用分析
 
+## 2026-11-22 LMMSE 边界收尾不构成本地 optical utility
+
+新增复数传递/耦合、零耦合、零/极端平移、近奇异协方差及低高噪声边界回归共 18 项通过；小规模临时副本亦核对了 v1r2 实验输出链。该结论只适用于固定复高斯单频线性模型，状态为 `THEORY_VERIFIED_WITHIN_ASSUMPTIONS`。它不说明本地 optical 是否改善 SAR 重建。真实频率效用须等到未使用、来源可核验且配准依据足够的 development 数据，并与匹配 SAR-only 和错误 optical 控制比较。详见[C-Transition 准备度审查](C_TRANSITION_READINESS_REVIEW.md)与[边界报告](../../experiments/synthetic_cpu/optical_shift_frequency_lmmse_boundary_cpu_20261122_v1/报告.md)。
+
 ## 2026-11-14 随机平移频率分辨 LMMSE 推导的合成数值核验
 
 冻结的纯合成协议在 30 个复高斯单频条件上各采样 500,000 次。经验 SAR-only MSE、联合 MSE 和风险差都满足 5 个 Monte Carlo 标准误界限（最大 3.235）；独立协方差矩阵解与闭式风险一致；各向同性随频率不增、各向异性方向排序均符合预声明规则。两个早期运行版本在汇总字段名上失败，均保留；v1r2 仅修复读取字段并完整通过。此结果验证[既有推导](#frequency-resolved-linear-utility-under-random-residual-translation-2026-10-25)的公式实现，不检验本地图像、H1/H2、配准分布或非线性模型，也不改变 C2/C3 gate。实验全程只用 CPU/NumPy，没有读取任何项目载荷或 confirmation/test。详见 D-2026-11-14-018 与[运行报告](../../experiments/synthetic_cpu/optical_shift_frequency_lmmse_cpu_20261114_v1r2/results/报告.md)。

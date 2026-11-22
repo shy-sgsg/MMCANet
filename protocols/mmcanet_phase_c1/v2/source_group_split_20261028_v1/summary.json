@@ -1,0 +1,38 @@
+{
+  "protocol_id": "mmcanet_phase_c1_v2_sen1_2_source_grouped_20261028",
+  "item_record_export_sha256": "276f54daf079ad8da8a286c99499c4a3b1692a5de9f6b7e0bc2ec1ebcdaeae03",
+  "season_listing_line_counts": {
+    "ROIs1158_spring": 151589,
+    "ROIs2017_winter": 133687
+  },
+  "season_listed_png_counts": {
+    "ROIs1158_spring": 151448,
+    "ROIs2017_winter": 133564
+  },
+  "season_non_png_scene_file_counts": {
+    "ROIs1158_spring": 0,
+    "ROIs2017_winter": 0
+  },
+  "source_group_count": 131,
+  "paired_patch_index_count": 142506,
+  "checksum_index_bytes": 102960516,
+  "checksum_index_rows": 564768,
+  "checksum_index_sha256": "b371c4e3534660b4d137606f80f2585cbe5159b6266431e88279550a3357878f",
+  "exact_duplicate_cross_group_hashes": 0,
+  "historical_b1_exact_hash_overlap_group_count": 0,
+  "split_blockers": [],
+  "group_roles_frozen": true,
+  "sample_counts": {
+    "train": 1600,
+    "development": 200,
+    "confirmation": 200
+  },
+  "source_group_role_counts": {
+    "train": 92,
+    "development": 19,
+    "confirmation": 20
+  },
+  "image_payloads_downloaded": false,
+  "test_set_accessed": false,
+  "test_set_used": false
+}

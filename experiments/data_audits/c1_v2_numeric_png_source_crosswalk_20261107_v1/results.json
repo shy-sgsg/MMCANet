@@ -1,0 +1,23 @@
+{
+  "审计编号": "c1_v2_numeric_png_source_crosswalk_20261107_v1",
+  "状态": "既有精确哈希交叉表未能恢复数字 PNG 映射",
+  "审计范围": "仅连接冻结 C1 train/development 来源 SHA-512 与历史来源哈希表；不读取影像或其他角色路径/哈希",
+  "C1_train_development样本数": {
+    "train": 1600,
+    "development": 200
+  },
+  "C1_train_development来源模态数": 3600,
+  "唯一SHA512命中数": 0,
+  "与C1官方来源路径一致数": 0,
+  "本地数字PNG路径匹配数": 0,
+  "SAR_optical同编号完整配对数": 0,
+  "匹配历史表行数": 0,
+  "多重命中计数": 0,
+  "C1_sample_manifest_SHA256": "6a278e97c161164d9440b5388c5b3fcda87746a56e26adfb7cdf658b94924e57",
+  "历史交叉表_SHA256": "af8f910775e506f0fe1cc63f731c5b70ef842ac229d88d7a28b194b67bd28549",
+  "本地影像载荷访问": false,
+  "confirmation载荷或路径哈希访问": false,
+  "test载荷或结果访问": false,
+  "模型_checkpoint_训练_GPU访问": false,
+  "解释边界": "零精确 SHA-512 命中不证明像素不相同，也不排除重编码后的内容相同；不据此断言数据集身份或地理独立性"
+}

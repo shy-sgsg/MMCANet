@@ -1,5 +1,14 @@
 # 研究风险与证据边界
 
+## 2026-11-22 C-Transition 数据、训练与观测主张阻塞
+
+- **新开发集缺口：** C1 v2 的 131 个来源组已全部分配，既有 development 已重复用于选择；现有目录互斥不证明地理/采集/footprint 独立。数字编号 2k PNG 没有来源 crosswalk。正式 optical 增益与频率迁移仍缺未使用的合格 development 来源组。
+- **训练阻塞：** 用户训练暂停仍有效。GPU 可见且 CUDA 可用，但快照空闲显存 1,971 MiB、利用率 98%，低于冻结 C3-A 的 3 GiB 门槛；不得据 CUDA 可用自行训练。
+- **物理表示：** C3-A target 是 8-bit normalized noisy pseudo-target，没有定标幅度/强度/功率及经核验成像模型；不可据该数据宣称真实 speckle 或 SAR 物理一致性。
+- **评价覆盖：** 冻结 C3-A v3 不含 TBR、亮区 MAE、前向观测残差；不可将这些指标说成已完成，也不可追溯改协议。需另版方案且满足数据资格后才可实施。
+
+具体证据与最小解锁条件见[C-Transition 准备度审查](C_TRANSITION_READINESS_REVIEW.md)。
+
 ## 2026-11-14 频率分辨 LMMSE 数值核验仍有显著表示域外推风险
 
 纯合成复高斯单频实验验证了闭式风险差实现与频率趋势，但不包含图像空间结构、真实光学–SAR 跨模态关系、局部形变、乘性 speckle 或网络训练。理想化模型中的“高频/高位移方差→较低线性增益”只能作为可检验假设，不能解释为真实数据配准规律或光学效用证据。继续真实数据 screen 前仍需核验来源/配准依据并预先冻结合格 split。见 D-2026-11-14-018 与[核验报告](../../experiments/synthetic_cpu/optical_shift_frequency_lmmse_cpu_20261114_v1r2/results/报告.md)。

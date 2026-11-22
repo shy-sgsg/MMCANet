@@ -1,0 +1,5 @@
+C1 train/development 来源交叉核验：1,600/200 对，92/19 个来源组
+派生 x2_light group/patch 与 SAR/optical 来源 SHA-512：全部匹配
+原始路径父目录、唯一性、角色互斥与清单 SHA-256：通过
+train/development 来源组、原始路径、sample_id 与来源 SHA-512 交集：均为 0
+自动断言：48739 条通过；仅读 CSV/JSON 元数据，无影像、confirmation/test、checkpoint、训练或 GPU 访问。

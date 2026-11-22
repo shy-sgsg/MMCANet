@@ -1,5 +1,9 @@
 # 研究假设
 
+## 2026-11-22 理论边界核验不更新 H1–H6
+
+LMMSE 复杂系数、退化边界和协方差求解回归通过，且 v1r2 小规模软件 smoke 通过；这只核对受限公式及实现。未使用 SAR/optical 项目图像、checkpoint 或训练，故不支持或反证 optical 增量、生成方法效用、观测一致性、可靠性回退及联合/级联比较。H1–H6、C2/C3 gate 均保持原状态。详见[LMMSE 边界记录](../../experiments/synthetic_cpu/optical_shift_frequency_lmmse_boundary_cpu_20261122_v1/报告.md)和[C-Transition 准备度审查](C_TRANSITION_READINESS_REVIEW.md)。
+
 ## 2026-11-14 频率分辨平移模型的合成核验不更新 H1–H6
 
 30 条件、1,500 万样本的复高斯单频实验支持随机高斯全局平移下的解析 LMMSE 风险差实现及预登记频率趋势，仅适用于该模型。未使用 SAR/optical 项目数据或网络，故不支持或反证 optical 增量、生成模型效用、观测一致性、可靠性回退或联合/级联比较；H1–H6、C2/C3 gate 与训练状态不变。详见 D-2026-11-14-018 和[核验报告](../../experiments/synthetic_cpu/optical_shift_frequency_lmmse_cpu_20261114_v1r2/results/报告.md)。

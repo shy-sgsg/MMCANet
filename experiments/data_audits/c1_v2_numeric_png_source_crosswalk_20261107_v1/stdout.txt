@@ -1,0 +1,7 @@
+C1 v2 train/development 数字 PNG 来源交叉核验
+允许角色样本：训练 1600 对，开发 200 对；共 3600 个来源模态。
+既有 SHA-512 表命中 0 行；唯一连接 0 个模态；上游来源路径一致 0 个。
+可恢复的数字 PNG 路径 0 个；SAR/optical 同编号完整配对 0/1800 对。
+结论：这份历史精确字节哈希表不能恢复 C1 v2 train/development 到本地数字 PNG 名称的映射。
+本次只读取 CSV/JSON 元数据；未打开图像、数组、checkpoint、confirmation/test 载荷；未训练或使用 GPU。
+零命中不等于像素不同，也不排除文件重编码；不改变数据来源或阶段 gate 判断。
