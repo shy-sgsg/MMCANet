@@ -1,8 +1,8 @@
-# C-Transition 第一阶段准备度审查（2026-11-22）
+# C-Transition 第一阶段理论、数据与 C3-A 结果审查（2026-11-23）
 
 ## 结论
 
-第一阶段的理论收尾、C1/C3-A 状态审计和下一轮实验准备已完成。下一项模型实验仍是按冻结协议运行 C3-A SAR-only Flow；它只支持复用 development 集上的探索性比较。训练暂停仍有效，且本次 GPU 快照低于协议要求的空闲显存，因此没有启动训练。建立新的独立 development 集也受数据来源阻塞。本文记录的是准备审查，不代表模型训练或真实模型评价已经完成。
+第一阶段的 LMMSE 理论边界核验已完成，C3-A SAR-only Flow 的冻结训练、development 推理、多样本评价与 Research Decision Review 也已结束。Flow 未达到冻结的追加第二 seed 条件，当前像素域配置停止；结果仅是被重复使用的 development 集上的探索性观察。新的独立 development 集仍受数据来源阻塞，因此不进入 Optical 条件 C3-B。训练按用户明确授权覆盖 3 GiB 空闲显存预检运行；C3-A 协议文件未修改，资源例外在 run manifest 中披露，全程没有 OOM。
 
 ## 1. LMMSE 理论工作包
 
@@ -55,7 +55,7 @@
 
 该数据阻塞影响正式泛化、C3-B optical 晋级和真实频率效用主张；它不自动取消 C3-A v1 已冻结的探索筛选协议。
 
-## 3. C3-A SAR-only Flow 冻结训练准备
+## 3. C3-A SAR-only Flow 冻结训练与运行复核
 
 继续复用 [C3-A SAR-only Flow v1 协议](../../protocols/mmcanet_phase_c3a/sar_only_flow_c1_v2_20261105_v1.json)，不创建重复模型，也不改历史配置：
 
@@ -69,19 +69,19 @@
 | 选轮 | 按来源组等权 development PSNR 最大化，平局选较早 epoch |
 | 继续条件 | 只有来源组等权配对 ΔPSNR ≥ `+0.05 dB`、组级 bootstrap 95% CI 下界 > 0、平均 ΔSSIM ≥ 0，才值得另做第二 seed；此条件不是晋级 gate |
 | 资源门槛 | CUDA；至少 3 GiB 空闲显存；不得有并行 GPU 训练 |
-| 运行目录 | `experiments/phase_c3a_sar_only_flow_c1_v2_20261105_v1`；只能新建唯一输出，不覆盖已有结果 |
+| 运行目录 | `experiments/phase_c3a_sar_only_flow_c1_v2_20261105_v1_attempt2_20261123`；独立唯一输出，没有覆盖既有结果 |
 
-检查点状态：该 C3-A 运行目录和有效 `best.pt` 当前不存在；既有确定性 SAR-only baseline `experiments/phase_c2_c1_v2_20261031_v1/matrix/runs/x2_light__sar_only/checkpoints/best.pt` 存在，SHA-256 为 `8255b5229ca1e041cb59aed582d794bb67afdbe1601b6f4dc425c43ce27f7165`。本准备度审查的初次状态检查只读取该固定 baseline 文件的大小和 SHA-256；随后独立的 CPU 合同核验加载了 checkpoint，并由匹配模型配置以 `strict=True` 成功加载，详见[C3-A 基线 checkpoint 合同核验](../../experiments/code_audits/c3a_baseline_checkpoint_contract_20261122_v1/报告.md)。训练入口的协议/hash/preflight/resume 契约已按当前工作区代码和定向测试审查；现有工作区中的 C3-A 相关 CPU 定向测试 **82 项通过**，未读取项目图像。这些 C3-A 实现和测试改动在本任务开始前已存在，本次提交不包含它们；该回归结果针对当时的工作区快照，不是本次提交单独可复现的测试集。
+运行目录现已包含完整训练日志、`last`/`best` checkpoint、环境、恢复历史和结果 manifest。训练在前次 checkpoint 加载遇到 PyTorch `UnpicklingError` 后，从已记录的 `last.pt` 正常续跑；该失败不是 CUDA OOM，失败日志与 SHA-256 均保留。C3-A v1 的确定性 SAR-only baseline `experiments/phase_c2_c1_v2_20261031_v1/matrix/runs/x2_light__sar_only/checkpoints/best.pt` SHA-256 为 `8255b5229ca1e041cb59aed582d794bb67afdbe1601b6f4dc425c43ce27f7165`。
 
 ### 训练与评价当前状态
 
-用户此前要求暂缓训练，授权并未恢复。本轮提权只读设备查询为：NVIDIA GeForce RTX 3050 Laptop GPU、驱动 `580.178.04`、PyTorch `2.8.0+cu128`、CUDA `12.8`、`torch.cuda.is_available=True`、1 张卡；采样时总显存 4,096 MiB、空闲 1,971 MiB、利用率 98%，有三个进程占用。它证明 CUDA 可见可用，但不满足 C3-A 的 3 GiB 空闲及无并发计算要求。没有启动训练、等待器、模型推理或项目 GPU 计算。
+用户授权在已运行的 CUDA 评价任务旁启动 C3-A，并以 OOM 为停止边界。run manifest 记录的空闲显存依次为 2,946,433,024、2,624,978,944 和 2,630,483,968 字节（约 2.74、2.44、2.45 GiB），低于协议 3 GiB 资源预检值；协议 JSON 保持原样，运行命令使用显式授权覆盖参数。外部 PID `589855` 为用户确认的评价任务。C3-A 训练于 2026-11-23 完成 5 轮，记录运行时间 1,663.71 秒，峰值已分配 GPU 显存 189,086,208 字节；未发生 OOM。
 
-正式恢复训练仍需要用户明确解除暂停，并在启动前重新满足冻结资源门槛。资源满足也不替代用户训练授权。
+按冻结验证规则选择 epoch 2。Flow 相对确定性 SAR-only baseline 的来源组配对 ΔPSNR 为 −3.0724 dB（95% CI [−3.4720, −2.6922]），ΔSSIM 为 −0.17818（[−0.20823, −0.15062]）；多样本 v3 的 ΔEPI 为 −0.16871（[−0.18814, −0.14697]）。冻结的第二 seed 条件未满足，停止当前配置且不追加 seed。完整解释见[Research Decision Review](C3-A%20SAR-only%20Flow%20决策复核_20261123.md)。
 
 ## 4. C3-A 评价方案与缺口
 
-保留 [多样本稳定性 v3](../../protocols/mmcanet_phase_c3a/multi_sample_stability_c1_v2_20261105_v3.json) 和 [样本集合补充 v3](../../protocols/mmcanet_phase_c3a/sample_set_evaluation_c1_v2_20261114_v3.json)：在有效 C3-A best checkpoint 生成后，仅评价 200 个 development 身份/19 组；每身份 4 个 draw，seed `20261105`，8 步 Heun；使用身份内配对、来源组级 10,000 次 bootstrap（seed `20261106`）。报告单次 draw 的 PSNR/SSIM/EPI/边缘强度比/裁剪比例、采样稳定性、像素均值点估计及协议 v3 定义的 Energy/variogram plugin 与 IID fair 评分；不选 checkpoint、不改 gate。对应输出分别为 `experiments/diagnostics/c3a_multi_sample_eval_c1_v2_20261105_v3` 和 `experiments/diagnostics/c3a_sample_set_evaluation_c1_v2_20261114_v3`。
+按 [多样本稳定性 v3](../../protocols/mmcanet_phase_c3a/multi_sample_stability_c1_v2_20261105_v3.json) 和 [样本集合补充 v3](../../protocols/mmcanet_phase_c3a/sample_set_evaluation_c1_v2_20261114_v3.json)，仅评价了 200 个 development 身份/19 组；每身份 4 个 draw，seed `20261105`，8 步 Heun；身份内配对、来源组级 10,000 次 bootstrap（seed `20261106`）。已报告单次 draw 的 PSNR/SSIM/EPI/边缘强度比/裁剪比例、采样稳定性、像素均值点估计及 Energy/variogram plugin 与 IID fair 评分，没有用这些结果选 checkpoint 或修改 gate。结果见 `experiments/diagnostics/c3a_multi_sample_eval_c1_v2_20261105_v3_attempt2_20261123` 与 `experiments/diagnostics/c3a_sample_set_evaluation_c1_v2_20261114_v3`。四 draw Flow 推理耗时 458.28 秒，基线 4.60 秒；详细性能、亮值代理及样本归档结果见 Research Decision Review。
 
 现有协议未覆盖 TBR、亮区 MAE 和前向观测残差。不得把它们写成已完成指标，也不追溯改写冻结 v3。若未来研究问题确需这些指标，应在有资格的数据和训练/评价授权下另立版本化协议；对当前 8-bit 表示域，残差只能称表示域一致性诊断，不能称辐射物理一致性。
 
@@ -102,14 +102,13 @@
 
 ## 7. SAR 物理一致性边界
 
-当前固定输入是归一化 8-bit 表示域 PNG，训练 target 是 noisy pseudo-target；未找到可用于本阶段的原始定标幅度/强度/功率与已验证成像观测模型。因此不能宣称真实 Gamma speckle、辐射一致性或真实传感器物理一致性。任何后续前向残差须先明确作用域、退化链和测量域；当前可说的是受控表示域一致性，且尚未在真实 C3-A checkpoint 上评价。
+当前固定输入是归一化 8-bit 表示域 PNG，训练 target 是 noisy pseudo-target；未找到可用于本阶段的原始定标幅度/强度/功率与已验证成像观测模型。因此不能宣称真实 Gamma speckle、辐射一致性或真实传感器物理一致性。C3-A checkpoint 已完成表示域生成与评价，但没有计算或验证前向观测残差；后续残差须先明确作用域、退化链和测量域。
 
 ## 8. 阶段决策与解锁顺序
 
 1. 保留 `THEORY_VERIFIED_WITHIN_ASSUMPTIONS`；停止扩大纯合成 LMMSE 扫描。
-2. 用户恢复训练后，优先按原冻结协议完成一个 C3-A SAR-only Flow 筛选，再执行原定 C3-A v3 描述性评价；训练结果只能解释为复用 development 上的探索性观察。
-3. 只有满足协议继续条件，才按单独冻结协议做第二 seed；不得因结果不理想而修改原 gate。
-4. 新独立 development 是正式 optical 增益、频率迁移和泛化主张的必要数据解锁；当前没有可用的未分配来源组。
-5. C2/C3-B 的已有门槛保持不变；本报告和理论核验不晋级任何阶段。
+2. C3-A v1 训练和 v3 评价已完成；当前像素域 SAR-only Flow 未达到第二 seed 条件，按冻结停止规则结束。
+3. C1 v2 的 131 个来源组均已分配，现有 development 已重复用于选择，confirmation 已封存；先取得有可核验身份、来源组和配准依据的新 development，才重新讨论 Optical 效用和 C3-B。
+4. C2 v2 gate 仍为 `unjudged`；本轮 C3-A 结果不回答 Optical 增量，也不晋级 C2 或 C3-B。
 
-本轮在项目盘仅剩约 11 GiB 时未生成大文件；临时 smoke 输出已自动清理。未读取 confirmation/test 影像载荷或测试测量，未加载任何 checkpoint，也未读取项目图像。
+本次 C3-A 仅读取 train 与 development 的 SAR LR 和 noisy pseudo-target；未读取 Optical、confirmation 或 test 影像载荷/测量。训练与评价加载了运行 checkpoint 和确定性 baseline checkpoint。训练期间未发生 OOM。
