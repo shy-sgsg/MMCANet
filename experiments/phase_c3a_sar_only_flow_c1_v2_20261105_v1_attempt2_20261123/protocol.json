@@ -1,0 +1,92 @@
+{
+  "format": "mmcanet_c3a_sar_only_flow_protocol_v1",
+  "protocol_id": "mmcanet_c3a_sar_only_flow_c1_v2_20261105_v1",
+  "status": "pre_registered_exploratory",
+  "title_zh": "C1 v2 train/development 上的 SAR-only 条件流匹配方法筛选",
+  "objective_zh": "检验像素域条件流匹配能否在固定 SAR 低分辨率输入下拟合 C2 x2_light 的 noisy pseudo-target，并与既有 SAR-only 确定性基线作同身份开发集比较。该筛选不晋级 C2/B1 门槛，也不构成生成质量或物理一致性主张。",
+  "split": {
+    "source_manifest_path": "protocols/mmcanet_phase_c1/v2/source_group_split_20261028_v1/sample_manifest.csv",
+    "source_manifest_sha256": "6a278e97c161164d9440b5388c5b3fcda87746a56e26adfb7cdf658b94924e57",
+    "train": {"sample_count": 1600, "source_group_count": 92, "use": "梯度训练"},
+    "development": {"sample_count": 200, "source_group_count": 19, "use": "逐轮评价、选最佳轮次和配对描述性比较"},
+    "confirmation": {"sample_count": 200, "source_group_count": 20, "use": "禁止读取影像载荷；不训练、不调参、不筛选模型"},
+    "test_set_accessed": false,
+    "test_set_used": false,
+    "confirmation_payload_accessed": false
+  },
+  "data": {
+    "fixed_input_root": "data/derived/c2_fixed_inputs_c1_v2_20261031_v1/x2_light",
+    "condition_id": "x2_light",
+    "sar_input": "冻结 C2 x2_light SAR LR 张量 [1,128,128]；不读取 optical 张量",
+    "target": "冻结 C2 x2_light noisy pseudo-target [1,256,256]",
+    "representation_domain": "源数据 8-bit PNG 经 log1p(20*x)/log1p(20) 的归一化表示域；不是定标幅度/强度/功率",
+    "degradation": "FFT 窗口 129、双线性降采样、表示域 Gamma(shape=8, rate=8) 乘性噪声；完全沿用固定数组，不重新采样或退化",
+    "condition_upsampling": "双线性插值至 256×256，align_corners=false"
+  },
+  "method": {
+    "family": "像素域 SAR-only 条件 Rectified Flow Matching",
+    "optical_input": false,
+    "model": {"architecture": "两层下采样的紧凑时间条件 U-Net", "base_channels": 16, "time_dimension": 64},
+    "source_distribution": "x0 = bilinear(SAR_LR) + 0.1 * epsilon，epsilon ~ N(0,I)",
+    "noise_sigma": 0.1,
+    "interpolation": "t ~ Uniform(0,1), x_t=(1-t)*x0+t*target, u=target-x0",
+    "objective": "未加权 velocity mean-squared error",
+    "sampler": "固定每个 sample_id 的高斯源噪声，8 步 Heun ODE 积分；积分途中不裁剪，最终为指标计算裁剪到 [0,1] 并记录裁剪比例",
+    "sampler_steps": 8,
+    "sampler_function_evaluations": 16,
+    "sampling_rule": "噪声种子由 run seed 与 sample_id 的 SHA-256 确定；每个开发样本只生成一个固定样本",
+    "prior_art_boundary": "输入中心化流源分布已有自然图像超分辨率先例；本实验检验 SAR 表示域可行性，不主张通用条件流或输入中心化设计的新颖性",
+    "prior_art_sources": [
+      {
+        "title": "RFMSR: Residual Flow Matching for Image Super-Resolution",
+        "url": "https://arxiv.org/abs/2607.12753",
+        "relevance_zh": "自然图像超分中使用以 LQ latent 为中心的 source distribution；不验证 SAR 去斑或光学引导 JDSR。"
+      }
+    ]
+  },
+  "training": {
+    "seed": 20261105,
+    "epochs": 5,
+    "batch_size": 4,
+    "optimizer": "Adam",
+    "learning_rate": 0.0001,
+    "weight_decay": 0.0,
+    "betas": [0.9, 0.999],
+    "schedule": "固定学习率",
+    "augmentation": "无",
+    "random_crops": false,
+    "mixed_precision": false,
+    "num_workers": 0,
+    "drop_last": false,
+    "sample_order": "逐轮由 CPU generator(seed+1) 确定性置乱",
+    "deterministic_algorithms": true,
+    "checkpoint_metric": "按来源组等权的开发集逐图 PSNR 均值",
+    "checkpoint_direction": "maximize",
+    "checkpoint_tie_break": "较早轮次"
+  },
+  "resources": {
+    "required_device": "CUDA GPU",
+    "minimum_free_memory_gib": 3,
+    "concurrent_gpu_training": false
+  },
+  "comparison": {
+    "baseline_run": "experiments/phase_c2_c1_v2_20261031_v1/matrix/runs/x2_light__sar_only",
+    "baseline_checkpoint": "best.pt",
+    "baseline_checkpoint_sha256": "8255b5229ca1e041cb59aed582d794bb67afdbe1601b6f4dc425c43ce27f7165",
+    "paired_identity_key": "sample_id；必须匹配 source_group_id 与 patch_id",
+    "primary_effect": "逐图 PSNR 的差值先在来源组内平均，再对 19 个来源组等权平均",
+    "uncertainty": "以来源组为重采样单位的 paired bootstrap 95% 区间",
+    "exploration_continuation_minimum_delta_psnr_db": 0.05,
+    "exploration_continuation_ci_lower_minimum": 0.0,
+    "exploration_continuation_minimum_delta_ssim": 0.0,
+    "exploration_continuation_rule": "只有当开发集来源组等权配对 ΔPSNR 至少 +0.05 dB、来源组 bootstrap 95% 区间下界大于 0，且配对 ΔSSIM 的来源组均值不低于 0，才值得追加第二 seed 的 SAR-only flow 筛选；这不是晋级门槛或独立泛化证据"
+  },
+  "limitations_zh": [
+    "C1 v2 的文件夹来源组互斥不证明地理或采集独立；精细空间重叠未知。",
+    "development 已用于 C2 选模，也将用于本次选模；所有比较均为复用开发集上的探索性观察。",
+    "训练目标是 noisy pseudo-target，PSNR/SSIM 表示与伪目标的一致程度，不等同于干净 SAR 恢复质量。",
+    "单 seed、单固定噪声样本和 5 轮预算不能支持稳定性、真实性或论文贡献主张。",
+    "GPU 被其他任务占用时不得启动训练；执行器在显存预检不足时必须失败退出。"
+  ],
+  "created_utc": "2026-11-04T18:23:14Z"
+}

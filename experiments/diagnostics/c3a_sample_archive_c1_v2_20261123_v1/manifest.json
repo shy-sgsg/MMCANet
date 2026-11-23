@@ -1,0 +1,94 @@
+{
+  "format": "c3a_development_sample_archive_v1",
+  "sample_count": 200,
+  "source_group_count": 19,
+  "draws_per_identity": 4,
+  "样本数": 200,
+  "来源组数": 19,
+  "每身份 Flow draw 数": 4,
+  "generated_draw_count": 800,
+  "亮值代理定义": "每身份 noisy pseudo-target 第 99 百分位阈值，含并列像素；归一化表示域描述，不作物理散射体解释。",
+  "选择或阶段 gate 改变": false,
+  "confirmation_payload_accessed": false,
+  "test_set_accessed": false,
+  "test_set_used": false,
+  "optical_payload_read": false,
+  "metadata": {
+    "training_protocol_sha256": "147c361b3e91bc4cd8d76ce5c464ad9d2137f2d06b38f31a0bc7c7a7e93101a7",
+    "evaluation_protocol_sha256": "ee83e2cb4dadea7d4fca6576e479d2922d70df44935f1be51116add26e06016c",
+    "archive_protocol_sha256": "6f89982a1865e8eb28a9e86f7bc73d9a751365ef8d1bf10be91b6a40f00fe69b",
+    "source_manifest_sha256": "6a278e97c161164d9440b5388c5b3fcda87746a56e26adfb7cdf658b94924e57",
+    "development_input_manifest_sha256": "de3101a78105c05653b9779342cabe98d61a9cddac6153b25a7d6347d0ef0da9",
+    "development_input_files_csv_sha256": "70d762015b2b16a604d381758091ae3d282526a7137e9de51c6db827b60f2839",
+    "flow_checkpoint_sha256": "c2cbc043542cd1d2e15f332a28761f5458ebcfa8b95603e40250d66d25dee399",
+    "baseline_checkpoint_sha256": "8255b5229ca1e041cb59aed582d794bb67afdbe1601b6f4dc425c43ce27f7165",
+    "evaluation_code_sha256": {
+      "scripts/evaluate_c3a_multisample.py": "bbfd36dc9ff7697625928fb52251d73782e5658ab9843aebb69cdfda54a1036c",
+      "scripts/run_phase_c3a_sar_flow.py": "72955eea752ca29c31aafecde64ec0962300cfddc5479d710f52d56823602b4e",
+      "MMCANetV2/phase_c3a_flow.py": "ca6652920f3763688a4c9442a4f4efcef4828925daaefd1aaeed1cd78b8078a4",
+      "MMCANetV2/phase_c2_data.py": "ba36442ddd66916a1dae68ef815374e3737409b5eb3cbe3be53d26bfbfd1b579",
+      "MMCANetV2/phase_c2_runner.py": "849b8a826afc2d0269a27c18ebb97e692899a248371915cb1f3da435870176b7",
+      "MMCANetV2/phase_c2_matched.py": "1bdf28e9c99c6080368049ddf8c35b89e46b4a6240151fba66461c400514780b",
+      "JointJDSR/model.py": "1a0ac45e8251db0331d2f9145bc545694c9a6c9cb8ff45712575c24c8a195796",
+      "MMCANetV2/phase_c3a_metrics.py": "705cf8beee63f8d1ee2b949be1e2a223bd8dc6dc5dc27a4b8711e48ae3b70ee7",
+      "MMCANetV2/phase_c3a_archive.py": "1a635e79ceced19bfebddf442d58c2d259c0133759a896c7b9db558754fc8876",
+      "scripts/training_resume.py": "d732e3db8cac88109624dec2b4a2afcb70f615e4900eaa5e25044c078e96dbe9"
+    },
+    "training_run": "experiments/phase_c3a_sar_only_flow_c1_v2_20261105_v1_attempt2_20261123",
+    "seed": 20261105,
+    "noise_seed_rule": "沿用冻结 C3-A v3：SHA-256(seed NUL sample_id NUL draw_index)，取摘要前 8 字节并映射为 torch.Generator seed。",
+    "sampler_steps": 8,
+    "flow_runtime_seconds": 458.2782046460052,
+    "baseline_runtime_seconds": 4.59888243599562,
+    "flow_peak_gpu_memory_allocated_bytes": 189401088,
+    "baseline_peak_gpu_memory_allocated_bytes": 85587456,
+    "gpu_free_memory_before_evaluation_bytes": 3037331456,
+    "gpu_total_memory_bytes": 3942383616,
+    "resource_preflight": {
+      "protocol_resource_requirements": {
+        "required_device": "CUDA GPU",
+        "minimum_free_memory_gib": 3,
+        "concurrent_gpu_training": false,
+        "batch_size": 4,
+        "num_workers": 0
+      },
+      "observed_cuda_compute_processes": [
+        {
+          "pid": 44415,
+          "process_name": "nautilus"
+        },
+        {
+          "pid": 61699,
+          "process_name": "resources"
+        },
+        {
+          "pid": 589855,
+          "process_name": "python3.13"
+        },
+        {
+          "pid": 686785,
+          "process_name": "python"
+        }
+      ],
+      "process_query_error": null,
+      "user_authorized_override": true,
+      "authorization_date": "2026-11-23",
+      "authorization_zh": "用户明确授权在其评价任务并行运行，并忽略冻结协议的 3 GiB 显存预检；以 CUDA OOM 作为停止边界。"
+    },
+    "device": "cuda:0",
+    "confirmation_payload_accessed": false,
+    "test_set_accessed": false,
+    "test_set_used": false,
+    "optical_payload_read": false
+  },
+  "bootstrap_seed": 20261106,
+  "bootstrap_repeats": 10000,
+  "files_sha256": {
+    "generated_samples.npz": "ac9efa0c09ba6b51ec63a67b42a2745a3b8fd5d180debeb70195f7c0dfd9f018",
+    "bright_proxy_per_draw.csv": "37f96adbe09ce9c1e31bd06907f53191cbf154659c346a6a6ffda2fedacfb8c7",
+    "bright_proxy_source_group_summary.csv": "b2ca543e8c38c7b95832c3cb72bb172e1fcdc57cd794c4070cc79afa188d6692",
+    "bright_proxy_group_bootstrap.json": "6ca7cd1845a37a403bc6630ec54f60f4121a642cde89bcd890f87ef54d9c8c74",
+    "runtime.json": "edb8124cce9334750b575c7029e4a707ed531e4dd650659530f6e43d1a7108fb"
+  },
+  "archive_sha256": "ac9efa0c09ba6b51ec63a67b42a2745a3b8fd5d180debeb70195f7c0dfd9f018"
+}

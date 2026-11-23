@@ -1,0 +1,2 @@
+C3-A 多次生成评分命令：
+/home/shy/anaconda3/envs/AISAR/bin/python /tmp/jdsr-c3a-20261123/scripts/evaluate_c3a_sample_set_supplement.py --training-run-dir /tmp/jdsr-c3a-20261123/experiments/phase_c3a_sar_only_flow_c1_v2_20261105_v1_attempt2_20261123 --output-dir experiments/diagnostics/c3a_sample_set_evaluation_c1_v2_20261114_v3 --user-authorized-resource-override --allow-compatible-run-location

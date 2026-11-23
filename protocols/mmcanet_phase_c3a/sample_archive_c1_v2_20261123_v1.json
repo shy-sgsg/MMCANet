@@ -1,0 +1,99 @@
+{
+  "format": "c3a_development_sample_archive_protocol_v1",
+  "protocol_id": "c3a_development_sample_archive_c1_v2_20261123_v1",
+  "status": "C3-A v1/v3 的附属描述性归档；不改变训练、评价、选模或晋级门槛",
+  "training_protocol": {
+    "path": "protocols/mmcanet_phase_c3a/sar_only_flow_c1_v2_20261105_v1.json",
+    "sha256": "147c361b3e91bc4cd8d76ce5c464ad9d2137f2d06b38f31a0bc7c7a7e93101a7"
+  },
+  "evaluation_protocol": {
+    "path": "protocols/mmcanet_phase_c3a/multi_sample_stability_c1_v2_20261105_v3.json",
+    "sha256": "ee83e2cb4dadea7d4fca6576e479d2922d70df44935f1be51116add26e06016c"
+  },
+  "data": {
+    "source_manifest_path": "protocols/mmcanet_phase_c1/v2/source_group_split_20261028_v1/sample_manifest.csv",
+    "source_manifest_sha256": "6a278e97c161164d9440b5388c5b3fcda87746a56e26adfb7cdf658b94924e57",
+    "role": "development",
+    "sample_count": 200,
+    "source_group_count": 19,
+    "payload_arrays_read": [
+      "lr",
+      "target"
+    ],
+    "optical_payload_read": false,
+    "confirmation_payload_accessed": false,
+    "test_set_accessed": false,
+    "test_set_used": false
+  },
+  "sampling": {
+    "draws_per_identity": 4,
+    "draw_indices": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "seed": 20261105,
+    "seed_rule": "沿用冻结 C3-A v3：SHA-256(seed NUL sample_id NUL draw_index)，取摘要前 8 字节并映射为 torch.Generator seed。",
+    "sampler": "沿用冻结 C3-A v1 的 8 步 Heun ODE，每步两次速度场评估；积分途中不裁剪。"
+  },
+  "archive": {
+    "arrays": {
+      "flow_raw": "[200,4,1,256,256] float32；最终裁剪前",
+      "flow_clipped": "[200,4,1,256,256] float32；按 [0,1] 裁剪",
+      "baseline_raw": "[200,1,256,256] float32",
+      "baseline_clipped": "[200,1,256,256] float32；按 [0,1] 裁剪",
+      "identity_metadata": [
+        "sample_id",
+        "source_group_id",
+        "patch_id",
+        "draw_index"
+      ]
+    },
+    "format": "压缩 NPZ；每个样本和来源组身份与 C1 v2 development 清单一致",
+    "target_payload_copied": false,
+    "overwrite_existing_directory": false
+  },
+  "bright_value_proxy": {
+    "target": "对应身份冻结 noisy pseudo-target；归一化 8-bit 表示域",
+    "quantile": 0.99,
+    "quantile_method": "linear",
+    "ties": "阈值并列像素全部纳入",
+    "metrics": [
+      "高值区域绝对误差",
+      "高值区域均值比",
+      "高值区域峰值比",
+      "高值饱和比例"
+    ],
+    "interpretation": "表示域高值目标保真代理，不代表定标 SAR 散射体保持或物理辐射一致性。"
+  },
+  "statistics": {
+    "identity_aggregation": "Flow 的四个 draw 先在身份内求均值；baseline 每身份一个确定性预测。",
+    "source_group_aggregation": "身份先在来源组内平均，19 个来源组等权。",
+    "paired_bootstrap": {
+      "unit": "来源组",
+      "repeats": 10000,
+      "seed": 20261106,
+      "comparison": "Flow 减确定性 SAR-only 基线；所有指标只作描述。"
+    }
+  },
+  "selection_or_gate_change": false,
+  "outputs": {
+    "directory": "experiments/diagnostics/c3a_sample_archive_c1_v2_20261123_v1",
+    "files": [
+      "manifest.json",
+      "generated_samples.npz",
+      "bright_proxy_per_draw.csv",
+      "bright_proxy_source_group_summary.csv",
+      "bright_proxy_group_bootstrap.json",
+      "runtime.json"
+    ]
+  },
+  "prohibited": {
+    "checkpoint_reselection": true,
+    "threshold_tuning": true,
+    "stage_promotion": true,
+    "c3b_training": true,
+    "test_or_confirmation_payload": true
+  }
+}

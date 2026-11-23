@@ -1,5 +1,14 @@
 # 实验登记
 
+## C3-A GPU 启动前置核验历史记录（2026-11-23）
+
+以下记录描述用户资源豁免前的一次预检，不代表当前实验状态。随后按用户明确授权完成的训练与评价见本登记中的“C3-A SAR-only Flow 单 seed 训练与评价已完成”及 [研究决策复核](C3-A%20SAR-only%20Flow%20决策复核_20261123.md)。
+
+- **编号：** `c3a_gpu_preflight_20261123_v1`；[核验报告](../../experiments/diagnostics/c3a_gpu_preflight_20261123_v1/报告.md)。
+- **核验：** 训练授权已恢复；C3-A v1/v3 与 train/development 输入合同、baseline checkpoint 哈希和结构匹配。隔离 worktree 补齐运行所需依赖、指标和样本归档代码；定向回归 95 项通过。
+- **资源与结果：** 14:24 第 49 次预检重新发现 AISAR Python PID `589855`（166 MiB）；`nvidia-smi` 快照空闲 2,977 MiB（2.91 GiB）、利用率 73%。同时违反进程空闲和 3 GiB 显存条件，运行器在读取影像前返回，未建正式运行目录。
+- **边界：** 未训练、推理或计算图像指标；CPU 前置完整性核验只读取 train/development 的 SAR LR 与 noisy pseudo-target。GPU 入口拒绝启动时未再次读取影像；未访问 optical/confirmation/test。此项只记录运行资格阻塞，不是模型实验结果、不改变 gate。
+
 ## C3-A 基线 checkpoint 合同 CPU 核验（2026-11-22）
 
 - **编号：** `c3a_baseline_checkpoint_contract_20261122_v1`；[报告](../../experiments/code_audits/c3a_baseline_checkpoint_contract_20261122_v1/报告.md)、[验证清单](../../experiments/code_audits/c3a_baseline_checkpoint_contract_20261122_v1/验证清单.json)。
@@ -2784,3 +2793,14 @@ OpenAlex reports the IOP PDF as the only location and no repository full text, t
 - **解释边界：** 元数据交叉连接，不是本轮重读 PNG 后的哈希复算；不证明地理/采集独立或数据集/传感器属性，也没有把本地 `data/sar`、`data/opt` 数字文件名逐一映射到原始目录。不得读取未知角色载荷补齐映射。
 - **产物：** [审计报告](../../experiments/data_audits/c1_v2_train_development_source_crosswalk_20261107_v1/report.md)、[协议](../../experiments/data_audits/c1_v2_train_development_source_crosswalk_20261107_v1/protocol.md)、[脚本](../../experiments/data_audits/c1_v2_train_development_source_crosswalk_20261107_v1/audit_source_crosswalk.py)、[结果](../../experiments/data_audits/c1_v2_train_development_source_crosswalk_20261107_v1/results.json)、[清单](../../experiments/data_audits/c1_v2_train_development_source_crosswalk_20261107_v1/manifest.json)。
 - **隔离：** 本次只访问 split/哈希元数据，未打开图像、数组、checkpoint 或 confirmation/test 载荷；无训练/GPU，C1–C6 gate 不变。
+
+## 2026-11-23：C3-A SAR-only Flow 单 seed 训练与评价已完成
+
+- **训练 run：** [训练清单](../../experiments/phase_c3a_sar_only_flow_c1_v2_20261105_v1_attempt2_20261123/manifest.json)；冻结协议 SHA-256 147c361b3e91bc4cd8d76ce5c464ad9d2137f2d06b38f31a0bc7c7a7e93101a7；状态 complete；seed 20261105；5 轮；best epoch 2；200 个 development 身份、19 组；仅读 SAR LR/target，confirmation/test/optical flags 全为 false。提交包含逐图开发指标、SAR-only 基线指标、配对比较和训练日志。
+- **多样本 v3：** [评价清单](../../experiments/diagnostics/c3a_multi_sample_eval_c1_v2_20261105_v3_attempt2_20261123/manifest.json)；协议 SHA-256 ee83e2cb4dadea7d4fca6576e479d2922d70df44935f1be51116add26e06016c；200 身份×4 draws。来源组配对 ΔPSNR −3.0694 dB（95% 区间 [−3.4646,−2.6974]）、ΔSSIM −0.17819（[−0.20714,−0.15086]）、ΔEPI −0.16871（[−0.18814,−0.14697]）；逐 draw CSV 与 bootstrap 摘要随提交保存。
+- **样本集合与归档：** [样本集合摘要](../../experiments/diagnostics/c3a_sample_set_evaluation_c1_v2_20261114_v3/summary.json)；[样本归档清单](../../experiments/diagnostics/c3a_sample_archive_c1_v2_20261123_v1/manifest.json)。输出 800 个 draw，NPZ 439,898,403 字节；逐图/来源组分数、bootstrap 与环境记录已保存。本地 run 保留 NPZ 与训练 checkpoint；Git 提交不含这些大型数组和权重。
+- **Research Decision Review：** 冻结的第二 seed 三项条件均未达到，不追加 seed；当前像素域 SAR-only Flow 停止。此结果只描述复用 development 的探索性比较，不推断 Optical 效用或独立泛化。
+- **资源偏离：** 按用户本轮明确授权，本次执行绕过并行 CUDA/3 GiB 预检，以 OOM 为界；无 OOM。授权及资源快照见 run manifest。冻结 JSON 未修改。
+- **预检修订：** 运行后移除按桌面进程名和 Python 脚本名无条件放行的分支；默认预检现会拦截所有其他 CUDA 进程并保留 3 GiB 门槛，只有显式用户授权旗标可豁免。该变更只影响未来预检，训练/推理代码与本次结果不变；实际 run 的执行脚本哈希保留在 manifest。
+- **报告：** [C3-A 决策复核](C3-A%20SAR-only%20Flow%20决策复核_20261123.md)。
+- **数据清单边界：** 完整 C1 来源清单含封存 confirmation 身份，未随提交发布；只在 run/input manifest 中记录其 SHA-256。未读取 confirmation/test 影像载荷。

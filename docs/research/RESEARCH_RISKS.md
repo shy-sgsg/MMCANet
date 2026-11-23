@@ -1,5 +1,12 @@
 # 研究风险与证据边界
 
+## 2026-11-23 C3-A 获准后仍受外部 CUDA 计算与显存门槛阻塞
+
+- **资源观察：** 提权设备可见；14:24 第 49 次预检重新看到 AISAR Python PID `589855`（166 MiB）；GPU 空闲约 2.91 GiB、利用率 73%，仍低于 3 GiB 门槛，且存在并行 CUDA 计算。此前 PID `426517` 已结束；显存快照会波动。等待外部任务结束并满足显存门槛后再运行，不降低门槛。
+- **执行边界：** 训练入口已在读取影像前拒绝启动，未创建 run。不得终止外部任务、与其并行训练、改用 CPU 或降低协议门槛。待进程结束后再做一次新鲜预检。
+- **实现风险：** 原预检把桌面 `nautilus`、`resources` 图形上下文也识别为计算阻塞；经 `nvidia-smi` 名称核验后仅从阻塞列表排除这两个程序，未知进程仍 fail-closed。该修正没有改动冻结协议的 `concurrent_gpu_training=false` 或 3 GiB 配置。
+- **结论边界：** 目前没有 C3-A 模型训练、生成样本或性能结果；95 项软件回归不能替代真实 GPU 实验。来源、划分和 development 重复使用的限制仍然有效。详见[GPU 预检报告](../../experiments/diagnostics/c3a_gpu_preflight_20261123_v1/报告.md)。
+
 ## 2026-11-22 C-Transition 数据、训练与观测主张阻塞
 
 - **新开发集缺口：** C1 v2 的 131 个来源组已全部分配，既有 development 已重复用于选择；现有目录互斥不证明地理/采集/footprint 独立。数字编号 2k PNG 没有来源 crosswalk。正式 optical 增益与频率迁移仍缺未使用的合格 development 来源组。
@@ -1599,3 +1606,12 @@ ICSP 2024 官方摘要提及 MSTAR/SARBake 和下游分割，但全文不可读�
 ## 派生 C3-A 输入来源已有 hash-bound 连接，原始数字文件名尚未映射（2026-11-07）
 
 train/development 的冻结 C1 原始相对路径与派生 x2_light 输入在 group/patch 和 SAR/optical 来源 SHA-512 上一致，支持派生输入的清单级来源追溯。该证据不连接本地 `data/sar`、`data/opt` 的 8000–9999 数字文件名，也不确认这些文件的发布版本或传感器属性。不得仅凭名称或旧下游训练名单交集补写来源；建立原始文件映射 需要不涉及未知角色的独立元数据。见[C1 来源审计](../../experiments/data_audits/c1_v2_train_development_source_crosswalk_20261107_v1/report.md)。
+
+## 2026-11-23 C3-A 实测风险更新
+
+- **结论范围：** C1 v2 development 曾重复用于训练选择；所有 Flow/C2 差异只支撑来源组隔离开发集上的探索性观察，不是独立泛化。来源组间地理、采集和精细 footprint 独立性仍未知。
+- **方法结果：** 当前像素域 SAR-only Flow 的 PSNR/SSIM/EPI 均落后于固定 SAR-only 确定性基线，且 4-draw 推理约慢 99.6 倍。按冻结规则不继续第二 seed。不能把一个实现/预算的失败泛化为所有 Flow/Diffusion 的失败。
+- **表示域与亮值：** 目标为 normalized 8-bit noisy pseudo-target。高值代理、边缘强度和裁剪比例不能解释为定标散射体保持或辐射物理一致性；EPI 与边缘幅值需联合看。
+- **分布解释：** 每身份四个 draw 的标准差和 Energy/Variogram 分数未相对于已知 SAR 后验或真实分布校准；不得写成不确定性校准或分布真实性证明。
+- **资源记录：** 本轮用户显式豁免并行进程与 3 GiB 预检，实际显存峰值约 189 MB 分配且无 OOM。它是本次执行特例，不应自动推广为所有 GPU 任务默认规则。
+- **后续数据风险：** 当前 C1 v2 的来源组均已分配，confirmation 已访问，数字编号 2,000 对未核实映射。C3-B 需新且来源可核验的 development cohort；若不能取得，必须继续暂停正式 optical 增量验证。

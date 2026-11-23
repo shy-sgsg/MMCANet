@@ -8,6 +8,7 @@ import hashlib
 import json
 import math
 import random
+import shlex
 import subprocess
 import sys
 import time
@@ -26,14 +27,17 @@ if str(ROOT) not in sys.path:
 if str(METRIC_ROOT) not in sys.path:
     sys.path.insert(0, str(METRIC_ROOT))
 
-from eval_metrics import edge_metrics
-from MMCANetV2.phase_c2_screen import build_fixed_masks
+from scripts.cli_zh import ChineseArgumentParser
+from MMCANetV2.phase_c3a_archive import write_c3a_sample_archive
+from MMCANetV2.phase_c2_data import C2FixedDataset
+from MMCANetV2.phase_c3a_metrics import build_fixed_masks, edge_metrics
 from MMCANetV2.phase_c3a_flow import SarConditionalFlow, SarTargetOnlyDataset, sample_heun, upsample_sar_condition
 from scripts.run_phase_c3a_sar_flow import (
     BASELINE_PATH,
     INPUT_ROOT,
     SOURCE_MANIFEST,
     _active_cuda_processes,
+    _cuda_compute_process_records,
     _csv_write,
     _environment,
     _evaluate,
@@ -49,7 +53,10 @@ from scripts.run_phase_c3a_sar_flow import (
 EVALUATION_PROTOCOL = ROOT / "protocols/mmcanet_phase_c3a/multi_sample_stability_c1_v2_20261105_v3.json"
 TRAIN_PROTOCOL = ROOT / "protocols/mmcanet_phase_c3a/sar_only_flow_c1_v2_20261105_v1.json"
 OUTPUT_PATH = ROOT / "experiments/diagnostics/c3a_multi_sample_eval_c1_v2_20261105_v3"
+DEFAULT_OUTPUT_PATH = OUTPUT_PATH
 EXPECTED_EVALUATION_PROTOCOL_SHA256 = "ee83e2cb4dadea7d4fca6576e479d2922d70df44935f1be51116add26e06016c"
+ARCHIVE_PROTOCOL = ROOT / "protocols/mmcanet_phase_c3a/sample_archive_c1_v2_20261123_v1.json"
+EXPECTED_ARCHIVE_PROTOCOL_SHA256 = "6f89982a1865e8eb28a9e86f7bc73d9a751365ef8d1bf10be91b6a40f00fe69b"
 
 
 def draw_noise_for_identity(
@@ -317,18 +324,45 @@ def _read_protocol() -> tuple[dict[str, Any], str]:
     return protocol, digest
 
 
-def _check_resources(protocol: dict[str, Any]) -> tuple[torch.device, int, int]:
+def _check_resources(
+    protocol: dict[str, Any], *, user_authorized_override: bool = False
+) -> tuple[torch.device, int, int]:
     if not torch.cuda.is_available():
         raise RuntimeError("多次采样诊断要求 CUDA GPU")
-    other_processes = _active_cuda_processes()
-    if other_processes:
-        raise RuntimeError(f"GPU 仍有 {len(other_processes)} 个其他 CUDA 计算进程")
+    if not user_authorized_override:
+        other_processes = _active_cuda_processes()
+        if other_processes:
+            raise RuntimeError(f"GPU 仍有 {len(other_processes)} 个其他 CUDA 计算进程")
     device = torch.device("cuda:0")
     free_bytes, total_bytes = torch.cuda.mem_get_info(device)
     threshold = int(protocol["resources"]["minimum_free_memory_gib"] * 1024**3)
-    if free_bytes < threshold:
+    if free_bytes < threshold and not user_authorized_override:
         raise RuntimeError(f"GPU 空闲显存 {free_bytes / 1024**3:.2f} GiB 低于协议门槛")
     return device, int(free_bytes), int(total_bytes)
+
+
+def _open_development_dataset() -> SarTargetOnlyDataset:
+    fixed_dataset = C2FixedDataset(
+        INPUT_ROOT / "development",
+        SOURCE_MANIFEST,
+        role="development",
+        scale=2,
+        verify_hashes_on_read=False,
+    )
+    return SarTargetOnlyDataset(fixed_dataset)
+
+
+def _resolve_output_path(requested: str | Path | None) -> Path:
+    if requested is None:
+        return DEFAULT_OUTPUT_PATH
+    candidate = Path(requested)
+    if not candidate.is_absolute():
+        candidate = ROOT / candidate
+    candidate = candidate.resolve()
+    experiments_root = (ROOT / "experiments").resolve()
+    if not candidate.is_relative_to(experiments_root):
+        raise ValueError("多次采样结果目录必须位于仓库 experiments/ 目录内")
+    return candidate
 
 
 def _build_flow_model(model_config: dict[str, Any]) -> SarConditionalFlow:
@@ -455,10 +489,21 @@ def _set_evaluation_determinism(settings: dict[str, Any]) -> None:
     torch.backends.cudnn.benchmark = bool(settings["cudnn_benchmark"])
 
 
+def _expected_training_protocol_hash(protocol: dict[str, Any]) -> str:
+    direct = protocol.get("training_protocol_sha256")
+    nested = protocol.get("training_protocol", {}).get("sha256")
+    values = [value for value in (direct, nested) if value is not None]
+    if not values or any(not isinstance(value, str) or not value for value in values):
+        raise ValueError("多次采样诊断协议缺少有效的训练协议 SHA-256")
+    if len(set(values)) != 1:
+        raise ValueError("多次采样诊断协议中的训练协议 SHA-256 字段互相冲突")
+    return values[0]
+
+
 def _validate_training_run(run_dir: Path, protocol: dict[str, Any], protocol_hash: str) -> tuple[dict[str, Any], dict[str, Any]]:
     training_protocol = json.loads(TRAIN_PROTOCOL.read_text(encoding="utf-8"))
     training_protocol_hash = sha256_file(TRAIN_PROTOCOL)
-    if training_protocol_hash != protocol["training_protocol_sha256"]:
+    if training_protocol_hash != _expected_training_protocol_hash(protocol):
         raise ValueError("训练协议哈希与多次采样诊断绑定值不匹配")
     run_manifest = json.loads((run_dir / "manifest.json").read_text(encoding="utf-8"))
     if run_manifest.get("status") != "complete" or run_manifest.get("protocol_sha256") != training_protocol_hash:
@@ -560,14 +605,20 @@ def evaluate_multi_sample(
     sampler_steps: int,
     noise_sigma: float,
     edge_masks_by_id: dict[str, np.ndarray],
-) -> tuple[list[dict[str, Any]], float]:
+    capture_predictions: bool = False,
+) -> tuple[list[dict[str, Any]], float] | tuple[list[dict[str, Any]], float, dict[str, Any]]:
     model.eval()
     rows: list[dict[str, Any]] = []
+    captured_ids: dict[str, list[str]] = {"sample_ids": [], "source_group_ids": [], "patch_ids": []}
+    raw_chunks_by_draw: list[list[np.ndarray]] = [[] for _ in range(draws)]
     torch.cuda.synchronize(device)
     started = time.perf_counter()
     for batch_index, batch in enumerate(loader, start=1):
         lr = batch["lr"].to(device, non_blocking=False)
         target = batch["target"].to(device, non_blocking=False)
+        if capture_predictions:
+            for key, source_key in (("sample_ids", "name"), ("source_group_ids", "source_group_id"), ("patch_ids", "patch_id")):
+                captured_ids[key].extend(str(value) for value in batch[source_key])
         condition = upsample_sar_condition(lr, size=(256, 256))
         edge_masks = _edge_masks_for_batch(batch, edge_masks_by_id)
         clipped_predictions: list[torch.Tensor] = []
@@ -586,6 +637,10 @@ def evaluate_multi_sample(
             if raw.shape != target.shape or not torch.isfinite(raw).all():
                 raise FloatingPointError("多次采样输出尺寸不符或含 NaN/Inf")
             clipped_predictions.append(raw.clamp(0.0, 1.0))
+            if capture_predictions:
+                raw_chunks_by_draw[draw_index].append(
+                    raw.detach().to(device="cpu", dtype=torch.float32).numpy().copy()
+                )
             draw_rows = _metric_rows(raw, raw, target, batch, method_name="C3-A SAR-only Flow")
             _attach_clip_range_components(draw_rows, raw)
             structural_rows = _batch_edge_metrics(raw, target, edge_masks)
@@ -605,7 +660,13 @@ def evaluate_multi_sample(
             flush=True,
         )
     torch.cuda.synchronize(device)
-    return rows, time.perf_counter() - started
+    runtime = time.perf_counter() - started
+    if capture_predictions:
+        captured_ids["flow_raw"] = np.stack(
+            [np.concatenate(chunks, axis=0) for chunks in raw_chunks_by_draw], axis=1
+        )
+        return rows, runtime, captured_ids
+    return rows, runtime
 
 
 @torch.inference_mode()
@@ -615,9 +676,13 @@ def evaluate_baseline_with_structure(
     *,
     device: torch.device,
     edge_masks_by_id: dict[str, np.ndarray],
-) -> tuple[list[dict[str, Any]], float]:
+    capture_predictions: bool = False,
+) -> tuple[list[dict[str, Any]], float] | tuple[list[dict[str, Any]], float, dict[str, Any]]:
     model.eval()
     rows: list[dict[str, Any]] = []
+    captured_ids: dict[str, list[str]] = {"sample_ids": [], "source_group_ids": [], "patch_ids": []}
+    raw_chunks: list[np.ndarray] = []
+    target_chunks: list[np.ndarray] = []
     torch.cuda.synchronize(device)
     started = time.perf_counter()
     for batch_index, batch in enumerate(loader, start=1):
@@ -626,6 +691,11 @@ def evaluate_baseline_with_structure(
         raw = model(lr)
         if raw.shape != target.shape or not torch.isfinite(raw).all():
             raise FloatingPointError("C2 SAR-only baseline 输出尺寸不符或含 NaN/Inf")
+        if capture_predictions:
+            for key, source_key in (("sample_ids", "name"), ("source_group_ids", "source_group_id"), ("patch_ids", "patch_id")):
+                captured_ids[key].extend(str(value) for value in batch[source_key])
+            raw_chunks.append(raw.detach().to(device="cpu", dtype=torch.float32).numpy().copy())
+            target_chunks.append(target.detach().to(device="cpu", dtype=torch.float32).numpy().copy())
         batch_rows = _metric_rows(raw, raw, target, batch, method_name="C2 SAR-only")
         _attach_clip_range_components(batch_rows, raw)
         structural_rows = _batch_edge_metrics(
@@ -637,15 +707,64 @@ def evaluate_baseline_with_structure(
         if batch_index % 10 == 0 or batch_index == len(loader):
             print(f"仅 SAR 基线评价进度：{batch_index}/{len(loader)} 批。", flush=True)
     torch.cuda.synchronize(device)
-    return rows, time.perf_counter() - started
+    runtime = time.perf_counter() - started
+    if capture_predictions:
+        captured_ids["baseline_raw"] = np.concatenate(raw_chunks, axis=0)
+        captured_ids["targets"] = np.concatenate(target_chunks, axis=0)
+        return rows, runtime, captured_ids
+    return rows, runtime
 
 
-def _run(run_dir: Path) -> int:
+def _read_archive_protocol() -> tuple[dict[str, Any], str]:
+    raw = ARCHIVE_PROTOCOL.read_bytes()
+    digest = hashlib.sha256(raw).hexdigest()
+    if digest != EXPECTED_ARCHIVE_PROTOCOL_SHA256:
+        raise ValueError("C3-A 样本归档附录协议 SHA-256 不匹配")
+    protocol = json.loads(raw)
+    if protocol.get("format") != "c3a_development_sample_archive_protocol_v1":
+        raise ValueError("C3-A 样本归档附录协议格式不匹配")
+    return protocol, digest
+
+
+def _run(
+    run_dir: Path,
+    archive_directory: Path | None = None,
+    *,
+    user_authorized_resource_override: bool = False,
+) -> int:
     started_utc = _utc_now()
     protocol, protocol_hash = _read_protocol()
+    archive_protocol: dict[str, Any] | None = None
+    archive_protocol_hash: str | None = None
+    if archive_directory is not None:
+        archive_directory = archive_directory.expanduser().resolve()
+        try:
+            archive_directory.relative_to(ROOT)
+        except ValueError as error:
+            raise ValueError("样本归档必须位于仓库内的冻结附属输出目录") from error
+        archive_protocol, archive_protocol_hash = _read_archive_protocol()
+        expected_archive_directory = ROOT / archive_protocol["outputs"]["directory"]
+        if archive_directory != expected_archive_directory.resolve():
+            raise ValueError("样本归档路径与附属协议固定目录不一致")
+        if archive_directory.exists():
+            raise FileExistsError(f"样本归档目录已存在：{archive_directory}")
+        if archive_protocol["training_protocol"]["sha256"] != sha256_file(TRAIN_PROTOCOL):
+            raise ValueError("样本归档附录绑定的训练协议 SHA-256 不匹配")
+        if archive_protocol["evaluation_protocol"]["sha256"] != protocol_hash:
+            raise ValueError("样本归档附录绑定的多次采样协议 SHA-256 不匹配")
     if OUTPUT_PATH.exists():
         raise FileExistsError(f"诊断结果目录已存在：{OUTPUT_PATH}")
-    device, free_bytes, total_bytes = _check_resources(protocol)
+    device, free_bytes, total_bytes = _check_resources(
+        protocol, user_authorized_override=user_authorized_resource_override
+    )
+    process_query_error = None
+    try:
+        observed_cuda_processes = _cuda_compute_process_records()
+    except (OSError, subprocess.SubprocessError, RuntimeError) as error:
+        if not user_authorized_resource_override:
+            raise
+        observed_cuda_processes = []
+        process_query_error = f"{type(error).__name__}: {error}"
     run_manifest, checkpoint = _validate_training_run(run_dir, protocol, protocol_hash)
     run_dir = run_dir.resolve()
     run_dir_relative = run_dir.relative_to(ROOT)
@@ -660,12 +779,19 @@ def _run(run_dir: Path) -> int:
         text=True,
     ).stdout
     command = [sys.executable, str(Path(__file__).resolve()), "--training-run-dir", str(run_dir)]
+    if archive_directory is not None:
+        command.extend(["--archive-directory", str(archive_directory)])
     code_paths = {
         "scripts/evaluate_c3a_multisample.py": Path(__file__).resolve(),
         "scripts/run_phase_c3a_sar_flow.py": ROOT / "scripts/run_phase_c3a_sar_flow.py",
         "MMCANetV2/phase_c3a_flow.py": ROOT / "MMCANetV2/phase_c3a_flow.py",
         "MMCANetV2/phase_c2_data.py": ROOT / "MMCANetV2/phase_c2_data.py",
-        "Early-FusionCascadeJDSR/eval_metrics.py": ROOT / "Early-FusionCascadeJDSR/eval_metrics.py",
+        "MMCANetV2/phase_c2_runner.py": ROOT / "MMCANetV2/phase_c2_runner.py",
+        "MMCANetV2/phase_c2_matched.py": ROOT / "MMCANetV2/phase_c2_matched.py",
+        "JointJDSR/model.py": ROOT / "JointJDSR/model.py",
+        "MMCANetV2/phase_c3a_metrics.py": ROOT / "MMCANetV2/phase_c3a_metrics.py",
+        "MMCANetV2/phase_c3a_archive.py": ROOT / "MMCANetV2/phase_c3a_archive.py",
+        "scripts/training_resume.py": ROOT / "scripts/training_resume.py",
     }
     code_sha256 = {name: sha256_file(path) for name, path in code_paths.items()}
     OUTPUT_PATH.mkdir(parents=True, exist_ok=False)
@@ -699,6 +825,18 @@ def _run(run_dir: Path) -> int:
         "flow_peak_gpu_memory_allocated_bytes": None,
         "gpu_free_memory_before_evaluation_bytes": free_bytes,
         "gpu_total_memory_bytes": total_bytes,
+        "resource_preflight": {
+            "protocol_resource_requirements": protocol["resources"],
+            "observed_cuda_compute_processes": observed_cuda_processes,
+            "process_query_error": process_query_error,
+            "user_authorized_override": user_authorized_resource_override,
+            "authorization_date": "2026-11-23" if user_authorized_resource_override else None,
+            "authorization_zh": (
+                "用户明确授权在其评价任务并行运行，并忽略冻结协议的 3 GiB 显存预检；以 CUDA OOM 作为停止边界。"
+                if user_authorized_resource_override
+                else None
+            ),
+        },
         "selection_or_checkpoint_update": False,
         "confirmation_payload_accessed": False,
         "test_set_accessed": False,
@@ -709,7 +847,7 @@ def _run(run_dir: Path) -> int:
     try:
         _json_write(OUTPUT_PATH / "manifest.json", manifest)
         (OUTPUT_PATH / "command.txt").write_text(
-            "多次采样诊断命令：\n" + " ".join(command) + "\n", encoding="utf-8"
+            "多次采样诊断命令：\n" + shlex.join(command) + "\n", encoding="utf-8"
         )
         (OUTPUT_PATH / "protocol.json").write_bytes(EVALUATION_PROTOCOL.read_bytes())
         (OUTPUT_PATH / "git_state.txt").write_text(
@@ -731,7 +869,7 @@ def _run(run_dir: Path) -> int:
             raise ValueError("C1 v2 冻结来源清单 SHA-256 不匹配")
         manifest["source_manifest_sha256"] = source_hash
         _json_write(OUTPUT_PATH / "manifest.json", manifest)
-        dataset = SarTargetOnlyDataset(INPUT_ROOT / "development", SOURCE_MANIFEST, role="development", scale=2)
+        dataset = _open_development_dataset()
         development_accessed = True
         manifest["development_payload_accessed"] = True
         _json_write(OUTPUT_PATH / "manifest.json", manifest)
@@ -766,12 +904,18 @@ def _run(run_dir: Path) -> int:
         baseline_model, _, _ = _load_baseline(device, dataset, training_protocol)
         torch.cuda.synchronize(device)
         torch.cuda.reset_peak_memory_stats(device)
-        baseline_rows, baseline_runtime = evaluate_baseline_with_structure(
+        baseline_result = evaluate_baseline_with_structure(
             baseline_model,
             data_loader,
             device=device,
             edge_masks_by_id=edge_masks_by_id,
+            capture_predictions=archive_directory is not None,
         )
+        if archive_directory is None:
+            baseline_rows, baseline_runtime = baseline_result
+            baseline_capture = None
+        else:
+            baseline_rows, baseline_runtime, baseline_capture = baseline_result
         baseline_peak = int(torch.cuda.max_memory_allocated(device))
         _csv_write(
             OUTPUT_PATH / "baseline_metrics.csv",
@@ -800,7 +944,7 @@ def _run(run_dir: Path) -> int:
         flow_parameter_count = sum(parameter.numel() for parameter in model.parameters())
         torch.cuda.synchronize(device)
         torch.cuda.reset_peak_memory_stats(device)
-        flow_rows, flow_runtime = evaluate_multi_sample(
+        flow_result = evaluate_multi_sample(
             model,
             data_loader,
             device=device,
@@ -809,7 +953,13 @@ def _run(run_dir: Path) -> int:
             sampler_steps=int(protocol["sampling"]["sampler_steps"]),
             noise_sigma=float(protocol["sampling"]["noise_sigma"]),
             edge_masks_by_id=edge_masks_by_id,
+            capture_predictions=archive_directory is not None,
         )
+        if archive_directory is None:
+            flow_rows, flow_runtime = flow_result
+            flow_capture = None
+        else:
+            flow_rows, flow_runtime, flow_capture = flow_result
         flow_peak = int(torch.cuda.max_memory_allocated(device))
         identity_summary = aggregate_multi_sample_metrics(
             flow_rows,
@@ -838,6 +988,54 @@ def _run(run_dir: Path) -> int:
         )
         _csv_write(OUTPUT_PATH / "identity_summary.csv", identity_summary, list(identity_summary[0]))
         _json_write(OUTPUT_PATH / "group_bootstrap_summary.json", summaries)
+        if archive_directory is not None:
+            if baseline_capture is None or flow_capture is None or archive_protocol is None or archive_protocol_hash is None:
+                raise RuntimeError("样本归档采集状态不完整")
+            for key in ("sample_ids", "source_group_ids", "patch_ids"):
+                if baseline_capture[key] != flow_capture[key]:
+                    raise ValueError(f"Flow 与 SAR-only 基线归档身份顺序不一致：{key}")
+            expected_ids = [str(row["sample_id"]) for row in dataset.rows]
+            if baseline_capture["sample_ids"] != expected_ids:
+                raise ValueError("归档样本顺序与 C1 v2 development 固定清单不一致")
+            archive_metadata = {
+                "training_protocol_sha256": run_manifest["protocol_sha256"],
+                "evaluation_protocol_sha256": protocol_hash,
+                "archive_protocol_sha256": archive_protocol_hash,
+                "source_manifest_sha256": source_hash,
+                "development_input_manifest_sha256": manifest["development_input_manifest_sha256"],
+                "development_input_files_csv_sha256": manifest["development_input_files_csv_sha256"],
+                "flow_checkpoint_sha256": sha256_file(run_dir / "checkpoints/best.pt"),
+                "baseline_checkpoint_sha256": sha256_file(BASELINE_PATH / "checkpoints/best.pt"),
+                "evaluation_code_sha256": code_sha256,
+                "training_run": str(run_dir_relative),
+                "seed": int(protocol["sampling"]["seed"]),
+                "noise_seed_rule": archive_protocol["sampling"]["seed_rule"],
+                "sampler_steps": int(protocol["sampling"]["sampler_steps"]),
+                "flow_runtime_seconds": flow_runtime,
+                "baseline_runtime_seconds": baseline_runtime,
+                "flow_peak_gpu_memory_allocated_bytes": flow_peak,
+                "baseline_peak_gpu_memory_allocated_bytes": baseline_peak,
+                "gpu_free_memory_before_evaluation_bytes": free_bytes,
+                "gpu_total_memory_bytes": total_bytes,
+                "resource_preflight": manifest["resource_preflight"],
+                "device": str(device),
+                "confirmation_payload_accessed": False,
+                "test_set_accessed": False,
+                "test_set_used": False,
+                "optical_payload_read": False,
+            }
+            write_c3a_sample_archive(
+                archive_directory,
+                sample_ids=baseline_capture["sample_ids"],
+                source_group_ids=baseline_capture["source_group_ids"],
+                patch_ids=baseline_capture["patch_ids"],
+                targets=baseline_capture["targets"],
+                flow_raw=flow_capture["flow_raw"],
+                baseline_raw=baseline_capture["baseline_raw"],
+                metadata=archive_metadata,
+                bootstrap_seed=int(archive_protocol["statistics"]["paired_bootstrap"]["seed"]),
+                bootstrap_repeats=int(archive_protocol["statistics"]["paired_bootstrap"]["repeats"]),
+            )
         input_manifest = {
             "source_manifest_path": str(SOURCE_MANIFEST.relative_to(ROOT)),
             "source_manifest_sha256": sha256_file(SOURCE_MANIFEST),
@@ -918,11 +1116,47 @@ def _run(run_dir: Path) -> int:
         raise
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(description="C3-A development 多次采样稳定性诊断")
-    parser.add_argument("--training-run-dir", type=Path, default=ROOT / "experiments/phase_c3a_sar_only_flow_c1_v2_20261105_v1")
-    args = parser.parse_args()
-    _run(args.training_run_dir.resolve())
+def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    parser = ChineseArgumentParser(description="C3-A development 多次采样稳定性诊断")
+    parser.add_argument(
+        "--training-run-dir",
+        type=Path,
+        default=ROOT / "experiments/phase_c3a_sar_only_flow_c1_v2_20261105_v1",
+        help="已完成的冻结 C3-A v1 训练目录",
+    )
+    parser.add_argument(
+        "--archive-directory",
+        type=Path,
+        default=None,
+        help="可选；额外保存同一采样循环的预测数组与表示域亮值代理",
+    )
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=None,
+        help="指定 experiments/ 下的新唯一评价结果目录；默认使用冻结 v3 结果目录。",
+    )
+    parser.add_argument(
+        "--user-authorized-resource-override",
+        action="store_true",
+        help=(
+            "按用户 2026-11-23 的明确授权，忽略并行 CUDA 进程和冻结协议的 3 GiB 最低空闲显存预检；"
+            "记录实际资源状态，并以 CUDA OOM 作为停止边界。"
+        ),
+    )
+    return parser.parse_args(argv)
+
+
+def main(args: argparse.Namespace | None = None) -> None:
+    global OUTPUT_PATH
+    if args is None:
+        args = _parse_args()
+    OUTPUT_PATH = _resolve_output_path(args.output_dir)
+    _run(
+        args.training_run_dir.resolve(),
+        archive_directory=args.archive_directory,
+        user_authorized_resource_override=args.user_authorized_resource_override,
+    )
 
 
 if __name__ == "__main__":

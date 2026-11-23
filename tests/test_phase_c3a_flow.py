@@ -195,4 +195,4 @@ def test_sar_condition_uses_bilinear_resize_with_requested_size():
 def test_c3a_runner_uses_the_project_ssim_implementation():
     from scripts.run_phase_c3a_sar_flow import project_ssim as c3a_ssim
 
-    assert c3a_ssim.__module__ == "eval_metrics"
+    assert c3a_ssim.__module__ == "MMCANetV2.phase_c3a_metrics"

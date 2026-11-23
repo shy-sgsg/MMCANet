@@ -1,0 +1,2 @@
+多次采样诊断命令：
+/home/shy/anaconda3/envs/AISAR/bin/python /tmp/jdsr-c3a-20261123/scripts/evaluate_c3a_multisample.py --training-run-dir /tmp/jdsr-c3a-20261123/experiments/phase_c3a_sar_only_flow_c1_v2_20261105_v1_attempt2_20261123 --archive-directory /tmp/jdsr-c3a-20261123/experiments/diagnostics/c3a_sample_archive_c1_v2_20261123_v1

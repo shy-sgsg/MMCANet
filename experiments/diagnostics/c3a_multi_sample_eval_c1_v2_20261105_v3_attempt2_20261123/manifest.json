@@ -1,0 +1,243 @@
+{
+  "format": "c3a_multi_sample_stability_result_v3",
+  "run_id": "c3a_multi_sample_eval_c1_v2_20261105_v3_attempt2_20261123",
+  "status": "complete",
+  "started_utc": "2026-11-23T08:04:00.064955+00:00",
+  "protocol_path": "protocols/mmcanet_phase_c3a/multi_sample_stability_c1_v2_20261105_v3.json",
+  "protocol_sha256": "ee83e2cb4dadea7d4fca6576e479d2922d70df44935f1be51116add26e06016c",
+  "training_run": "experiments/phase_c3a_sar_only_flow_c1_v2_20261105_v1_attempt2_20261123",
+  "training_run_manifest_status": "complete",
+  "training_protocol_sha256": "147c361b3e91bc4cd8d76ce5c464ad9d2137f2d06b38f31a0bc7c7a7e93101a7",
+  "flow_checkpoint_sha256": "c2cbc043542cd1d2e15f332a28761f5458ebcfa8b95603e40250d66d25dee399",
+  "baseline_checkpoint_sha256": "8255b5229ca1e041cb59aed582d794bb67afdbe1601b6f4dc425c43ce27f7165",
+  "git_head": "13a3c91ca9c252c146361a42247321f251834b55",
+  "git_status_dirty": true,
+  "code_sha256": {
+    "scripts/evaluate_c3a_multisample.py": "bbfd36dc9ff7697625928fb52251d73782e5658ab9843aebb69cdfda54a1036c",
+    "scripts/run_phase_c3a_sar_flow.py": "72955eea752ca29c31aafecde64ec0962300cfddc5479d710f52d56823602b4e",
+    "MMCANetV2/phase_c3a_flow.py": "ca6652920f3763688a4c9442a4f4efcef4828925daaefd1aaeed1cd78b8078a4",
+    "MMCANetV2/phase_c2_data.py": "ba36442ddd66916a1dae68ef815374e3737409b5eb3cbe3be53d26bfbfd1b579",
+    "MMCANetV2/phase_c2_runner.py": "849b8a826afc2d0269a27c18ebb97e692899a248371915cb1f3da435870176b7",
+    "MMCANetV2/phase_c2_matched.py": "1bdf28e9c99c6080368049ddf8c35b89e46b4a6240151fba66461c400514780b",
+    "JointJDSR/model.py": "1a0ac45e8251db0331d2f9145bc545694c9a6c9cb8ff45712575c24c8a195796",
+    "MMCANetV2/phase_c3a_metrics.py": "705cf8beee63f8d1ee2b949be1e2a223bd8dc6dc5dc27a4b8711e48ae3b70ee7",
+    "MMCANetV2/phase_c3a_archive.py": "1a635e79ceced19bfebddf442d58c2d259c0133759a896c7b9db558754fc8876",
+    "scripts/training_resume.py": "d732e3db8cac88109624dec2b4a2afcb70f615e4900eaa5e25044c078e96dbe9"
+  },
+  "sample_count": 200,
+  "source_group_count": 19,
+  "draws_per_identity": 4,
+  "sampler_steps": 8,
+  "function_evaluations_per_draw": 16,
+  "determinism": {
+    "global_seed": 20261105,
+    "deterministic_algorithms": true,
+    "cudnn_deterministic": true,
+    "cudnn_benchmark": false,
+    "dataloader_num_workers": 0
+  },
+  "structural_metric_protocol": {
+    "edge_mask": {
+      "source": "同一 C1 v2 x2_light development SAR LR 与 noisy pseudo-target",
+      "implementation": "MMCANetV2.phase_c2_screen.build_fixed_masks 与 Early-FusionCascadeJDSR.eval_metrics.edge_metrics",
+      "operator": "3×3 Sobel gradient magnitude，cv2.BORDER_REFLECT_101",
+      "threshold_percentile": 90.0,
+      "percentile_method": "linear",
+      "ties": "include",
+      "mask_reuse": "每个身份只从固定 LR SAR/伪目标生成一次；同一 mask 用于 C2 SAR-only baseline 和全部 Flow draws"
+    },
+    "epi": "固定 edge mask 内预测与目标 Sobel 梯度幅值的 Pearson 相关系数；分母无效时按协议 fail-closed",
+    "edge_strength_ratio": "固定 edge mask 内预测/目标平均 Sobel 梯度幅值之比；描述性指标，接近 1 代表幅值接近，不设选择阈值",
+    "clip_domain": "先将最终预测裁剪至 [0,1]，再计算 EPI 与边缘强度比；目标维持冻结归一化 noisy pseudo-target"
+  },
+  "clip_component_protocol": {
+    "原始输出低于0比例": "最终预测裁剪前，raw_prediction < 0 的像素比例。",
+    "原始输出高于1比例": "最终预测裁剪前，raw_prediction > 1 的像素比例。",
+    "恒等关系": "两项互斥；其和必须等于既有最终裁剪比例。恰为 0 或 1 的输出不计为越界。",
+    "用途": "表示域范围的描述性诊断；不作 checkpoint 选择、阈值调节或阶段晋级。"
+  },
+  "development_payload_accessed": true,
+  "baseline_runtime_seconds": 4.59888243599562,
+  "flow_runtime_seconds": 458.2782046460052,
+  "baseline_peak_gpu_memory_allocated_bytes": 85587456,
+  "flow_peak_gpu_memory_allocated_bytes": 189401088,
+  "gpu_free_memory_before_evaluation_bytes": 3037331456,
+  "gpu_total_memory_bytes": 3942383616,
+  "resource_preflight": {
+    "protocol_resource_requirements": {
+      "required_device": "CUDA GPU",
+      "minimum_free_memory_gib": 3,
+      "concurrent_gpu_training": false,
+      "batch_size": 4,
+      "num_workers": 0
+    },
+    "observed_cuda_compute_processes": [
+      {
+        "pid": 44415,
+        "process_name": "nautilus"
+      },
+      {
+        "pid": 61699,
+        "process_name": "resources"
+      },
+      {
+        "pid": 589855,
+        "process_name": "python3.13"
+      },
+      {
+        "pid": 686785,
+        "process_name": "python"
+      }
+    ],
+    "process_query_error": null,
+    "user_authorized_override": true,
+    "authorization_date": "2026-11-23",
+    "authorization_zh": "用户明确授权在其评价任务并行运行，并忽略冻结协议的 3 GiB 显存预检；以 CUDA OOM 作为停止边界。"
+  },
+  "selection_or_checkpoint_update": false,
+  "confirmation_payload_accessed": false,
+  "test_set_accessed": false,
+  "test_set_used": false,
+  "optical_payload_read": false,
+  "source_manifest_sha256": "6a278e97c161164d9440b5388c5b3fcda87746a56e26adfb7cdf658b94924e57",
+  "development_input_manifest_sha256": "de3101a78105c05653b9779342cabe98d61a9cddac6153b25a7d6347d0ef0da9",
+  "development_input_files_csv_sha256": "70d762015b2b16a604d381758091ae3d282526a7137e9de51c6db827b60f2839",
+  "edge_mask_manifest_sha256": "a4dd12c3b84b5dfd430972448d9d9b016c12b7d866343c591fb2833a20e56a0c",
+  "finished_utc": "2026-11-23T08:12:11.152764+00:00",
+  "flow_runtime_seconds_per_draw_per_identity": 0.5728477558075065,
+  "baseline_parameter_count": 96209,
+  "flow_parameter_count": 323617,
+  "output_sample_count": 800,
+  "output_files": [
+    "baseline_metrics.csv",
+    "edge_mask_manifest.csv",
+    "environment.json",
+    "environment.txt",
+    "flow_per_draw_metrics.csv",
+    "group_bootstrap_summary.json",
+    "identity_summary.csv",
+    "input_manifest.json",
+    "protocol.json",
+    "runtime.json",
+    "command.txt",
+    "git_state.txt"
+  ],
+  "output_sha256": {
+    "baseline_metrics.csv": "78657ac1ffbfac03c03ff74cdc528ab3350d254a6bf438d1731c9fccfc62dd90",
+    "edge_mask_manifest.csv": "a4dd12c3b84b5dfd430972448d9d9b016c12b7d866343c591fb2833a20e56a0c",
+    "environment.json": "33946d27279100caa27b9b6debe0787d32c638910bf75a115037693aef6f0020",
+    "environment.txt": "0d26ec3fbe83a144f5231d8981d551040df9e583ddb5ae9aacfa9b5e6178929d",
+    "flow_per_draw_metrics.csv": "509ca949116c5e903e9a5c20f0828f8e587d9e8f104de019e0cdb1dea3515cbd",
+    "group_bootstrap_summary.json": "9e887d8bfebbfaf12dfc397f20d185172659cd0e6d7c39f7302e4c8f1665637f",
+    "identity_summary.csv": "7f4babe17105d4b1a26611bf962c7844f89df86dba915a5453be2174c1346064",
+    "input_manifest.json": "782ce3adc997e9bc005889ed9f9e599497c871e00349931b757bfe24f58d89c0",
+    "protocol.json": "ee83e2cb4dadea7d4fca6576e479d2922d70df44935f1be51116add26e06016c",
+    "runtime.json": "fe9ef658496d360e94316786c7f09e3f02e29c9d83a9ef55fafc74e58a832957",
+    "command.txt": "aab965896d9e1f40b7deb230d4a561be64fdfd6044ac7e7c02caa0c88e14f47a",
+    "git_state.txt": "ad76949d21cc753ba40fd3e29563d63a1ea0c53d8612ee4ea3e5bef8d58316e9"
+  },
+  "baseline_metrics_row_count": 200,
+  "summary": {
+    "平均配对 ΔPSNR": {
+      "指标": "平均配对 ΔPSNR",
+      "来源组等权均值": -3.0694386518374697,
+      "来源组等权中位数": -2.884913738460706,
+      "95% 区间下界": -3.4645592606443305,
+      "95% 区间上界": -2.6973647615848915,
+      "来源组数": 19,
+      "bootstrap 重复数": 10000,
+      "bootstrap seed": 20261106
+    },
+    "平均配对 ΔSSIM": {
+      "指标": "平均配对 ΔSSIM",
+      "来源组等权均值": -0.17818582505435665,
+      "来源组等权中位数": -0.17295302390252157,
+      "95% 区间下界": -0.20714446945277556,
+      "95% 区间上界": -0.1508590934860498,
+      "来源组数": 19,
+      "bootstrap 重复数": 10000,
+      "bootstrap seed": 20261106
+    },
+    "平均配对 ΔEPI": {
+      "指标": "平均配对 ΔEPI",
+      "来源组等权均值": -0.16870505331905714,
+      "来源组等权中位数": -0.17133631647968367,
+      "95% 区间下界": -0.1881360654429914,
+      "95% 区间上界": -0.14697286770128218,
+      "来源组数": 19,
+      "bootstrap 重复数": 10000,
+      "bootstrap seed": 20261106
+    },
+    "Flow PSNR 样本标准差": {
+      "指标": "Flow PSNR 样本标准差",
+      "来源组等权均值": 0.045066273441528436,
+      "来源组等权中位数": 0.044313344848492905,
+      "95% 区间下界": 0.04170215683877234,
+      "95% 区间上界": 0.0487710284467936,
+      "来源组数": 19,
+      "bootstrap 重复数": 10000,
+      "bootstrap seed": 20261106
+    },
+    "Flow SSIM 样本标准差": {
+      "指标": "Flow SSIM 样本标准差",
+      "来源组等权均值": 0.004718826955845415,
+      "来源组等权中位数": 0.00469915851152313,
+      "95% 区间下界": 0.004537252525902125,
+      "95% 区间上界": 0.0049000331690993906,
+      "来源组数": 19,
+      "bootstrap 重复数": 10000,
+      "bootstrap seed": 20261106
+    },
+    "Flow EPI 样本标准差": {
+      "指标": "Flow EPI 样本标准差",
+      "来源组等权均值": 0.018849826513618318,
+      "来源组等权中位数": 0.01873063338900365,
+      "95% 区间下界": 0.01733884069245026,
+      "95% 区间上界": 0.02042990063117422,
+      "来源组数": 19,
+      "bootstrap 重复数": 10000,
+      "bootstrap seed": 20261106
+    },
+    "Flow 平均边缘强度比": {
+      "指标": "Flow 平均边缘强度比",
+      "来源组等权均值": 0.5407867256768105,
+      "来源组等权中位数": 0.5561896016349318,
+      "95% 区间下界": 0.4877733874762593,
+      "95% 区间上界": 0.594976065213298,
+      "来源组数": 19,
+      "bootstrap 重复数": 10000,
+      "bootstrap seed": 20261106
+    },
+    "平均预测像素标准差": {
+      "指标": "平均预测像素标准差",
+      "来源组等权均值": 0.07304945990764067,
+      "来源组等权中位数": 0.0754576941782778,
+      "95% 区间下界": 0.07055883406006408,
+      "95% 区间上界": 0.07534654835542066,
+      "来源组数": 19,
+      "bootstrap 重复数": 10000,
+      "bootstrap seed": 20261106
+    },
+    "Flow 平均原始输出低于0比例": {
+      "指标": "Flow 平均原始输出低于0比例",
+      "来源组等权均值": 0.0014852879720441462,
+      "来源组等权中位数": 0.000923919677734375,
+      "95% 区间下界": 0.0007095762188925127,
+      "95% 区间上界": 0.0024454276527514297,
+      "来源组数": 19,
+      "bootstrap 重复数": 10000,
+      "bootstrap seed": 20261106
+    },
+    "Flow 平均原始输出高于1比例": {
+      "指标": "Flow 平均原始输出高于1比例",
+      "来源组等权均值": 0.015626544131046277,
+      "来源组等权中位数": 0.009326588023792614,
+      "95% 区间下界": 0.009345283097627631,
+      "95% 区间上界": 0.022755181572654028,
+      "来源组数": 19,
+      "bootstrap 重复数": 10000,
+      "bootstrap seed": 20261106
+    }
+  },
+  "interpretation_zh": "同一最佳 checkpoint 在已反复使用的 development 上进行四次固定种子采样；EPI 与边缘强度比仅表示对 noisy pseudo-target 固定边缘区域的表示域一致性。结果是单训练 seed 的描述性诊断，不用于选轮、改 gate 或独立泛化主张。"
+}

@@ -1,0 +1,5 @@
+GPU 预检（用户授权资源覆盖）：NVIDIA GeForce RTX 3050 Laptop GPU，空闲显存 2.91/3.67 GiB；CUDA 计算进程 PID=[44415, 61699, 589855]。
+本次按用户授权忽略并行 CUDA 进程与冻结协议 3 GiB 预检门槛；训练参数保持冻结值，若 CUDA 发生 OOM 则停止并保留证据。
+已核验 train：1600 个样本、92 个来源组；仅读取 SAR LR 与目标数组。
+已核验 development：200 个样本、19 个来源组；仅读取 SAR LR 与目标数组。
+实验失败，诊断已保存在 /tmp/jdsr-c3a-20261123/experiments/phase_c3a_sar_only_flow_c1_v2_20261105_v1/manifest.json：RuntimeError: Deterministic behavior was enabled with either `torch.use_deterministic_algorithms(True)` or `at::Context::setDeterministicAlgorithms(true)`, but this operation is not deterministic because it uses CuBLAS and you have CUDA >= 10.2. To enable deterministic behavior in this case, you must set an environment variable before running your PyTorch application: CUBLAS_WORKSPACE_CONFIG=:4096:8 or CUBLAS_WORKSPACE_CONFIG=:16:8. For more information, go to https://docs.nvidia.com/cuda/cublas/index.html#results-reproducibility

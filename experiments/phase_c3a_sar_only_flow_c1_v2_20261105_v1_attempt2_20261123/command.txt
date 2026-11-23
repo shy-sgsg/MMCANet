@@ -1,0 +1,1 @@
+CUBLAS_WORKSPACE_CONFIG=:4096:8 /home/shy/anaconda3/envs/AISAR/bin/python scripts/run_phase_c3a_sar_flow.py --user-authorized-resource-override --output-dir experiments/phase_c3a_sar_only_flow_c1_v2_20261105_v1_attempt2_20261123

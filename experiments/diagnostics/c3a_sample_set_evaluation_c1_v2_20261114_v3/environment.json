@@ -1,0 +1,23 @@
+{
+  "Python 版本": "3.13.7 | packaged by Anaconda, Inc. | (main, Sep  9 2025, 19:59:03) [GCC 11.2.0]",
+  "Python 解释器": "/home/shy/anaconda3/envs/AISAR/bin/python",
+  "PyTorch 版本": "2.8.0+cu128",
+  "CUDA 运行时": "12.8",
+  "cuDNN 版本": 91002,
+  "驱动版本": "580.178.04",
+  "GPU 设备": "NVIDIA GeForce RTX 3050 Laptop GPU",
+  "GPU 总显存字节": 3942383616,
+  "GPU 预检空闲显存字节": 2762145792,
+  "平台": "Linux-7.0.0-43-generic-x86_64-with-glibc2.43",
+  "NumPy 版本": "2.3.4",
+  "TorchVision 版本": null,
+  "运行耗时秒": 457.4832379779982,
+  "推理峰值分配显存字节": 182061056,
+  "确定性设置": {
+    "global_seed": 20261105,
+    "deterministic_algorithms": true,
+    "cudnn_deterministic": true,
+    "cudnn_benchmark": false,
+    "dataloader_num_workers": 0
+  }
+}

@@ -1,0 +1,22 @@
+Traceback (most recent call last):
+  File "/tmp/jdsr-c3a-20261123/scripts/evaluate_c3a_multisample.py", line 1118, in <module>
+    main()
+    ~~~~^^
+  File "/tmp/jdsr-c3a-20261123/scripts/evaluate_c3a_multisample.py", line 1110, in main
+    _run(
+    ~~~~^
+        args.training_run_dir.resolve(),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        archive_directory=args.archive_directory,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        user_authorized_resource_override=args.user_authorized_resource_override,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/tmp/jdsr-c3a-20261123/scripts/evaluate_c3a_multisample.py", line 731, in _run
+    run_manifest, checkpoint = _validate_training_run(run_dir, protocol, protocol_hash)
+                               ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/jdsr-c3a-20261123/scripts/evaluate_c3a_multisample.py", line 469, in _validate_training_run
+    if training_protocol_hash != protocol["training_protocol_sha256"]:
+                                 ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'training_protocol_sha256'

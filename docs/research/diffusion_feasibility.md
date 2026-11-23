@@ -335,3 +335,7 @@ IEEE Xplore 官方摘要称，`Super-Resolving SAR Images with Diffusion Models:
 ICML 2026 MPC-Flow 在通用图像逆问题中用模型预测控制引导 Flow 先验，包含超分任务；本轮仅能核验 PMLR 官方摘要，故只记录方法类别与任务范围，不引用未读正文的细节。它不证明 SAR 斑点似然、光学引导或 SAR 输出质量，不使本地 C3/C4 路线获得资格。仅当任务匹配的生成先验和观测模型分别通过现行门槛后，才可把训练后控制求解器列入后续比较。
 
 ICLR 2026 的统计基准使用可精确采样的离散 Lévy 后验评测 DPS，并以覆盖率和最优性差距直接检查分布级质量。为核对本地候选评分量，本项目运行了六维稀疏高斯混合的 CPU 已知后验诊断；三类错误分布的 CRPS 均高于精确后验，精确后验的 50%/90% 覆盖分别为 0.4990/0.9014。该结果只支持该解析合成案例，不外推至 SAR、C3-A 模型或物理后验。详见[来源与范围审查](../../experiments/literature_audits/posterior_sampling_statistical_benchmark_20261109_v1/报告.md)及[CPU 报告](../../experiments/synthetic_cpu/posterior_score_calibration_cpu_20261109_v1r1/报告.md)。
+
+## 2026-11-23 C3-A SAR-only Flow 实测可行性复核
+
+冻结设置下 5 轮像素域 SAR-only Flow 的 best epoch 为 2，但在 200 个、19 个来源组隔离的 development 身份上，来源组配对 ΔPSNR、ΔSSIM、ΔEPI 均显著为负；像素均值点估计仍低于确定性 C2 SAR-only 基线。四 draw 稳定性和样本集合评分未抵消任务指标退化；4-draw 推理耗时约为单次确定性基线的 99.6 倍。按冻结规则停止当前配置，不跑第二 seed。结论只针对当前数据表示、目标、容量、预算与采样设置，不外推为对其他 Flow/Diffusion 的总体否定。数据和完整指标见 [C3-A 决策复核](C3-A%20SAR-only%20Flow%20决策复核_20261123.md)。

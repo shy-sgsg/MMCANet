@@ -1,0 +1,61 @@
+HEAD：13a3c91ca9c252c146361a42247321f251834b55
+工作区状态（运行开始前）：
+ M docs/research/CURRENT_STATE.md
+ M docs/research/DECISION_LOG.md
+ M docs/research/EXPERIMENT_REGISTRY.md
+ M docs/research/MASTER_RESEARCH_PLAN.md
+ M docs/research/NEXT_ACTIONS.md
+ M docs/research/RESEARCH_RISKS.md
+ M scripts/evaluate_c3a_multisample.py
+ M scripts/run_phase_c3a_sar_flow.py
+ M tests/test_phase_c3a_flow.py
+?? JointJDSR/__init__.py
+?? JointJDSR/model.py
+?? MMCANet/src/experiment_utils.py
+?? MMCANetV2/phase_c2_data.py
+?? MMCANetV2/phase_c2_matched.py
+?? MMCANetV2/phase_c2_runner.py
+?? MMCANetV2/phase_c3a_archive.py
+?? MMCANetV2/phase_c3a_metrics.py
+?? MMCANetV2/phase_c3a_sample_set.py
+?? "docs/research/C3A\346\240\267\346\234\254\345\275\222\346\241\243\344\270\216\344\272\256\345\200\274\344\273\243\347\220\206\350\256\276\350\256\241_20261123.md"
+?? docs/superpowers/plans/2026-11-23-c3a-flow-run.md
+?? "experiments/diagnostics/c3a_gpu_preflight_20261123_v1/\346\212\245\345\221\212.md"
+?? experiments/diagnostics/c3a_multi_sample_eval_c1_v2_20261105_v3/command.txt
+?? experiments/diagnostics/c3a_multi_sample_eval_c1_v2_20261105_v3/environment.json
+?? experiments/diagnostics/c3a_multi_sample_eval_c1_v2_20261105_v3/environment.txt
+?? experiments/diagnostics/c3a_multi_sample_eval_c1_v2_20261105_v3/git_state.txt
+?? experiments/diagnostics/c3a_multi_sample_eval_c1_v2_20261105_v3/manifest.json
+?? experiments/diagnostics/c3a_multi_sample_eval_c1_v2_20261105_v3/protocol.json
+?? experiments/phase_c2_c1_v2_20261031_v1/matrix/runs/x2_light__sar_only/manifest.json
+?? experiments/phase_c3a_sar_only_flow_c1_v2_20261105_v1/command.txt
+?? experiments/phase_c3a_sar_only_flow_c1_v2_20261105_v1/environment.txt
+?? experiments/phase_c3a_sar_only_flow_c1_v2_20261105_v1/git_state.txt
+?? experiments/phase_c3a_sar_only_flow_c1_v2_20261105_v1/input_manifest.json
+?? experiments/phase_c3a_sar_only_flow_c1_v2_20261105_v1/manifest.json
+?? experiments/phase_c3a_sar_only_flow_c1_v2_20261105_v1/protocol.json
+?? experiments/phase_c3a_sar_only_flow_c1_v2_20261105_v1/sar_only_baseline_development.csv
+?? experiments/phase_c3a_sar_only_flow_c1_v2_20261105_v1_attempt2_20261123/command.txt
+?? experiments/phase_c3a_sar_only_flow_c1_v2_20261105_v1_attempt2_20261123/development_metrics.csv
+?? experiments/phase_c3a_sar_only_flow_c1_v2_20261105_v1_attempt2_20261123/environment.txt
+?? experiments/phase_c3a_sar_only_flow_c1_v2_20261105_v1_attempt2_20261123/git_state.txt
+?? experiments/phase_c3a_sar_only_flow_c1_v2_20261105_v1_attempt2_20261123/input_manifest.json
+?? experiments/phase_c3a_sar_only_flow_c1_v2_20261105_v1_attempt2_20261123/manifest.json
+?? experiments/phase_c3a_sar_only_flow_c1_v2_20261105_v1_attempt2_20261123/paired_development_comparison.csv
+?? experiments/phase_c3a_sar_only_flow_c1_v2_20261105_v1_attempt2_20261123/protocol.json
+?? experiments/phase_c3a_sar_only_flow_c1_v2_20261105_v1_attempt2_20261123/runtime.json
+?? experiments/phase_c3a_sar_only_flow_c1_v2_20261105_v1_attempt2_20261123/sar_only_baseline_development.csv
+?? experiments/phase_c3a_sar_only_flow_c1_v2_20261105_v1_attempt2_20261123/train_log.csv
+?? "experiments/phase_c3a_sar_only_flow_c1_v2_20261105_v1_attempt2_20261123/\347\273\255\350\267\221\345\221\275\344\273\244.txt"
+?? protocols/mmcanet_phase_c1/v2/source_group_split_20261028_v1/sample_manifest.csv
+?? protocols/mmcanet_phase_c3a/sample_archive_c1_v2_20261123_v1.json
+?? scripts/evaluate_c3a_sample_set_supplement.py
+?? tests/test_c3a_fair_sample_set_scores.py
+?? tests/test_c3a_gpu_preflight.py
+?? tests/test_c3a_multisample_archive_cli.py
+?? tests/test_c3a_phase_metrics.py
+?? tests/test_c3a_resume_code_hashes.py
+?? tests/test_c3a_sample_archive.py
+?? tests/test_c3a_sample_set_scoring.py
+?? tests/test_c3a_sample_set_supplement.py
+?? tests/test_phase_c2_data.py

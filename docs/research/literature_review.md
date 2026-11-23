@@ -883,3 +883,7 @@ Vuong 与 Nguyen 的 2025 ICMLA 工作 *Perception-based multiplicative noise re
 ICML 2026 的 MPC-Flow 将预训练 Flow 先验的逆问题条件生成写成推理阶段的控制子问题，并在自然图像修复、去模糊和超分任务上报告评估。现有可核验来源为 PMLR 官方书目与摘要，PDF 本轮不可读取；不推断正文中的具体数据、算子、超参数或数值结果。该工作收窄“Flow 先验配合推理时观测控制”的宽泛新颖性空间，但不涉及 SAR 输出、乘性散斑、光学引导或本项目 JDSR。见[MPC-Flow 出版方记录](https://proceedings.mlr.press/v306/webber26a.html)和[审查报告](../../experiments/literature_audits/posterior_sampling_statistical_benchmark_20261109_v1/报告.md)。
 
 ICLR 2026 的 *A Statistical Benchmark for Diffusion-Posterior-Sampling Algorithms* 使用可精确采样的离散 Lévy 后验作为分布级金标准，并报告 MMSE 最优性差距与后验覆盖检查。它支持在已知后验的合成问题中验证采样评价工具，而非仅用点估计指标推断后验质量。本项目据此完成六维稀疏高斯混合的纯 CPU 评分诊断；该诊断不使用 SAR/项目数据，且未检验本地模型或物理后验。见[ICLR 全文](https://openreview.net/pdf?id=zDI2G8t0of)、[本地诊断报告](../../experiments/synthetic_cpu/posterior_score_calibration_cpu_20261109_v1r1/报告.md)及[文献审查报告](../../experiments/literature_audits/posterior_sampling_statistical_benchmark_20261109_v1/报告.md)。
+
+## 2026-11-23 本地 C3-A 结果不新增文献主张
+
+本轮没有新增文献检索或改变相关工作矩阵；related_work_matrix.csv 保持不变。C3-A 结果只对本地像素域 SAR-only Flow 实现提供开发集观察，不能用于扩大或缩小已核验的文献新颖性边界。当前证据显示该实现未通过冻结的第二 seed continuation 规则；已有 SAR 单模态生成超分和联合恢复先例仍按各自来源等级登记。详见 [C3-A 决策复核](C3-A%20SAR-only%20Flow%20决策复核_20261123.md)。

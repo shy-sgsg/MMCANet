@@ -1,0 +1,234 @@
+{
+  "protocol_sha256": "147c361b3e91bc4cd8d76ce5c464ad9d2137f2d06b38f31a0bc7c7a7e93101a7",
+  "source_manifest_path": "protocols/mmcanet_phase_c1/v2/source_group_split_20261028_v1/sample_manifest.csv",
+  "source_manifest_sha256": "6a278e97c161164d9440b5388c5b3fcda87746a56e26adfb7cdf658b94924e57",
+  "roles": {
+    "train": {
+      "root": "/tmp/jdsr-c3a-20261123/data/derived/c2_fixed_inputs_c1_v2_20261031_v1/x2_light/train",
+      "manifest_sha256": "64d335f06812859b96b884a5583092df76dd4b6fa181c3a842b18ed5d3bf6eeb",
+      "files_csv_sha256": "97f35201125dcb3830e9d0583d3350159f0d6757056c7acf13c4c1a0910466ad",
+      "sample_count": 1600,
+      "source_group_count": 92,
+      "payload_arrays_read": [
+        "lr",
+        "target"
+      ]
+    },
+    "development": {
+      "root": "/tmp/jdsr-c3a-20261123/data/derived/c2_fixed_inputs_c1_v2_20261031_v1/x2_light/development",
+      "manifest_sha256": "de3101a78105c05653b9779342cabe98d61a9cddac6153b25a7d6347d0ef0da9",
+      "files_csv_sha256": "70d762015b2b16a604d381758091ae3d282526a7137e9de51c6db827b60f2839",
+      "sample_count": 200,
+      "source_group_count": 19,
+      "payload_arrays_read": [
+        "lr",
+        "target"
+      ]
+    }
+  },
+  "resume_binding": {
+    "source_manifest_sha256": "6a278e97c161164d9440b5388c5b3fcda87746a56e26adfb7cdf658b94924e57",
+    "fixed_input_records": {
+      "train": {
+        "root": "/tmp/jdsr-c3a-20261123/data/derived/c2_fixed_inputs_c1_v2_20261031_v1/x2_light/train",
+        "manifest_sha256": "64d335f06812859b96b884a5583092df76dd4b6fa181c3a842b18ed5d3bf6eeb",
+        "files_csv_sha256": "97f35201125dcb3830e9d0583d3350159f0d6757056c7acf13c4c1a0910466ad",
+        "sample_count": 1600,
+        "source_group_count": 92,
+        "payload_arrays_read": [
+          "lr",
+          "target"
+        ]
+      },
+      "development": {
+        "root": "/tmp/jdsr-c3a-20261123/data/derived/c2_fixed_inputs_c1_v2_20261031_v1/x2_light/development",
+        "manifest_sha256": "de3101a78105c05653b9779342cabe98d61a9cddac6153b25a7d6347d0ef0da9",
+        "files_csv_sha256": "70d762015b2b16a604d381758091ae3d282526a7137e9de51c6db827b60f2839",
+        "sample_count": 200,
+        "source_group_count": 19,
+        "payload_arrays_read": [
+          "lr",
+          "target"
+        ]
+      }
+    },
+    "code_sha256": {
+      "MMCANetV2/phase_c3a_flow.py": "ca6652920f3763688a4c9442a4f4efcef4828925daaefd1aaeed1cd78b8078a4",
+      "scripts/run_phase_c3a_sar_flow.py": "72955eea752ca29c31aafecde64ec0962300cfddc5479d710f52d56823602b4e",
+      "MMCANetV2/phase_c2_data.py": "ba36442ddd66916a1dae68ef815374e3737409b5eb3cbe3be53d26bfbfd1b579",
+      "MMCANetV2/phase_c2_runner.py": "849b8a826afc2d0269a27c18ebb97e692899a248371915cb1f3da435870176b7",
+      "MMCANetV2/phase_c2_matched.py": "1bdf28e9c99c6080368049ddf8c35b89e46b4a6240151fba66461c400514780b",
+      "MMCANetV2/phase_c3a_metrics.py": "705cf8beee63f8d1ee2b949be1e2a223bd8dc6dc5dc27a4b8711e48ae3b70ee7",
+      "MMCANet/src/experiment_utils.py": "f8e93380d6f36d46e5fda565b95e1d4c171adf7c2f88092c823edaca5b8650de",
+      "JointJDSR/model.py": "1a0ac45e8251db0331d2f9145bc545694c9a6c9cb8ff45712575c24c8a195796",
+      "scripts/training_resume.py": "d732e3db8cac88109624dec2b4a2afcb70f615e4900eaa5e25044c078e96dbe9"
+    },
+    "environment_signature": {
+      "python": "3.13.7 | packaged by Anaconda, Inc. | (main, Sep  9 2025, 19:59:03) [GCC 11.2.0]",
+      "python_executable": "/home/shy/anaconda3/envs/AISAR/bin/python",
+      "pytorch": "2.8.0+cu128",
+      "cuda_runtime": "12.8",
+      "cudnn": 91002,
+      "driver": "580.178.04",
+      "device": "NVIDIA GeForce RTX 3050 Laptop GPU",
+      "device_count": 1,
+      "cublas_workspace_config": ":4096:8",
+      "platform": "Linux-7.0.0-43-generic-x86_64-with-glibc2.43",
+      "numpy": "2.3.4",
+      "opencv": "4.13.0"
+    },
+    "training_options": {
+      "protocol_sha256": "147c361b3e91bc4cd8d76ce5c464ad9d2137f2d06b38f31a0bc7c7a7e93101a7",
+      "training": {
+        "seed": 20261105,
+        "epochs": 5,
+        "batch_size": 4,
+        "optimizer": "Adam",
+        "learning_rate": 0.0001,
+        "weight_decay": 0.0,
+        "betas": [
+          0.9,
+          0.999
+        ],
+        "schedule": "固定学习率",
+        "augmentation": "无",
+        "random_crops": false,
+        "mixed_precision": false,
+        "num_workers": 0,
+        "drop_last": false,
+        "sample_order": "逐轮由 CPU generator(seed+1) 确定性置乱",
+        "deterministic_algorithms": true,
+        "checkpoint_metric": "按来源组等权的开发集逐图 PSNR 均值",
+        "checkpoint_direction": "maximize",
+        "checkpoint_tie_break": "较早轮次"
+      },
+      "method": {
+        "family": "像素域 SAR-only 条件 Rectified Flow Matching",
+        "optical_input": false,
+        "model": {
+          "architecture": "两层下采样的紧凑时间条件 U-Net",
+          "base_channels": 16,
+          "time_dimension": 64
+        },
+        "source_distribution": "x0 = bilinear(SAR_LR) + 0.1 * epsilon，epsilon ~ N(0,I)",
+        "noise_sigma": 0.1,
+        "interpolation": "t ~ Uniform(0,1), x_t=(1-t)*x0+t*target, u=target-x0",
+        "objective": "未加权 velocity mean-squared error",
+        "sampler": "固定每个 sample_id 的高斯源噪声，8 步 Heun ODE 积分；积分途中不裁剪，最终为指标计算裁剪到 [0,1] 并记录裁剪比例",
+        "sampler_steps": 8,
+        "sampler_function_evaluations": 16,
+        "sampling_rule": "噪声种子由 run seed 与 sample_id 的 SHA-256 确定；每个开发样本只生成一个固定样本",
+        "prior_art_boundary": "输入中心化流源分布已有自然图像超分辨率先例；本实验检验 SAR 表示域可行性，不主张通用条件流或输入中心化设计的新颖性",
+        "prior_art_sources": [
+          {
+            "title": "RFMSR: Residual Flow Matching for Image Super-Resolution",
+            "url": "https://arxiv.org/abs/2607.12753",
+            "relevance_zh": "自然图像超分中使用以 LQ latent 为中心的 source distribution；不验证 SAR 去斑或光学引导 JDSR。"
+          }
+        ]
+      },
+      "device": "cuda:0",
+      "user_authorized_resource_override": true
+    }
+  },
+  "resource_preflight_history": [
+    {
+      "checked_at_utc": "2026-11-23T07:11:44.671052+00:00",
+      "observed_cuda_compute_processes": [
+        {
+          "pid": 44415,
+          "process_name": "nautilus"
+        },
+        {
+          "pid": 61699,
+          "process_name": "resources"
+        },
+        {
+          "pid": 589855,
+          "process_name": "python3.13"
+        }
+      ],
+      "active_process_ids_under_original_preflight": [],
+      "process_query_error": null,
+      "protocol_resource_requirements": {
+        "required_device": "CUDA GPU",
+        "minimum_free_memory_gib": 3,
+        "concurrent_gpu_training": false
+      },
+      "protocol_minimum_free_memory_gib": 3.0,
+      "preflight_free_memory_bytes": 2946433024,
+      "preflight_total_memory_bytes": 3942383616,
+      "user_authorized_override": true,
+      "authorization_date": "2026-11-23",
+      "authorization_zh": "用户明确授权与其评价任务并行，并忽略冻结协议 3 GiB 最低空闲显存预检；以 CUDA OOM 作为停止边界。"
+    },
+    {
+      "checked_at_utc": "2026-11-23T07:43:39.427023+00:00",
+      "observed_cuda_compute_processes": [
+        {
+          "pid": 44415,
+          "process_name": "nautilus"
+        },
+        {
+          "pid": 61699,
+          "process_name": "resources"
+        },
+        {
+          "pid": 589855,
+          "process_name": "python3.13"
+        }
+      ],
+      "active_process_ids_under_original_preflight": [],
+      "process_query_error": null,
+      "protocol_resource_requirements": {
+        "required_device": "CUDA GPU",
+        "minimum_free_memory_gib": 3,
+        "concurrent_gpu_training": false
+      },
+      "protocol_minimum_free_memory_gib": 3.0,
+      "preflight_free_memory_bytes": 2624978944,
+      "preflight_total_memory_bytes": 3942383616,
+      "user_authorized_override": true,
+      "authorization_date": "2026-11-23",
+      "authorization_zh": "用户明确授权与其评价任务并行，并忽略冻结协议 3 GiB 最低空闲显存预检；以 CUDA OOM 作为停止边界。"
+    },
+    {
+      "checked_at_utc": "2026-11-23T07:48:31.038358+00:00",
+      "observed_cuda_compute_processes": [
+        {
+          "pid": 44415,
+          "process_name": "nautilus"
+        },
+        {
+          "pid": 61699,
+          "process_name": "resources"
+        },
+        {
+          "pid": 589855,
+          "process_name": "python3.13"
+        }
+      ],
+      "active_process_ids_under_original_preflight": [],
+      "process_query_error": null,
+      "protocol_resource_requirements": {
+        "required_device": "CUDA GPU",
+        "minimum_free_memory_gib": 3,
+        "concurrent_gpu_training": false
+      },
+      "protocol_minimum_free_memory_gib": 3.0,
+      "preflight_free_memory_bytes": 2630483968,
+      "preflight_total_memory_bytes": 3942383616,
+      "user_authorized_override": true,
+      "authorization_date": "2026-11-23",
+      "authorization_zh": "用户明确授权与其评价任务并行，并忽略冻结协议 3 GiB 最低空闲显存预检；以 CUDA OOM 作为停止边界。"
+    }
+  ],
+  "confirmation_payload_accessed": false,
+  "test_set_accessed": false,
+  "test_set_used": false,
+  "optical_payload_read": false,
+  "payload_access": {
+    "train": true,
+    "development": true
+  }
+}

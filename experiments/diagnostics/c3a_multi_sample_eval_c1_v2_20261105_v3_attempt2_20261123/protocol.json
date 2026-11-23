@@ -1,0 +1,142 @@
+{
+  "format": "c3a_multi_sample_stability_protocol_v3",
+  "protocol_id": "c3a_multi_sample_stability_c1_v2_20261105_v3",
+  "status": "pre_registered_exploratory",
+  "title_zh": "C1 v2 development 上 C3-A SAR-only Flow 多次采样、结构与输出范围诊断",
+  "objective_zh": "在 C3-A v1 训练结束并按冻结规则选出 best checkpoint 后，对每个 development 身份生成 4 个固定种子的样本，描述样本级质量、采样波动及原始输出越过 [0,1] 下界/上界的比例。新增比例仅用于区分最终裁剪的方向；不训练、不选轮、不替换权重、不改变 C3-A v1 继续规则或任何 C2/B1 gate。",
+  "training_protocol": {
+    "path": "protocols/mmcanet_phase_c3a/sar_only_flow_c1_v2_20261105_v1.json",
+    "sha256": "147c361b3e91bc4cd8d76ce5c464ad9d2137f2d06b38f31a0bc7c7a7e93101a7",
+    "expected_run": "experiments/phase_c3a_sar_only_flow_c1_v2_20261105_v1",
+    "checkpoint": "checkpoints/best.pt",
+    "checkpoint_selection_remains": "原 C3-A v1 的单固定噪声、来源组等权 development PSNR 规则"
+  },
+  "data": {
+    "source_manifest_path": "protocols/mmcanet_phase_c1/v2/source_group_split_20261028_v1/sample_manifest.csv",
+    "source_manifest_sha256": "6a278e97c161164d9440b5388c5b3fcda87746a56e26adfb7cdf658b94924e57",
+    "fixed_input_root": "data/derived/c2_fixed_inputs_c1_v2_20261031_v1/x2_light/development",
+    "condition_id": "x2_light",
+    "role": "development",
+    "sample_count": 200,
+    "source_group_count": 19,
+    "payload_arrays_read": [
+      "sar_lr",
+      "noisy_pseudo_target"
+    ],
+    "optical_payload_read": false,
+    "train_payload_read_by_this_diagnostic": false,
+    "confirmation_payload_accessed": false,
+    "test_set_accessed": false,
+    "test_set_used": false
+  },
+  "sampling": {
+    "draws_per_identity": 4,
+    "seed": 20261105,
+    "noise_seed_rule": "SHA-256(seed NUL sample_id NUL draw_index)，取摘要前 8 字节并映射为 torch.Generator seed；draw_index 为 0、1、2、3",
+    "sampler": "沿用训练协议的 8 步 Heun ODE，每步两次速度场评估；积分过程不裁剪；指标及像素波动计算使用最终 [0,1] 裁剪结果",
+    "sampler_steps": 8,
+    "function_evaluations_per_draw": 16,
+    "noise_sigma": 0.1,
+    "baseline": "同身份 C2 x2_light SAR-only best checkpoint；每身份确定性推理一次"
+  },
+  "metrics": {
+    "per_draw": [
+      "PSNR",
+      "SSIM",
+      "EPI",
+      "边缘强度比",
+      "最终裁剪比例",
+      "原始输出低于0比例",
+      "原始输出高于1比例"
+    ],
+    "per_identity_mean": "逐身份对 4 个 draw 的 PSNR、SSIM、EPI、边缘强度比及上下界越界比例求均值；质量/结构指标另求样本标准差，再与同身份确定性 SAR-only baseline 配对；来源组内先平均，随后 19 个来源组等权。",
+    "sampling_stability": [
+      "逐身份 4 次 PSNR 样本标准差",
+      "逐身份 4 次 SSIM 样本标准差",
+      "逐身份 4 次 EPI 样本标准差",
+      "最终裁剪图像的逐像素样本标准差均值"
+    ],
+    "uncertainty": "以来源组为重采样单位的 paired bootstrap 95% 区间；identity 内先聚合 4 次 draw，禁止把 draw 当作独立来源样本",
+    "bootstrap_repeats": 10000,
+    "bootstrap_seed": 20261106,
+    "selection_or_gate_change": false,
+    "structural": {
+      "edge_mask": {
+        "source": "同一 C1 v2 x2_light development SAR LR 与 noisy pseudo-target",
+        "implementation": "MMCANetV2.phase_c2_screen.build_fixed_masks 与 Early-FusionCascadeJDSR.eval_metrics.edge_metrics",
+        "operator": "3×3 Sobel gradient magnitude，cv2.BORDER_REFLECT_101",
+        "threshold_percentile": 90.0,
+        "percentile_method": "linear",
+        "ties": "include",
+        "mask_reuse": "每个身份只从固定 LR SAR/伪目标生成一次；同一 mask 用于 C2 SAR-only baseline 和全部 Flow draws"
+      },
+      "epi": "固定 edge mask 内预测与目标 Sobel 梯度幅值的 Pearson 相关系数；分母无效时按协议 fail-closed",
+      "edge_strength_ratio": "固定 edge mask 内预测/目标平均 Sobel 梯度幅值之比；描述性指标，接近 1 代表幅值接近，不设选择阈值",
+      "clip_domain": "先将最终预测裁剪至 [0,1]，再计算 EPI 与边缘强度比；目标维持冻结归一化 noisy pseudo-target"
+    },
+    "clip_component_definition": {
+      "原始输出低于0比例": "最终预测裁剪前，raw_prediction < 0 的像素比例。",
+      "原始输出高于1比例": "最终预测裁剪前，raw_prediction > 1 的像素比例。",
+      "恒等关系": "两项互斥；其和必须等于既有最终裁剪比例。恰为 0 或 1 的输出不计为越界。",
+      "用途": "表示域范围的描述性诊断；不作 checkpoint 选择、阈值调节或阶段晋级。"
+    },
+    "group_bootstrap_metrics": [
+      "平均配对 ΔPSNR",
+      "平均配对 ΔSSIM",
+      "平均配对 ΔEPI",
+      "Flow PSNR 样本标准差",
+      "Flow SSIM 样本标准差",
+      "Flow EPI 样本标准差",
+      "Flow 平均边缘强度比",
+      "平均预测像素标准差",
+      "Flow 平均原始输出低于0比例",
+      "Flow 平均原始输出高于1比例"
+    ]
+  },
+  "resources": {
+    "required_device": "CUDA GPU",
+    "minimum_free_memory_gib": 3,
+    "concurrent_gpu_training": false,
+    "batch_size": 4,
+    "num_workers": 0
+  },
+  "outputs": {
+    "directory": "experiments/diagnostics/c3a_multi_sample_eval_c1_v2_20261105_v3",
+    "files": [
+      "manifest.json",
+      "protocol.json",
+      "command.txt",
+      "environment.json",
+      "environment.txt",
+      "git_state.txt",
+      "edge_mask_manifest.csv",
+      "input_manifest.json",
+      "runtime.json",
+      "baseline_metrics.csv",
+      "flow_per_draw_metrics.csv",
+      "identity_summary.csv",
+      "group_bootstrap_summary.json"
+    ]
+  },
+  "interpretation_limits_zh": [
+    "训练仅一个 seed；4 次 draw 估计该 checkpoint 的条件采样波动，不代表训练随机性或完整分布校准。",
+    "development 已用于 C3-A v1 的 epoch 选择与初筛；本结果是复用 development 的描述性诊断，不是独立泛化证据。",
+    "目标为归一化 8-bit noisy pseudo-target；PSNR/SSIM 与伪目标的一致程度不等于干净 SAR 恢复质量。",
+    "该补充评价不回写原训练日志、best checkpoint、C3-A v1 继续规则、C2 gate 或 B1/B2/B3 状态。",
+    "EPI 与边缘强度比均相对 noisy pseudo-target 及其固定目标导出边缘区域计算；它们衡量表示域边缘一致性，不代表干净结构恢复或物理散射体保真。",
+    "原始输出上下界越界分解只用于区分表示域裁剪方向，不等同于辐射定标、亮点保真或物理饱和证据。"
+  ],
+  "created_utc": "2026-11-06T18:09:03.129996+00:00",
+  "determinism": {
+    "global_seed": 20261105,
+    "deterministic_algorithms": true,
+    "cudnn_deterministic": true,
+    "cudnn_benchmark": false,
+    "dataloader_num_workers": 0
+  },
+  "supersedes": {
+    "protocol_path": "protocols/mmcanet_phase_c3a/multi_sample_stability_c1_v2_20261105_v2.json",
+    "protocol_sha256": "8d886f26023f9d929265b3f70ad9f51314f94788b1e4a01f269af5c1f0a589fc",
+    "reason_zh": "在 C3-A 尚未开始训练或访问任何图像载荷时，CPU 表示域审计发现上采样 SAR 条件常超出 target 的 [0,1] 表示范围。为使未来裁剪记录可解释，新增 raw 输出低于 0 与高于 1 的拆分比例；保留总裁剪比例、全部主指标、采样、数据、训练和选模规则。v2 原件保留，不覆盖。"
+  }
+}

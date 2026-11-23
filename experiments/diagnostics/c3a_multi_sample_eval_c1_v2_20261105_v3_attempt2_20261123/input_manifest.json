@@ -1,0 +1,17 @@
+{
+  "source_manifest_path": "protocols/mmcanet_phase_c1/v2/source_group_split_20261028_v1/sample_manifest.csv",
+  "source_manifest_sha256": "6a278e97c161164d9440b5388c5b3fcda87746a56e26adfb7cdf658b94924e57",
+  "development_fixed_manifest_sha256": "de3101a78105c05653b9779342cabe98d61a9cddac6153b25a7d6347d0ef0da9",
+  "development_fixed_files_csv_sha256": "70d762015b2b16a604d381758091ae3d282526a7137e9de51c6db827b60f2839",
+  "edge_mask_manifest_sha256": "a4dd12c3b84b5dfd430972448d9d9b016c12b7d866343c591fb2833a20e56a0c",
+  "sample_count": 200,
+  "source_group_count": 19,
+  "payload_arrays_read": [
+    "lr",
+    "target"
+  ],
+  "confirmation_payload_accessed": false,
+  "test_set_accessed": false,
+  "test_set_used": false,
+  "optical_payload_read": false
+}

@@ -1,0 +1,18 @@
+Traceback (most recent call last):
+  File "/tmp/jdsr-c3a-20261123/scripts/evaluate_c3a_multisample.py", line 1129, in <module>
+    main()
+    ~~~~^^
+  File "/tmp/jdsr-c3a-20261123/scripts/evaluate_c3a_multisample.py", line 1121, in main
+    _run(
+    ~~~~^
+        args.training_run_dir.resolve(),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        archive_directory=args.archive_directory,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        user_authorized_resource_override=args.user_authorized_resource_override,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/tmp/jdsr-c3a-20261123/scripts/evaluate_c3a_multisample.py", line 846, in _run
+    dataset = SarTargetOnlyDataset(INPUT_ROOT / "development", SOURCE_MANIFEST, role="development", scale=2)
+TypeError: SarTargetOnlyDataset.__init__() got an unexpected keyword argument 'role'

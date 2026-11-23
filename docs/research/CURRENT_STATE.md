@@ -1,4 +1,16 @@
-# 当前状态——权威快照（2026-11-22）
+# 当前状态——权威快照（2026-11-23）
+
+## 2026-11-23 C3-A 训练、推理、评价与 Research Decision Review 已完成
+
+- **授权与隔离：** 在提交 13a3c91ca9c252c146361a42247321f251834b55 的隔离 worktree 中执行。用户明确授权本次不等待并行 CUDA 进程、不保持 3 GiB 预检门槛，以 OOM 为停止边界；冻结协议 JSON 未修改。训练、评价和归档均无 OOM。主工作区原有 6,011 项改动未覆盖或回退；新增实验产物安全复制到对应唯一路径。
+- **冻结合同：** C3-A v1 哈希为 147c361b3e91bc4cd8d76ce5c464ad9d2137f2d06b38f31a0bc7c7a7e93101a7；v3 哈希为 ee83e2cb4dadea7d4fca6576e479d2922d70df44935f1be51116add26e06016c；C1 v2 split 哈希为 6a278e97c161164d9440b5388c5b3fcda87746a56e26adfb7cdf658b94924e57。训练使用 1,600/92 组，development 使用 200/19 组；只读取 SAR LR 与 noisy pseudo-target。confirmation、test、optical 载荷均未访问，相关 flags 为 false。
+- **训练：** seed 20261105 按 x2_light 冻结设置完成 5 轮，best epoch=2；累计运行时间 1,663.71 秒，参数量 323,617，峰值已分配 GPU 显存 189,086,208 字节。失败的前置环境和 checkpoint 加载尝试及成功续跑日志都已保留。
+- **确定性基线比较：** C2 SAR-only baseline checkpoint SHA-256 为 8255b5229ca1e041cb59aed582d794bb67afdbe1601b6f4dc425c43ce27f7165。Flow 减基线来源组配对 ΔPSNR 为 −3.0724 dB（95% 区间 [−3.4720, −2.6922]），ΔSSIM 为 −0.17818（[−0.20823, −0.15062]）；v3 的 ΔEPI 为 −0.16871（[−0.18814, −0.14697]）。四 draw 像素均值的 PSNR/SSIM/EPI 仍分别低 1.1407 dB/0.08662/0.09843。
+- **决策：** 冻结的追加第二 seed 条件三项均未达到，停止当前像素域 Flow 配置，不追加 seed。该结果不能否定其他生成方法或回答 Optical 增量价值，不晋级 C3-B；C2 v2 gate 仍未判定。C3-B 需先有新的独立、来源可核验 development 数据协议。
+- **资源与成本：** GPU 为 RTX 3050 Laptop，总显存 3,942,383,616 字节。四 draw Flow 推理 458.28 秒，确定性基线 4.60 秒；峰值已分配显存分别为 189,401,088 与 85,587,456 字节。全程没有 OOM。
+- **预检实现复核：** 完成运行后移除了按进程名/脚本名放行的默认例外。当前默认预检会拦截所有其他 CUDA 计算进程并保留冻结 3 GiB 门槛；只有显式传入本次用户授权的 override 参数才跳过资源预检。修订只影响未来预检分支，不改模型、训练数据、checkpoint 或评价结果；本次实际执行的脚本哈希保存在 run manifest。
+- **记录：** [研究决策复核](C3-A%20SAR-only%20Flow%20决策复核_20261123.md)、[训练 run 清单与逐图结果](../../experiments/phase_c3a_sar_only_flow_c1_v2_20261105_v1_attempt2_20261123/manifest.json)、[v3 多样本清单与逐 draw 指标](../../experiments/diagnostics/c3a_multi_sample_eval_c1_v2_20261105_v3_attempt2_20261123/manifest.json)、[样本集合评分](../../experiments/diagnostics/c3a_sample_set_evaluation_c1_v2_20261114_v3/summary.json)、[高值代理归档统计](../../experiments/diagnostics/c3a_sample_archive_c1_v2_20261123_v1/manifest.json)、[资源预检及用户授权补记](../../experiments/diagnostics/c3a_gpu_preflight_20261123_v1/报告.md)。提交包含清单、逐图/来源组指标、汇总与中文日志；包含 confirmation 身份的完整 C1 来源清单、模型 checkpoint 和 800 个生成样本的 NPZ 保留在本地运行目录，未提交。来源清单 SHA-256 仍记录于 run manifest；本次没有读取 confirmation/test 影像载荷。
+- **下一步：** 在启动任何 C3-B 前，取得未用于既往训练/选模且身份、来源组、配准可核验的新数据，预注册独立 development；然后另行冻结匹配/错配 Optical 对照方案。正式 C3-B 训练不在本次授权内。
 
 ## 2026-11-22 C3-A 基线 checkpoint 合同 CPU 核验完成
 

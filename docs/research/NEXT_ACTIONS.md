@@ -1,5 +1,13 @@
 # 下一步行动
 
+## 2026-11-23 C3-A 已完成；后续按数据协议推进
+
+1. **已关闭：** 冻结 C3-A SAR-only Flow 训练、development 推理、多样本 v3、样本分布补充评价、样本归档及 Research Decision Review 已完成。当前像素域 Flow 未达到第二 seed continuation 条件，不追加 seed。
+2. **最高优先级：** 解决新的独立 development 数据。当前 C1 v2 的 131 个来源组均已分配，development 已反复用于训练选择，confirmation 曾被访问并永久封存；仓库数字命名 2,000 对 PNG 未映射到 C1。最小修复是取得其他未参与既往训练/选择且具正确配对和可核验来源组的数据；初始目标至少 200 对、20 个独立来源组，最终数量经精度分析后冻结。先审计身份、组、空间/时间重叠与配准，再版本化 train/development 清单和哈希。
+3. **数据不足时：** 不用 confirmation/test 顶替、不按文件名推断来源，不训练 C3-B；继续只做新数据来源与元数据核验，并记录具体缺口。
+4. **C3-B 方案（当前仅计划）：** 依赖新的 development 协议和 C2 optical 效用 gate 的重新评估。以同一新 split 从头训练 SAR-only 与 Optical-conditioned 对照，预注册 matched、组内置换、missing/zero 和几何错位控制、随机种子、预算、来源组配对指标与停止规则。只有匹配 Optical 增益可重复且失败护栏合格后，另行申请执行。当前 SAR-only Flow 不列为优先生成骨干。
+5. **禁止项：** 本次没有 C3-B 训练授权；不访问 confirmation/test/optical 历史受限载荷，不改 C2/C3 阶段门槛。决策和完整数字见 [Research Decision Review](C3-A%20SAR-only%20Flow%20决策复核_20261123.md)。
+
 ## 2026-11-22 C3-A 基线合同核验完成
 
 - **已完成：** C2 SAR-only 基线 checkpoint 与冻结 C3-A 协议、train/development 固定输入元数据绑定通过；CPU 严格加载及合成尺寸检查通过。详见[核验记录](../../experiments/code_audits/c3a_baseline_checkpoint_contract_20261122_v1/报告.md)。

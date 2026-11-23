@@ -1,0 +1,100 @@
+{
+  "格式": "c3a_sample_set_evaluation_result_v3",
+  "运行 ID": "c3a_sample_set_evaluation_c1_v2_20261114_v3",
+  "状态": "完成",
+  "开始时间 UTC": "2026-11-23T08:16:25.706989+00:00",
+  "补充协议路径": "protocols/mmcanet_phase_c3a/sample_set_evaluation_c1_v2_20261114_v3.json",
+  "补充协议 SHA-256": "ddb0883fac67e86f5b062a9e58304ec9efd8eec9a1010b3af68c53e3fb3aa0e5",
+  "C3-A v3 协议 SHA-256": "ee83e2cb4dadea7d4fca6576e479d2922d70df44935f1be51116add26e06016c",
+  "训练运行目录": "experiments/phase_c3a_sar_only_flow_c1_v2_20261105_v1_attempt2_20261123",
+  "训练运行清单 SHA-256": "27f9e350df95ccb6fa72eaf06b5f2a18aaa017e50efe16e310b0903c565853e6",
+  "补充协议绑定的预期训练运行目录": "experiments/phase_c3a_sar_only_flow_c1_v2_20261105_v1",
+  "训练运行目录有偏离": true,
+  "训练协议 SHA-256": "147c361b3e91bc4cd8d76ce5c464ad9d2137f2d06b38f31a0bc7c7a7e93101a7",
+  "最佳 checkpoint SHA-256": "c2cbc043542cd1d2e15f332a28761f5458ebcfa8b95603e40250d66d25dee399",
+  "输入清单 SHA-256": "5cda650af6a814a2aa510cebb9ce249f2af940b523588b32dbdf7b4a93f1a03c",
+  "C1 来源清单 SHA-256": "6a278e97c161164d9440b5388c5b3fcda87746a56e26adfb7cdf658b94924e57",
+  "development 固定输入 manifest SHA-256": "de3101a78105c05653b9779342cabe98d61a9cddac6153b25a7d6347d0ef0da9",
+  "development 固定输入 files.csv SHA-256": "70d762015b2b16a604d381758091ae3d282526a7137e9de51c6db827b60f2839",
+  "代码版本": "13a3c91ca9c252c146361a42247321f251834b55",
+  "工作区存在未提交修改": true,
+  "相关代码 SHA-256": {
+    "scripts/evaluate_c3a_sample_set_supplement.py": "ee04030b3018f2387cf5e0d475cf8a9af467ce66537826b7a8f34385cc0f4763",
+    "scripts/evaluate_c3a_multisample.py": "bbfd36dc9ff7697625928fb52251d73782e5658ab9843aebb69cdfda54a1036c",
+    "scripts/run_phase_c3a_sar_flow.py": "72955eea752ca29c31aafecde64ec0962300cfddc5479d710f52d56823602b4e",
+    "MMCANetV2/phase_c2_data.py": "ba36442ddd66916a1dae68ef815374e3737409b5eb3cbe3be53d26bfbfd1b579",
+    "MMCANetV2/phase_c2_runner.py": "849b8a826afc2d0269a27c18ebb97e692899a248371915cb1f3da435870176b7",
+    "MMCANetV2/phase_c2_matched.py": "1bdf28e9c99c6080368049ddf8c35b89e46b4a6240151fba66461c400514780b",
+    "MMCANetV2/phase_c3a_flow.py": "ca6652920f3763688a4c9442a4f4efcef4828925daaefd1aaeed1cd78b8078a4",
+    "MMCANetV2/phase_c3a_metrics.py": "705cf8beee63f8d1ee2b949be1e2a223bd8dc6dc5dc27a4b8711e48ae3b70ee7",
+    "MMCANetV2/phase_c3a_sample_set.py": "54160fb077e9930ddb598db13b3aafe756bab862c51a470a1f0501a45cb1db28",
+    "JointJDSR/model.py": "1a0ac45e8251db0331d2f9145bc545694c9a6c9cb8ff45712575c24c8a195796",
+    "scripts/training_resume.py": "d732e3db8cac88109624dec2b4a2afcb70f615e4900eaa5e25044c078e96dbe9"
+  },
+  "development 样本数": 200,
+  "development 来源组数": 19,
+  "每身份 draw 数": 4,
+  "draw 编号": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "development 载荷已访问": true,
+  "train 载荷已访问": false,
+  "optical 载荷已读取": false,
+  "confirmation 载荷已访问": false,
+  "test 载荷已访问": false,
+  "test 已使用": false,
+  "更新 checkpoint": false,
+  "用于选择模型": false,
+  "改变阶段 gate": false,
+  "写入预测图像": false,
+  "GPU 预检空闲字节": 2985885696,
+  "GPU 总字节": 3942383616,
+  "GPU 资源预检": {
+    "冻结资源要求": {
+      "required_device": "CUDA GPU",
+      "minimum_free_memory_gib": 3,
+      "concurrent_gpu_training": false,
+      "batch_size": 4,
+      "num_workers": 0
+    },
+    "观测到的 CUDA 计算进程": [
+      {
+        "pid": 44415,
+        "process_name": "nautilus"
+      },
+      {
+        "pid": 61699,
+        "process_name": "resources"
+      },
+      {
+        "pid": 589855,
+        "process_name": "python3.13"
+      },
+      {
+        "pid": 699200,
+        "process_name": "python"
+      }
+    ],
+    "进程清单读取错误": null,
+    "用户授权覆盖": true,
+    "授权日期": "2026-11-23",
+    "授权说明": "用户明确授权在其评价任务并行运行，并忽略冻结协议的 3 GiB 显存预检；以 CUDA OOM 作为停止边界。"
+  },
+  "结束时间 UTC": "2026-11-23T08:24:04.040056+00:00",
+  "实际生成 draw 数": 4,
+  "逐 draw 输出行数": 800,
+  "身份级输出行数": 200,
+  "来源组输出行数": 19,
+  "评价耗时秒": 457.4832379779982,
+  "推理峰值分配显存字节": 182061056,
+  "结果文件 SHA-256": {
+    "edge_mask_manifest.csv": "a4dd12c3b84b5dfd430972448d9d9b016c12b7d866343c591fb2833a20e56a0c",
+    "single_draw_metrics.csv": "f5665eedb0ed5d11e62d5bf89ec9a98f9d6dbc4139fac9f2670ce92ba219d2af",
+    "identity_object_metrics.csv": "33374f2a0e357e390605f28f507f7a46b2ba9f5d942d15e2674f1ebc28974359",
+    "source_group_metrics.csv": "4458e8be6f594a7d6ecb8bfe158eeb74ffdec85d217664ab76f43ae7061fda4f",
+    "summary.json": "53a2e618e8051fc33634707127b55b836779306b560d91ba96ff35690a7d7d1c"
+  }
+}

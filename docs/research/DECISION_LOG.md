@@ -1,5 +1,13 @@
 # 决策记录
 
+## D-2026-11-23-001 — C3-A 等待外部 CUDA 计算结束，不绕过冻结资源门槛
+
+- **触发。** 用户明确授权执行冻结 C3-A SAR-only Flow；训练入口提权后发现已有 CUDA 计算，且空闲显存不足 3 GiB。
+- **证据。** 13:19–13:57 快照看到 AISAR Python PID `426517`（278 MiB），后已退出；14:06–14:19 两次预检无其他计算进程但 CUDA 空闲仅 2.67/3.67 GiB。14:24 第 49 次预检重新发现 PID `589855`（166 MiB）；提权 `nvidia-smi` 显示已用 1,119/4,096 MiB、空闲 2,977 MiB（2.91 GiB）、利用率 73%。运行器因进程条件退出，显存也低于 3 GiB；正式输出目录不存在，未读取图像。此前 CPU 固定输入完整性核验只读取 train/development 的 SAR LR 与 noisy pseudo-target。等待器一次子进程无诊断退出 `-6`，未创建目录；随后直连入口在同一外部进程状态正常返回 2。目前 v2 等待器记录每分钟 gate 检查，信号异常最多重试一次。普通沙箱的 `nvidia-smi` 进程查询失败，提权入口可读取。
+- **实现修正。** 冻结协议禁止并行 GPU 训练；驱动列表中 `nautilus` 与 `resources` 是经名称核验的桌面图形上下文。预检改为忽略这两个进程，同时对 AISAR Python 和其他未知 CUDA 计算进程继续 fail-closed。未修改冻结 JSON、显存阈值、seed、训练或评价规则。
+- **决定。** 不与现有高利用率计算并行，不终止外部 PID，不降低 3 GiB 门槛。外部 CUDA 计算结束且新鲜 GPU 预检通过后，运行冻结 C3-A v1，再按 v3 做 development 评价与 Research Decision Review。
+- **范围与边界。** 代码预检修复及 CPU 测试已完成；C3-A 训练、推理、指标、Flow 价值判断尚未发生。未读 optical、confirmation 或 test 载荷；不启动额外 seed/C3-B。详见[GPU 预检报告](../../experiments/diagnostics/c3a_gpu_preflight_20261123_v1/报告.md)。
+
 ## D-2026-11-22-003 — 确认 C3-A 冻结 SAR-only 基线 checkpoint 可严格加载
 
 - **问题。** C3-A 冻结筛选的同身份 SAR-only 基线是否与现有 C2 checkpoint 和固定输入元数据一致？
@@ -8087,3 +8095,13 @@ C3-A 按冻结训练批量 4 和 256×256 分辨率完成纯合成 CPU 前向/�
 - **证据。** 预登记的 24×24 logistic-normal AR(1)/RBF CPU 实验保持相同边际及一阶相关，远距离相关不同；`h=1` 排序比例为 0.490/0.473，而 `h={1,2,4,8}` 等权分数为 0.990/0.857，两个方向配对分差区间均高于零。CRPS 与整图能量的逐目标排序接近机会水平。
 - **决定。** 将多距离变差分数作为未启用补充设计的候选，并记录其单一构造限制；不改 C3-A v3、评价器、正式评分权重、阶段 gate、模型或训练状态。未来协议需预先选择距离、权重、边界并以更多结构案例验证。
 - **范围与限制。** 只生成合成矩阵；没有项目影像、模型/checkpoint、confirmation/test 载荷或测量值访问，无训练/GPU。详见[实验报告](../../experiments/synthetic_cpu/c3a_spatial_variogram_multiscale_cpu_20261109_v1/report.md)。
+
+## D-2026-11-23-002 — C3-A SAR-only 像素域 Flow 未达到追加 seed 条件
+
+**触发。** 用户授权后，完成冻结 C3-A v1 五轮训练、v3 四次采样评价、样本集合补充评分和生成数组归档。
+
+**证据。** 使用 C1 v2 训练 1,600 个身份/92 组和 development 200 个身份/19 组；未访问 confirmation/test/optical。Flow 相对固定 C2 SAR-only 确定性基线的来源组配对 ΔPSNR 为 −3.0724 dB（95% 区间 [−3.4720,−2.6922]）、ΔSSIM −0.17818（[−0.20823,−0.15062]）；v3 ΔEPI −0.16871（[−0.18814,−0.14697]）。这三项均不满足冻结的第二 seed 继续条件。四 draw 推理耗时 458.28 秒，基线 4.60 秒；没有 OOM。详细指标、成本及偏差见 [Research Decision Review](C3-A%20SAR-only%20Flow%20决策复核_20261123.md)。
+
+**决定。** 停止当前像素域 SAR-only Flow 配置，不追加第二 seed。此决定不否定其他生成方法，不回答 Optical 增量，不更改 C2 gate 或冻结协议。C3-B 不在本轮授权内。
+
+**C3-B 前置。** 当前 131 个来源组均已分配；development 已反复用于选择，confirmation 曾访问后封存；本地数字命名 2,000 对未映射到 C1。现阶段无法构造可信的新独立 development 清单。最低修复是取得未参与既往训练/选择、身份与来源组可核验的新配对数据，先冻结 train/development 与审计清单，再设计 Optical、SAR-only 和错配控制。

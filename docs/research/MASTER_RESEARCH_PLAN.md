@@ -1,5 +1,9 @@
 # 总研究计划
 
+## 2026-11-23 C3-A SAR-only Flow 执行与阶段决策
+
+冻结 C3-A v1 按 seed 20261105 完成 5 轮；best epoch 为 2。C1 v2 development 上，Flow 相对 C2 SAR-only 确定性联合重建基线的来源组配对 ΔPSNR 为 −3.0724 dB（95% 区间 [−3.4720, −2.6922]），ΔSSIM 为 −0.17818（[−0.20823, −0.15062]）；v3 四 draw 评价的 ΔEPI 为 −0.16871（[−0.18814, −0.14697]）。冻结 continuation 条件均未达到，停止当前像素域 Flow，不运行第二 seed。用户明确授权本次忽略并行 CUDA 与 3 GiB 预检门槛；冻结 protocol 未改，实测无 OOM。结果只描述复用 development，不代表独立泛化或物理一致性。SAR-only 负结果不回答 Optical 增量价值，C2 v2 gate 仍未判定，因此不晋级 C3-B。后续先取得未使用且来源映射可核验的新 development 影像组并冻结 split，再另行拟定匹配/错配 Optical 对照方案。详情见 [C3-A Research Decision Review](C3-A%20SAR-only%20Flow%20决策复核_20261123.md)。
+
 ## 2026-11-22 C-Transition 第一阶段准备状态
 
 理论收尾、C1/C3-A 审计和 SAR-only Flow 冻结准备已完成；并未完成模型训练或真实模型评价。后续研究仍按 C1→C2→C3 顺序与既有 gate 执行。下一项模型实验为冻结的 C3-A SAR-only Flow 探索筛选，需先由用户恢复训练授权且 GPU 满足至少 3 GiB 空闲、无并行计算条件。C1 v2 的 development 只能支撑范围受限的探索；新的独立 development 因 131 个现有来源组均已分配、数字编号 PNG 无身份映射而阻塞。C2/C3-B 与真实频率效用主张不因此解锁。详见[准备度审查](C_TRANSITION_READINESS_REVIEW.md)。

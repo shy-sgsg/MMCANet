@@ -610,3 +610,7 @@ C3-A 仍只读取 SAR LR 与 noisy pseudo-target。v8 等待尚未开始训练�
 ## 2026-11-07 补充：乘性噪声 SDE 文献不构成光学引导证据
 
 ICMLA 2025 的乘性噪声去噪工作把 UC Merced Land Use 用作跨数据集测试，但没有将 optical 与 SAR 配对输入模型，也没有测量 optical 相对 SAR-only 基线的增益。因此它不能支持或否定本项目 Q1/Q2；相关证据状态不变。见[文献全文审查](../../experiments/literature_audits/multiplicative_noise_sde_fulltext_20261107_v1/report.md)。
+
+## 2026-11-23 SAR-only Flow 结果不回答 Optical 增量价值
+
+C3-A 只输入 SAR LR，故 Flow 相对 SAR-only 确定性基线的负差不能支持或反驳“匹配 Optical 是否带来增量价值”。C2 v2 gate 仍未判定，且已有 development 被重复使用；confirmation 已访问后封存。需在来源可核验的新 development cohort 上比较 matched Optical、同任务 SAR-only 与置换/缺失/错位控制后，才能更新 Q1/H1。详见 [C3-A Research Decision Review](C3-A%20SAR-only%20Flow%20决策复核_20261123.md)。

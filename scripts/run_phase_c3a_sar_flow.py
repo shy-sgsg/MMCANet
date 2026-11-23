@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import csv
 import argparse
+import cv2
 import hashlib
 import json
 import math
@@ -30,7 +31,8 @@ METRIC_ROOT = REPOSITORY_ROOT / "Early-FusionCascadeJDSR"
 if str(METRIC_ROOT) not in sys.path:
     sys.path.insert(0, str(METRIC_ROOT))
 
-from eval_metrics import ssim as project_ssim
+from MMCANetV2.phase_c3a_metrics import ssim as project_ssim
+from scripts.cli_zh import ChineseArgumentParser
 from MMCANetV2.phase_c2_data import C2FixedDataset, sha256_file
 from MMCANetV2.phase_c2_runner import _load_c2_model_class
 from MMCANetV2.phase_c3a_flow import (
@@ -46,6 +48,7 @@ from scripts.training_resume import save_checkpoint_atomic
 PROTOCOL_PATH = REPOSITORY_ROOT / "protocols/mmcanet_phase_c3a/sar_only_flow_c1_v2_20261105_v1.json"
 EXPECTED_PROTOCOL_SHA256 = "147c361b3e91bc4cd8d76ce5c464ad9d2137f2d06b38f31a0bc7c7a7e93101a7"
 OUTPUT_PATH = REPOSITORY_ROOT / "experiments/phase_c3a_sar_only_flow_c1_v2_20261105_v1"
+DEFAULT_OUTPUT_PATH = OUTPUT_PATH
 BASELINE_PATH = REPOSITORY_ROOT / "experiments/phase_c2_c1_v2_20261031_v1/matrix/runs/x2_light__sar_only"
 SOURCE_MANIFEST = REPOSITORY_ROOT / "protocols/mmcanet_phase_c1/v2/source_group_split_20261028_v1/sample_manifest.csv"
 INPUT_ROOT = REPOSITORY_ROOT / "data/derived/c2_fixed_inputs_c1_v2_20261031_v1/x2_light"
@@ -231,14 +234,20 @@ def _environment(device: torch.device) -> dict[str, Any]:
         "device_total_memory_bytes": int(total_bytes),
         "device_free_memory_before_run_bytes": int(free_bytes),
         "device_count": torch.cuda.device_count(),
+        "cublas_workspace_config": os.environ.get("CUBLAS_WORKSPACE_CONFIG"),
         "platform": platform.platform(),
         "numpy": np.__version__,
+        "opencv": cv2.__version__,
     }
 
 
 def _active_cuda_processes() -> list[int]:
+    return _active_cuda_processes_from_records(_cuda_compute_process_records())
+
+
+def _cuda_compute_process_records() -> list[dict[str, Any]]:
     query = subprocess.run(
-        ["nvidia-smi", "--query-compute-apps=pid", "--format=csv,noheader"],
+        ["nvidia-smi", "--query-compute-apps=pid,process_name", "--format=csv,noheader"],
         check=False,
         capture_output=True,
         text=True,
@@ -246,12 +255,19 @@ def _active_cuda_processes() -> list[int]:
     )
     if query.returncode != 0:
         raise RuntimeError("无法读取 CUDA 计算进程清单；按预登记规则停止启动")
-    process_ids: list[int] = []
-    for line in query.stdout.splitlines():
-        value = line.strip()
-        if value and value.isdigit():
-            process_ids.append(int(value))
-    return sorted(set(process_ids) - {os.getpid()})
+    processes: list[dict[str, Any]] = []
+    for row in csv.reader(query.stdout.splitlines()):
+        if not row or not any(value.strip() for value in row):
+            continue
+        if len(row) != 2 or not row[0].strip().isdigit() or not row[1].strip():
+            raise RuntimeError("CUDA 计算进程清单格式无效；按预登记规则停止启动")
+        process_name = Path(row[1].strip()).name
+        processes.append({"pid": int(row[0].strip()), "process_name": process_name})
+    return sorted(processes, key=lambda item: item["pid"])
+
+
+def _active_cuda_processes_from_records(processes: list[dict[str, Any]]) -> list[int]:
+    return sorted({int(process["pid"]) for process in processes} - {os.getpid()})
 
 
 def _load_baseline(
@@ -306,13 +322,55 @@ def fixed_input_files_sha256(dataset: SarTargetOnlyDataset) -> str:
 
 
 def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="运行或恢复冻结的 C3-A SAR-only Flow 筛选。")
+    parser = ChineseArgumentParser(description="运行或恢复冻结的 C3-A SAR-only Flow 筛选。")
     parser.add_argument(
         "--resume",
         action="store_true",
         help="仅从预定运行目录中最近一个完整 epoch 的 checkpoint 继续。",
     )
+    parser.add_argument(
+        "--user-authorized-resource-override",
+        action="store_true",
+        help=(
+            "按用户 2026-11-23 的明确授权，忽略并行 CUDA 进程和冻结协议的 3 GiB 最低空闲显存预检；"
+            "记录实际资源状态，并以 CUDA OOM 作为停止边界。训练配置不变。"
+        ),
+    )
+    parser.add_argument(
+        "--output-dir",
+        default=None,
+        help="指定 experiments/ 下的新唯一结果目录；用于保留先前失败尝试，默认使用冻结筛选目录。",
+    )
     return parser.parse_args(argv)
+
+
+def _resolve_output_path(requested: str | None) -> Path:
+    if requested is None:
+        return DEFAULT_OUTPUT_PATH
+    candidate = Path(requested)
+    if not candidate.is_absolute():
+        candidate = REPOSITORY_ROOT / candidate
+    candidate = candidate.resolve()
+    experiments_root = (REPOSITORY_ROOT / "experiments").resolve()
+    if not candidate.is_relative_to(experiments_root):
+        raise ValueError("结果目录必须位于仓库 experiments/ 目录内")
+    return candidate
+
+
+def _resource_preflight_block_reason(
+    *,
+    active_processes: list[int],
+    free_bytes: int,
+    minimum_free_bytes: int,
+    user_authorized_override: bool,
+) -> str | None:
+    if user_authorized_override:
+        return None
+    if active_processes:
+        return "检测到其他 CUDA 计算进程"
+    if free_bytes < minimum_free_bytes:
+        return "空闲显存低于冻结协议门槛"
+    return None
 
 
 def _validate_output_mode(path: Path, *, resume: bool) -> None:
@@ -334,6 +392,10 @@ def _resume_environment_signature(environment: dict[str, Any]) -> dict[str, Any]
         "driver",
         "device",
         "device_count",
+        "cublas_workspace_config",
+        "platform",
+        "numpy",
+        "opencv",
     )
     return {key: environment.get(key) for key in fields}
 
@@ -345,6 +407,10 @@ def _resume_code_hashes() -> dict[str, str]:
         "MMCANetV2/phase_c2_data.py",
         "MMCANetV2/phase_c2_runner.py",
         "MMCANetV2/phase_c2_matched.py",
+        "MMCANetV2/phase_c3a_metrics.py",
+        "MMCANet/src/experiment_utils.py",
+        "JointJDSR/model.py",
+        "scripts/training_resume.py",
     )
     return {path: sha256_file(REPOSITORY_ROOT / path) for path in paths}
 
@@ -356,6 +422,7 @@ def _build_resume_binding(
     fixed_input_records: dict[str, dict[str, Any]],
     environment: dict[str, Any],
     device: torch.device,
+    user_authorized_resource_override: bool,
 ) -> dict[str, Any]:
     return {
         "source_manifest_sha256": source_manifest_sha256,
@@ -367,6 +434,7 @@ def _build_resume_binding(
             "training": protocol["training"],
             "method": protocol["method"],
             "device": str(device),
+            "user_authorized_resource_override": user_authorized_resource_override,
         },
     }
 
@@ -642,9 +710,11 @@ def _select_resume_checkpoint(
 
 
 def _run() -> int:
+    global OUTPUT_PATH
     run_started_clock = time.perf_counter()
     started_at = _utc_now()
     args = _parse_args()
+    OUTPUT_PATH = _resolve_output_path(args.output_dir)
     protocol_bytes = PROTOCOL_PATH.read_bytes()
     protocol = json.loads(protocol_bytes)
     protocol_sha256 = hashlib.sha256(protocol_bytes).hexdigest()
@@ -652,17 +722,18 @@ def _run() -> int:
         raise ValueError("C3-A protocol 身份不匹配")
     if protocol_sha256 != EXPECTED_PROTOCOL_SHA256:
         raise ValueError("C3-A protocol SHA-256 与代码内冻结值不一致")
+    process_query_error = None
     try:
-        active_processes = _active_cuda_processes()
+        observed_cuda_processes = _cuda_compute_process_records()
+        active_processes = _active_cuda_processes_from_records(observed_cuda_processes)
     except (OSError, subprocess.SubprocessError, RuntimeError) as error:
-        print(f"未启动训练：{error}；没有读取影像。", flush=True)
-        return 2
-    if active_processes:
-        print(
-            f"未启动训练：检测到 {len(active_processes)} 个其他 CUDA 计算进程；为避免并发占用，训练未启动且没有读取影像。",
-            flush=True,
-        )
-        return 2
+        if not args.user_authorized_resource_override:
+            print(f"未启动训练：{error}；没有读取影像。", flush=True)
+            return 2
+        observed_cuda_processes = []
+        active_processes = []
+        process_query_error = f"{type(error).__name__}: {error}"
+        print(f"资源记录提示：读取 CUDA 计算进程清单失败（{process_query_error}）；按用户授权继续预检。", flush=True)
     if torch.cuda.device_count() < 1 or not torch.cuda.is_available():
         print("未启动训练：当前不可见 CUDA 设备；尚未读取影像载荷。", flush=True)
         return 2
@@ -671,15 +742,46 @@ def _run() -> int:
     free_bytes, total_bytes = torch.cuda.mem_get_info(device)
     minimum_free_gpu_bytes = int(float(protocol["resources"]["minimum_free_memory_gib"]) * 1024**3)
     print(
-        f"GPU 预检：{torch.cuda.get_device_name(device)}，空闲显存 {free_bytes / 1024**3:.2f}/{total_bytes / 1024**3:.2f} GiB。",
+        f"GPU 预检{'（用户授权资源覆盖）' if args.user_authorized_resource_override else ''}："
+        f"{torch.cuda.get_device_name(device)}，空闲显存 {free_bytes / 1024**3:.2f}/{total_bytes / 1024**3:.2f} GiB；"
+        f"CUDA 计算进程 PID={[item['pid'] for item in observed_cuda_processes]}。",
         flush=True,
     )
-    if free_bytes < minimum_free_gpu_bytes:
+    preflight_block_reason = _resource_preflight_block_reason(
+        active_processes=active_processes,
+        free_bytes=int(free_bytes),
+        minimum_free_bytes=minimum_free_gpu_bytes,
+        user_authorized_override=args.user_authorized_resource_override,
+    )
+    if preflight_block_reason:
         print(
-            f"未启动训练：空闲显存低于预登记的 {minimum_free_gpu_bytes / 1024**3:.0f} GiB 门槛；没有创建运行目录或读取影像。",
+            f"未启动训练：{preflight_block_reason}；没有创建运行目录或读取影像。",
             flush=True,
         )
         return 2
+    if args.user_authorized_resource_override:
+        print(
+            "本次按用户授权忽略并行 CUDA 进程与冻结协议 3 GiB 预检门槛；"
+            "训练参数保持冻结值，若 CUDA 发生 OOM 则停止并保留证据。",
+            flush=True,
+        )
+    resource_preflight = {
+        "checked_at_utc": _utc_now(),
+        "observed_cuda_compute_processes": observed_cuda_processes,
+        "active_process_ids_under_original_preflight": active_processes,
+        "process_query_error": process_query_error,
+        "protocol_resource_requirements": protocol["resources"],
+        "protocol_minimum_free_memory_gib": float(protocol["resources"]["minimum_free_memory_gib"]),
+        "preflight_free_memory_bytes": int(free_bytes),
+        "preflight_total_memory_bytes": int(total_bytes),
+        "user_authorized_override": bool(args.user_authorized_resource_override),
+        "authorization_date": "2026-11-23" if args.user_authorized_resource_override else None,
+        "authorization_zh": (
+            "用户明确授权与其评价任务并行，并忽略冻结协议 3 GiB 最低空闲显存预检；以 CUDA OOM 作为停止边界。"
+            if args.user_authorized_resource_override
+            else None
+        ),
+    }
     _validate_output_mode(OUTPUT_PATH, resume=args.resume)
     git_head = subprocess.run(
         ["git", "rev-parse", "HEAD"], cwd=REPOSITORY_ROOT, check=True, capture_output=True, text=True
@@ -710,6 +812,7 @@ def _run() -> int:
             "started_utc": started_at,
             "finished_utc": None,
             "environment": environment,
+            "resource_preflight_history": [resource_preflight],
             "command": [sys.executable, *sys.argv],
             "resume_history": [],
             "last_completed_epoch": 0,
@@ -726,7 +829,11 @@ def _run() -> int:
             },
         }
         _json_write(OUTPUT_PATH / "manifest.json", run_manifest)
-        (OUTPUT_PATH / "command.txt").write_text(shlex.join([sys.executable, *sys.argv]) + "\n", encoding="utf-8")
+        command_text = shlex.join([sys.executable, *sys.argv])
+        cublas_workspace_config = os.environ.get("CUBLAS_WORKSPACE_CONFIG")
+        if cublas_workspace_config:
+            command_text = f"CUBLAS_WORKSPACE_CONFIG={shlex.quote(cublas_workspace_config)} {command_text}"
+        (OUTPUT_PATH / "command.txt").write_text(command_text + "\n", encoding="utf-8")
         (OUTPUT_PATH / "environment.txt").write_text(
             "\n".join(f"{key}：{value}" for key, value in environment.items()) + "\n", encoding="utf-8"
         )
@@ -774,6 +881,7 @@ def _run() -> int:
             fixed_input_records=fixed_input_records,
             environment=environment,
             device=device,
+            user_authorized_resource_override=args.user_authorized_resource_override,
         )
         if args.resume:
             input_manifest = json.loads(input_manifest_path.read_text(encoding="utf-8"))
@@ -783,6 +891,10 @@ def _run() -> int:
                 protocol_sha256=protocol_sha256,
                 resume_binding=resume_binding,
             )
+            run_manifest.setdefault("resource_preflight_history", []).append(resource_preflight)
+            input_manifest.setdefault("resource_preflight_history", []).append(resource_preflight)
+            _json_write(input_manifest_path, input_manifest)
+            _json_write(OUTPUT_PATH / "manifest.json", run_manifest)
             selected_checkpoint_path, selected_checkpoint = _select_resume_checkpoint(
                 OUTPUT_PATH / "checkpoints",
                 protocol_sha256=protocol_sha256,
@@ -798,6 +910,7 @@ def _run() -> int:
                 "source_manifest_sha256": source_hash,
                 "roles": fixed_input_records,
                 "resume_binding": resume_binding,
+                "resource_preflight_history": [resource_preflight],
                 "confirmation_payload_accessed": False,
                 "test_set_accessed": False,
                 "test_set_used": False,

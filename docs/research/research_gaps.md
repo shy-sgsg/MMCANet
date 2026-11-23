@@ -652,3 +652,7 @@ FlowSGS 与 FMPS 的一手全文已补入相关工作矩阵。两者覆盖通用
 ICML 2026 MPC-Flow 在通用图像逆问题中已研究训练后 Flow 轨迹控制，并含超分任务；现有可读证据为出版方摘要，不能写成 SAR 物理一致性或光学引导先例。仍缺的是具备资格的 SAR 表示域观测似然、SAR 输出匹配任务的 Flow 比较，以及该方法能否保留亮散射结构。
 
 ICLR 2026 后验统计基准表明，分布采样质量可在精确后验可得的合成问题中直接检验。本地六维稀疏高斯混合 CPU 诊断已经验证部分评分工具，但并未覆盖空间图像、乘性噪声、长尾散射结构或训练模型。如何在不把通用线性高斯结果外推至 SAR 的前提下建立适当的表示域后验校准方案，仍是开放问题。见[MPC-Flow/后验基准审查](../../experiments/literature_audits/posterior_sampling_statistical_benchmark_20261109_v1/报告.md)和[已知后验 CPU 诊断](../../experiments/synthetic_cpu/posterior_score_calibration_cpu_20261109_v1r1/报告.md)。
+
+## 2026-11-23 SAR-only Flow 负结果与新独立 development 缺口
+
+冻结的 C3-A 像素域 Flow 在已复用 development 上未达到任何第二 seed 继续条件，且 4-draw 推理显著慢于固定 SAR-only 确定性基线。该观察削弱了当前这一具体实现继续投入的理由，但不判断其他生成参数化。更直接的未解问题仍是匹配 Optical 的增量价值：C2 v2 gate 未判定，当前 development 已被复用，confirmation 已访问后封存。本地数字命名 2,000 对仍无 C1 身份映射。C3-B 前必须取得来源组身份和配准均可核验的新 development 数据，并冻结比较与停止规则；详见 [决策复核](C3-A%20SAR-only%20Flow%20决策复核_20261123.md)。

@@ -1,0 +1,7 @@
+{
+  "started_utc": "2026-11-23T08:04:00.064955+00:00",
+  "finished_utc": "2026-11-23T08:12:11.152764+00:00",
+  "baseline_runtime_seconds": 4.59888243599562,
+  "flow_runtime_seconds": 458.2782046460052,
+  "flow_runtime_seconds_per_draw_per_identity": 0.5728477558075065
+}

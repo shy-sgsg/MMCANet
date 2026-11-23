@@ -1,6 +1,6 @@
 # JDSR / MMCANet：SAR 联合去斑与超分辨率
 
-> **当前研究状态（2026-11-22）：** C-Transition 第一阶段审查与 C3-A SAR-only Flow 冻结准备已完成；训练仍按用户要求暂停。详见[准备度审查](docs/research/C_TRANSITION_READINESS_REVIEW.md)和[当前状态](docs/research/CURRENT_STATE.md)。
+> **当前研究状态（2026-11-23）：** C3-A SAR-only Flow 训练、development 评价与 Research Decision Review 已完成；当前像素域 Flow 未达到追加 seed 条件，停止该配置。C3-B 尚未获授权，须先解决新的独立 development 数据协议。详见[决策复核](docs/research/C3-A%20SAR-only%20Flow%20决策复核_20261123.md)和[当前状态](docs/research/CURRENT_STATE.md)。
 
 
 **正式研究总纲：** [v1.8 研究总纲](docs/research/RESEARCH_CHARTER.md)，于 2026-11-09 获用户明确批准。正式题目为“光学先验引导与 SAR 物理一致性约束的生成式联合去斑和超分辨率重建方法研究”。v1.8 增补 SAR 两阶段潜扩散先例，并明确单次生成、像素均值点估计和样本分布是不同评价对象；沿用冻结 C1 v2，不改变历史 gate、数据权限或训练状态。对当前 8-bit PNG 表示域实验，不作未经验证的辐射物理解释。
@@ -15,12 +15,12 @@
 - **数据来源限制：** 冻结 C1 v2 train/development 的 3,600 个文件已由暂存记录连接到 TUM MediaTUM 条目 1436631 和官方 SHA-512 文件索引；旧 `fixed_train_dev2k` / `fixed_val_dev2k` 哈希审计的零精确匹配只适用于那批历史文件。`./data/` 数字命名 2,000 对仍未映射到 C1 v2。坐标、采集日期、轨道与 patch footprint 交叉表仍缺，故只支持来源场景文件夹级隔离，不声称地理/采集独立。见[来源链核查](docs/research/C1_OFFICIAL_SOURCE_METADATA_AUDIT_20261107.md)。
 - **C2 v2 方法筛查：** 沿用冻结 C1 v2 来源场景划分完成四种固定退化条件、八组 ×30 epoch 训练。原 paired screen 因 2 个 development 样本的 target 背景中位数为零而 fail-closed，故 gate 未判定；另完成全 200 个 development 样本的非门槛诊断。matched optical 相对 SAR-only 的 PSNR 增益点估计为 −0.0055 至 +0.0061 dB，四个区间均跨零且低于预设 +0.05 dB 继续阈值。见[训练矩阵](experiments/phase_c2_c1_v2_20261031_v1/matrix/manifest.json)、[失败记录](experiments/phase_c2_c1_v2_20261031_v1/screen/execution_manifest.json)和[补充诊断报告](experiments/phase_c2_c1_v2_20261031_v1/non_gate_diagnostic_20261031_v1/diagnostic_report.md)。
 - **C2 指标诊断：** 新增零背景下仍有定义的表示域均值/中位数目标—背景对比差函数，独立于 C2 v2 evaluator 和 gate。合成边界及既有 evaluator 回归 43 项通过；随后按单独冻结的 CPU v4 协议，在 6 条既有 development 零中位数失败记录上完成 24 次前向。结果仅作失败样本描述，不更新 optical 效用判断或 C2 gate；详见[设计与结果记录](docs/research/C2_ZERO_BACKGROUND_CONTRAST_DIAGNOSTIC.md)及[运行报告](experiments/diagnostics/c2_zero_background_contrast_cpu_20261107_v4/report.md)。
-- **C3-A SAR-only Flow 筛选：** `x2_light` 冻结 train/development 协议、模型与入口已准备，网络有 323,617 个可训练参数；真实训练与 development 评价按用户要求暂停，GPU 等待器未运行。张量合同、Heun 数值诊断、输入清单保护和显式 epoch 续训已完成 CPU 验证；checkpoint v2 严格绑定协议、输入、代码、环境及 RNG/generator 状态，并修复 best/last 写入间中断。C3-A 续训、Flow、评价器及等待器定向回归 67 项通过，相关 `py_compile` 通过。另已在 CPU 上核验 train/development 共 3,600 个 SAR LR/target 数组文件（1,600/200 个样本、92/19 个来源组），未读取 optical/confirmation/test 载荷。以上均不代表模型效果，不改变冻结 C3-A 协议或任何研究 gate；见[当前状态](docs/research/CURRENT_STATE.md)、[实验登记](docs/research/EXPERIMENT_REGISTRY.md)和[数据预检](experiments/diagnostics/c3a_cpu_data_preflight_20261106_v1/report.md)。
-- **C3-A 表示域范围与裁剪诊断：** train/development 中约 14.94%/15.29% 的双线性上采样 SAR 条件像素大于 1，noisy pseudo-target 中约 1.23%/1.28% 像素恰为 1；仅是归一化 PNG 表示域统计。多次采样评价保留 v2，并新增未运行 v3 分解 raw 输出低于 0/高于 1 的比例，便于区分总裁剪比例的方向；30 项 CPU 定向测试通过。用户要求训练继续暂停，尚无 C3-A 模型效果结果。详见[范围审计](experiments/diagnostics/c3a_representation_range_audit_20261107_v1/report.md)和[协议更新记录](experiments/diagnostics/c3a_representation_range_audit_20261107_v1/protocol_update.md)。
-- **C3-A 数值域合同：** 代码与冻结协议一致地保留可能大于 1 的 SAR 条件、无界速度场和未裁剪的 Heun 路径；仅评价边界裁剪并统计 raw 输出越界。没有据表示域不对称擅改协议，详见[合同核对](docs/research/C3A_NUMERIC_DOMAIN_CONTRACT_AUDIT_20261107.md)。
+- **C3-A SAR-only Flow 筛选：** 按冻结 x2_light 协议完成单 seed、5 轮训练；best epoch=2。Flow 相对 C2 SAR-only 确定性基线的 development 来源组配对 ΔPSNR 为 −3.0724 dB、ΔSSIM 为 −0.17818，未达到追加第二 seed 条件；当前像素域配置停止。四 draw v3、样本集合评分、逐图指标、checkpoint 和样本归档均已保存；用户明确授权本次忽略并行 CUDA 与 3 GiB 预检门槛，实际无 OOM。只用 SAR LR/noisy pseudo-target，未访问 optical、confirmation、test。C3-A 结果只属复用 development 的探索性观察；C2 gate 仍未判定，不晋级 C3-B。详见[决策复核](docs/research/C3-A%20SAR-only%20Flow%20决策复核_20261123.md)与[实验登记](docs/research/EXPERIMENT_REGISTRY.md)。
+- **C3-A 表示域范围与裁剪诊断：** x2_light 固定输入中 SAR 条件可超过 1；本轮 Flow 原始输出低于 0/高于 1 的像素比例为 0.00149/0.01563。冻结评价在最终裁剪至 [0,1] 后计算指标，同时保存 raw/clipped draws 与亮值代理。上述仅是归一化 PNG 表示域统计，不代表物理散射体或辐射一致性；详见[决策复核](docs/research/C3-A%20SAR-only%20Flow%20决策复核_20261123.md)。
+- **C3-A 数值域合同：** 本轮按冻结实现保留 SAR 条件、速度场与 Heun 积分数值范围，仅在评价末端裁剪并统计越界；没有据表示域不对称擅改协议。实测数值与限制见[决策复核](docs/research/C3-A%20SAR-only%20Flow%20决策复核_20261123.md)。
 - **阶段门槛：** B1 保持 not_promoted / stop_at_b1；B2/B3 继续关闭。C2 结果只按冻结规则决定继续、停止或不确定，不自动晋级历史门槛。
 - **v1.8 文献与生成评价边界：** MONTI 2026 已有 SAR 结构超分后潜扩散生成散斑外观的两阶段先例。未来随机生成结果须分别报告单次 draw、多个 draw 的像素均值点估计和生成分布；均值图不能替代单次生成质量或分布真实性。v1.8 不追溯修改 C3-A v3 或历史 gate，详见[逐节差异与采纳记录](docs/research/RESEARCH_CHARTER_CHANGELOG_20261107.md)。
-- **旧论文稿状态：** `paper/MMCANet/` 中的英文稿是 2026 年 7 月旧 pilot（1,900/100 文件级协议），不是当前 C1 v2 或模型效果证据；仅作历史材料保留。静态核对见[论文主张—证据审计](docs/research/PAPER_CLAIM_EVIDENCE_AUDIT_20261107.md)。
+- **旧论文稿状态：** paper/MMCANet/ 中的英文稿是 2026 年 7 月旧 pilot（1,900/100 文件级协议），不是当前 C1 v2 或模型效果证据；仅作历史材料保留，主张边界见[当前状态](docs/research/CURRENT_STATE.md)。
 - **状态入口：** [当前状态](docs/research/CURRENT_STATE.md)、[下一步行动](docs/research/NEXT_ACTIONS.md)、[实验登记](docs/research/EXPERIMENT_REGISTRY.md)、[决策记录](docs/research/DECISION_LOG.md)和[研究风险](docs/research/RESEARCH_RISKS.md)。
 
 ## 核心科学问题
@@ -51,7 +51,7 @@
 
 - **已有证据支持：** 用户已批准研究总纲 v1.8；C1 v2 的来源场景文件夹划分和 train/development/confirmation 身份数已有清单证据。地理与采集独立性仍未证实。
 - **已实现：** C2 固定筛查代码、C3-A SAR-only Flow 模型/入口，以及零背景对比差诊断代码已实现；代码测试不等同于方法效果证据。
-- **暂停中：** C3-A 训练按用户要求暂缓；多次采样补充评价代码和协议已实现并通过合成验证，尚无真实训练或 development 结果。
+- **已停止当前 C3-A Flow 配置：** 冻结单 seed 实验已完成，但未达到追加第二 seed 条件；C3-A 不回答 Optical 效用，C2 v2 gate 仍未判定。详见[决策复核](docs/research/C3-A%20SAR-only%20Flow%20决策复核_20261123.md)。
 - **当前证据不支持：** 现有证据不支持“稳定 optical 增益”主张；C2 v2 gate 仍未判定，不能解释为 optical 无效。
 - **已停止：** 历史 B1 仍为 `not_promoted / stop_at_b1`，B2/B3 按现行门槛关闭。
 - **待验证候选：** Optical-conditioned Flow、Conditional Diffusion、Residual Flow、后验/观测一致性约束和可靠性自适应引导均是待验证方向，不是已完成贡献。
