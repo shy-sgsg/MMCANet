@@ -1,5 +1,14 @@
 # 决策记录
 
+## D-2026-11-24-001 — 停止当前 SAR-only DDPM 设置并保持 C3-B 关闭
+
+- **问题。** 在用户指定的 SAR-only 生成模型优先探索中，是否继续扩展 Conditional DDPM 或 SwinIR-centered Residual DDPM；当前结果是否足以进入 Optical 条件 C3-B？
+- **证据。** C1 v2 x2-light 固定 train 1,600/92 来源组、development 200/19 来源组；仅读取 SAR LR/noisy pseudo-target。seed `20261124`，两种扩散配置各训练 30 epochs、1,000 个扩散步、20-step DDIM、4 draws。Residual pixel-mean 相对 SwinIR 任务适配基线 ΔPSNR `−0.5381 dB`（来源组 bootstrap 95% CI `[−0.6072,−0.4713]`）、ΔSSIM `−0.02773`、ΔEPI `−0.01598`；相对内部 C2 方向相同。Conditional DDPM 单 draw PSNR `11.5083 dB`，亮区均值比 `0.7426`、背景均值比 `0.6810`。Residual 采样 2,059.1 秒/200 张四 draw；SwinIR 单次推理 18.58 秒。续训/采样/汇总记录未见 CUDA OOM，Residual epoch 24 后原进程停止的具体原因未明。完整指标和边界见[决策复核](SAR-only%20Published%20Baseline%20与%20Diffusion%20决策复核_20261124.md)及[run manifest](../../experiments/published_baselines_sar_only_20261123_v1/运行_sar_only_diffusion_20261123_v1/manifest.json)。
+- **决定。** STOP 当前 Conditional DDPM 与 Residual DDPM 配置，不追加相同配置 seed，不为当前质量目标投入更多 GPU。Residual 条件对直接 SAR 条件有显著改进，但仍不及确定性参照。该决定不否定其他扩散参数化或其他分布目标；若未来要重开，必须重新提出可证伪假设、独立 development、可评价的生成分布参照和停止门槛。
+- **阶段与数据边界。** 该 SAR-only 实验不测 Optical 增量或 SAR 测量一致性，不能支持/反驳 H1/Q1。`C2 v2 gate` 仍未判定，development 已复用，C3-B 尚未获授权；保持关闭。`test_set_accessed/used=false`、`confirmation_payload_accessed=false`、`optical_payload_loaded=false`。
+- **限制。** 单 seed 与重复使用 development 仅支撑探索观察；8-bit noisy pseudo-target 指标不代表 clean SAR/radiometric truth；4 draws 的 CRPS/energy/variogram 不证明分布校准。Residual 训练从 epoch 24 checkpoint 恢复，optimizer/RNG 已恢复；第 1–23 轮逐图选模行缺失并已披露。
+- **资源与提交。** 用户授权忽略并行 CUDA 与 3 GiB 门槛、以真实 OOM 为资源边界；续训、采样与汇总记录未见 OOM，Residual epoch 24 后原进程退出原因未知。生成 NPY 和 checkpoint 保留本地，Git 只纳入代码、中文报告、manifest、日志及小型指标表。
+
 ## D-2026-11-23-001 — C3-A 等待外部 CUDA 计算结束，不绕过冻结资源门槛
 
 - **触发。** 用户明确授权执行冻结 C3-A SAR-only Flow；训练入口提权后发现已有 CUDA 计算，且空闲显存不足 3 GiB。

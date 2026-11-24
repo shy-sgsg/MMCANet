@@ -1,0 +1,11 @@
+{
+  "阶段": "conditional_sample",
+  "状态": "完成",
+  "说明": "从已完整训练的 conditional EMA checkpoint 重建完整 200 张 4-draw 评价",
+  "开始时间 Unix": 1795448923.0690613,
+  "命令": "experiments/published_baselines_sar_only_20261123_v1/continue_diffusion_run.py --stage conditional_sample --run-dir experiments/published_baselines_sar_only_20261123_v1/运行_sar_only_diffusion_20261123_v1",
+  "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+  "结束时间 Unix": 1795451699.7115798,
+  "已归档部分预测": "predictions/conditional_中断部分_11张_20261123_234843",
+  "完整样本数": 200
+}

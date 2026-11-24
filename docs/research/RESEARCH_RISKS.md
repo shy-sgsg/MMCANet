@@ -1,5 +1,27 @@
 # 研究风险与证据边界
 
+## 2026-11-24 SAR-only Published Baseline / Diffusion 结果风险
+
+- **证据范围：** 所有模型结果来自单 seed 和历史重复使用的 C1 v2 development（200 张/19 组）；组 bootstrap 区间不消除 split 复用、来源地理独立性未知或多重试验风险，不能宣称独立泛化。
+- **目标表示：** 8-bit normalized noisy pseudo-target 的 PSNR/SSIM 是表示域一致性分数，不是 clean SAR 恢复质量、辐射定标误差或物理一致性证据。
+- **生成分布：** 每臂只有 4 draws；样本 spread、CRPS、energy score 与 variogram score 均没有真实或校准后验参照，不能命名为可信不确定性或真实 speckle 分布。
+- **结果与主张：** 当前 Conditional 和 SwinIR-centered Residual DDPM 均在主要像素/结构指标上落后于确定性参照；停止这两种具体设置，但不将单 seed 负结果外推为所有 diffusion 无效。Residual 条件改善了直接 Conditional DDPM 的退化，仍未达到基线。
+- **方法谱系：** SwinIR 是随机初始化的 SAR 单通道任务适配版；C2 是项目内部基线；DSRKD 作者代码/权重尚未取得，CD-SW 作者身份、许可、代码树与报告配置存在未核实项。不得称为发表方法精确复现或强发表基线比较。
+- **连续性缺口：** Residual 训练从 epoch 24 checkpoint 恢复并成功完成 30 轮；epoch 1–23 的逐图选模记录没有保留，只能重建逐轮标量日志，并在报告中披露。最终 200 张逐图生成/评价结果完整。
+- **计算成本与空间：** Residual 四 draw 采样约为 SwinIR 单次推理的 110.8 倍；续训、采样和汇总记录未见 CUDA OOM，Residual 原进程 epoch 24 后退出原因未知。最终临时分区约剩 1.8 GiB；checkpoint、固定输入和生成样本均有后续复用价值，不作自动清理，启动新任务前需重查余量。
+- **阶段资格：** 本轮无 Optical 输入，不能更新匹配光学效用假设。C2 v2 gate 仍未判定、新 independent development 不存在、C3-B 未获本轮授权；不把 SAR-only 结果用于解锁 C3-B。
+
+完整结果和限制见 [2026-11-24 Research Decision Review](SAR-only%20Published%20Baseline%20与%20Diffusion%20决策复核_20261124.md)。
+
+## 2026-11-23 SAR-only Published Baseline / Diffusion 启动时风险快照（历史）
+
+- **外部 baseline 身份：** 当前可执行 SwinIR run 使用发表通用架构的单通道 SAR 任务适配版、随机初始化及本地 noisy pseudo-target 数据，不是论文 SAR 方法或作者权重复现。C2MatchedJoint 是内部对照。DSRKD 作者代码/权重尚未取得；不可用重写实现冒充。
+- **直接 SAR 扩散代码：** 题名对应的 CD-SW 公开仓库已找到，但维护者与论文作者身份未核实；发布状态在 IOP 正文访问受限时无法由出版方页面复核。README 的训练脚本与代码树不符，配置的默认数据/随机退化和当前固定输入不同，扩散步数硬编码 4 而 README 写 1,000，预训练权重待发布，根目录无通用 LICENSE。暂不能将仓库报告指标映射到本地，也不能称作可复现官方结果。
+- **训练状态与资源：** SwinIR 已完成 20/30 轮，当前 best development 组均衡 PSNR 为 21.5696 dB（第 15 轮）。训练仍在运行，不能报告为最终结果。用户允许并行 GPU 评价且取消 3 GiB 门槛；最近 GPU 快照已用 2,190/4,096 MiB、利用率 99%，SwinIR 峰值 allocated 558.4 MiB，无 OOM。若出现真实 OOM，按预登记新目录回退配置并保留失败证据。
+- **磁盘观察：** `/tmp` 尚有约 6.8 GiB，本轮 SwinIR run 目录约 31 MiB；`/home` 分区可用空间快照在约 26–42 GiB 间变化，未归因于本轮输出。暂未找到可安全清理且归属明确的历史内容；扩散生成前再次核对空间。
+- **数据与证据：** development 已重复用于历史训练/选择；单 seed、单 split 只支持范围受限探索。归一化 8-bit noisy pseudo-target 的 PSNR/SSIM 不等同 clean SAR 恢复质量或辐射物理保真；4 draws 的 CRPS/energy/variogram 分数有明显小样本局限，不称校准不确定性。
+- **阶段资格：** 本轮只用 SAR 数据。HSFMamba 需 optical 输入且 C2 gate 未判定、新独立 development 缺失；不在本轮访问 optical，也不将 SAR-only 结果解读为 optical 增益证据。
+
 ## 2026-11-23 C3-A 获准后仍受外部 CUDA 计算与显存门槛阻塞
 
 - **资源观察：** 提权设备可见；14:24 第 49 次预检重新看到 AISAR Python PID `589855`（166 MiB）；GPU 空闲约 2.91 GiB、利用率 73%，仍低于 3 GiB 门槛，且存在并行 CUDA 计算。此前 PID `426517` 已结束；显存快照会波动。等待外部任务结束并满足显存门槛后再运行，不降低门槛。

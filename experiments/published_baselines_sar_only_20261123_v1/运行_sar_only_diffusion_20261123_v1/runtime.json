@@ -1,0 +1,25 @@
+{
+  "training_seconds_by_variant": {
+    "conditional": 2099.020796864963,
+    "residual": 4458.507522118935
+  },
+  "sampling_seconds_by_variant": {
+    "conditional": 2737.4070693038666,
+    "residual": 2059.1265829079493
+  },
+  "measured_training_and_sampling_seconds": 11354.061971195715,
+  "swinir_base_inference_seconds_train_and_development": null,
+  "swinir_base_inference_time_note": "初始进程在写入总 runtime.json 前中断，未持久化该计时；不作估算。",
+  "cuda_peak_allocated_mib": 549.9228515625,
+  "cuda_peak_reserved_mib": 634.0,
+  "cuda_free_memory_bytes_after_finalize": 2549678080,
+  "disk_free_bytes_after_finalize": 1912451072,
+  "parameters": 958401,
+  "optimizer_updates_per_variant": 12000,
+  "generated_image_count_per_variant": 800,
+  "prediction_array_shape_per_sample": [
+    4,
+    256,
+    256
+  ]
+}

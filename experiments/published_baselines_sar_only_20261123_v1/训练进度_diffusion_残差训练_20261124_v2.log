@@ -1,0 +1,11 @@
+恢复阶段失败：FileExistsError: 发现已有 residual 训练产物；保留现场并拒绝覆盖
+Traceback (most recent call last):
+  File "/tmp/jdsr-c3a-final/experiments/published_baselines_sar_only_20261123_v1/continue_diffusion_run.py", line 420, in <module>
+    main()
+    ~~~~^^
+  File "/tmp/jdsr-c3a-final/experiments/published_baselines_sar_only_20261123_v1/continue_diffusion_run.py", line 400, in main
+    run_stage(args.stage, Path(args.run_dir))
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/jdsr-c3a-final/experiments/published_baselines_sar_only_20261123_v1/continue_diffusion_run.py", line 203, in run_stage
+    raise FileExistsError("发现已有 residual 训练产物；保留现场并拒绝覆盖")
+FileExistsError: 发现已有 residual 训练产物；保留现场并拒绝覆盖

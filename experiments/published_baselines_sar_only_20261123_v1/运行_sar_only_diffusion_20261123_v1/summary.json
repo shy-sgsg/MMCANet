@@ -1,0 +1,505 @@
+{
+  "interpretation_scope": "单 seed、历史重复使用 development 的探索观察；不构成独立泛化或校准不确定性证据",
+  "train_only_residual_rms": 0.09527937661805623,
+  "train_only_residual_scale": 10.495450699773908,
+  "SwinIR_SAR_deterministic_reference": {
+    "checkpoint_sha256": "b4d043d30ea25724cfca65fb7ed0b79ee2e6a7aa07e8e123ff710f2fccd63c61",
+    "best_epoch": 30,
+    "group_balanced_metrics": {
+      "psnr_db": 21.635174888033717,
+      "ssim": 0.3597367462399409,
+      "epi_corr": 0.3586619059486083,
+      "edge_strength_ratio": 0.23785878700612392,
+      "bright_mean_ratio": 0.9998483005037718,
+      "bright_p95_ratio": 0.9415001048710927,
+      "background_mean_ratio": 1.018389026285929
+    }
+  },
+  "internal_C2_deterministic_reference": {
+    "checkpoint_sha256": "8255b5229ca1e041cb59aed582d794bb67afdbe1601b6f4dc425c43ce27f7165",
+    "group_balanced_metrics": {
+      "psnr_db": 21.608208472115223,
+      "ssim": 0.36270649582963754,
+      "epi_corr": 0.35572637295201553,
+      "edge_strength_ratio": 0.255122296837484,
+      "bright_mean_ratio": 1.0077082676180242,
+      "bright_p95_ratio": 0.9503286386220647,
+      "background_mean_ratio": 1.013876611764351
+    }
+  },
+  "diffusion_variants": {
+    "conditional": {
+      "best_epoch": 30,
+      "development_group_balanced_epsilon_mse": 0.038501902414577995,
+      "training": {
+        "training_seconds": 2099.020796864963,
+        "optimizer_updates": 12000,
+        "parameter_count": 958401,
+        "peak_allocated_mib": 521.88671875,
+        "peak_reserved_mib": 608.0,
+        "runtime_source": "由逐轮日志重建；原首轮进程在写入总 runtime.json 前中断"
+      },
+      "sampling": {
+        "draw_count_per_image": 4,
+        "ddim_steps": 20,
+        "sampling_seconds_total": 2737.4070693038666,
+        "sampling_seconds_median_per_draw": 3.3892292869932135,
+        "repeat_same_noise_max_abs_difference": 0.0,
+        "best_epoch": 30,
+        "checkpoint_best_epoch": 30,
+        "peak_allocated_mib": 115.74169921875,
+        "peak_reserved_mib": 132.0
+      },
+      "single_draw_group_balanced_metrics": {
+        "psnr_db": 11.508275008509804,
+        "ssim": 0.21310307284684935,
+        "epi_corr": 0.20757564487536687,
+        "edge_strength_ratio": 0.5320808223795546,
+        "bright_mean_ratio": 0.7426341991675528,
+        "bright_p95_ratio": 0.7572763927886931,
+        "background_mean_ratio": 0.6809891961122814
+      },
+      "single_draw_metric_standard_deviation_across_draws": {
+        "psnr_db": 1.029999588807851,
+        "ssim": 0.013427961201547864,
+        "epi_corr": 0.020460240902772348,
+        "edge_strength_ratio": 0.030083715955479727,
+        "bright_mean_ratio": 0.03798578836346953,
+        "bright_p95_ratio": 0.03266236083013032,
+        "background_mean_ratio": 0.054805588370822465
+      },
+      "group_balanced_pixel_mean_metrics": {
+        "psnr_db": 11.766085474995378,
+        "ssim": 0.2889211124436982,
+        "epi_corr": 0.28274328383656766,
+        "edge_strength_ratio": 0.379957529034746,
+        "bright_mean_ratio": 0.7426341983690218,
+        "bright_p95_ratio": 0.7288737060065477,
+        "background_mean_ratio": 0.680989194572257
+      },
+      "mean_pixelwise_sample_std": 0.06759899836033582,
+      "draw_pair_mean_absolute_difference": 0.09530953157693148,
+      "output_clipped_fraction_mean": 0.0,
+      "group_balanced_distribution_scores": {
+        "pixelwise_crps": 0.21605326008934467,
+        "normalized_image_energy_score": 0.22814544900203543,
+        "adjacent_variogram_score": 0.004040637367384788
+      },
+      "checkpoint_sha256": {
+        "best": "1fd741b521fed8599519a5d370cb2206ea1249a7a857f67f8edddd52ef03da03",
+        "last": "985b53b00f05effc700da1b27f95d91265036536dd8e3ea689fce05092b03ecc"
+      }
+    },
+    "residual": {
+      "best_epoch": 30,
+      "development_group_balanced_epsilon_mse": 0.14460532228413933,
+      "training": {
+        "training_seconds": 4458.507522118935,
+        "optimizer_updates": 12000,
+        "parameter_count": 958401,
+        "peak_allocated_mib": 549.9228515625,
+        "peak_reserved_mib": 634.0,
+        "elapsed_since_resume_start_seconds": 612.3284092439862,
+        "best_epoch": 30,
+        "best_development_group_balanced_epsilon_mse": 0.14460532228413933,
+        "resume_from_epoch": 24,
+        "recovered_training_log": "训练进度_diffusion_20261123_v1.log",
+        "recovered_per_image_validation_epochs": [
+          24
+        ],
+        "per_image_validation_epochs_unavailable": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23
+        ],
+        "interruption_cause": "训练进程在第 24 轮 checkpoint 后消失；内核日志未发现 OOM 记录，CUDA OOM 未被证实"
+      },
+      "sampling": {
+        "draw_count_per_image": 4,
+        "ddim_steps": 20,
+        "sampling_seconds_total": 2059.1265829079493,
+        "sampling_seconds_median_per_draw": 1.7335931670095306,
+        "repeat_same_noise_max_abs_difference": 0.0,
+        "best_epoch": 30,
+        "checkpoint_best_epoch": 30,
+        "peak_allocated_mib": 115.99169921875,
+        "peak_reserved_mib": 134.0
+      },
+      "single_draw_group_balanced_metrics": {
+        "psnr_db": 20.094757217318765,
+        "ssim": 0.3206974750865493,
+        "epi_corr": 0.3175601177758273,
+        "edge_strength_ratio": 0.21061195942715094,
+        "bright_mean_ratio": 0.9776619039582863,
+        "bright_p95_ratio": 0.9394064279121646,
+        "background_mean_ratio": 1.0327980585218046
+      },
+      "single_draw_metric_standard_deviation_across_draws": {
+        "psnr_db": 0.9498383438648749,
+        "ssim": 0.0035623332220456605,
+        "epi_corr": 0.014061763788624155,
+        "edge_strength_ratio": 0.014275364502422661,
+        "bright_mean_ratio": 0.04368412483182242,
+        "bright_p95_ratio": 0.03586449293296861,
+        "background_mean_ratio": 0.05895346959025055
+      },
+      "group_balanced_pixel_mean_metrics": {
+        "psnr_db": 21.097100974809173,
+        "ssim": 0.332007491045496,
+        "epi_corr": 0.34268470625543,
+        "edge_strength_ratio": 0.18876454765784145,
+        "bright_mean_ratio": 0.9776619027961384,
+        "bright_p95_ratio": 0.9321957943827343,
+        "background_mean_ratio": 1.0327980570815967
+      },
+      "mean_pixelwise_sample_std": 0.04509223923552781,
+      "draw_pair_mean_absolute_difference": 0.06387068489566446,
+      "output_clipped_fraction_mean": 0.008885459899902344,
+      "group_balanced_distribution_scores": {
+        "pixelwise_crps": 0.055285143876717506,
+        "normalized_image_energy_score": 0.07613561617467748,
+        "adjacent_variogram_score": 0.004685082838602994
+      },
+      "checkpoint_sha256": {
+        "best": "ec8a2c45574088ecc7092733bbb2462384537aebc3234865c933ff72862c02db",
+        "last": "943b8582983c7b93ac76bd54f6eb3ae72a246cda6610c87a49adec7043ef6325"
+      }
+    }
+  },
+  "paired_group_bootstrap_vs_swinir": {
+    "conditional": {
+      "psnr_db": {
+        "group_balanced_delta": -9.869089413038338,
+        "group_bootstrap_95_ci": [
+          -11.30808773238769,
+          -8.524748944155906
+        ]
+      },
+      "ssim": {
+        "group_balanced_delta": -0.07081563379624263,
+        "group_bootstrap_95_ci": [
+          -0.09697420500621974,
+          -0.048072035307668994
+        ]
+      },
+      "epi_corr": {
+        "group_balanced_delta": -0.07591862211204065,
+        "group_bootstrap_95_ci": [
+          -0.08890633819498553,
+          -0.06318215970803394
+        ]
+      },
+      "edge_strength_ratio": {
+        "group_balanced_delta": 0.14209874202862202,
+        "group_bootstrap_95_ci": [
+          0.09832797538979328,
+          0.19102007252066516
+        ]
+      },
+      "bright_mean_ratio": {
+        "group_balanced_delta": -0.2572141021347502,
+        "group_bootstrap_95_ci": [
+          -0.2740832307285955,
+          -0.24135831467343857
+        ]
+      },
+      "bright_p95_ratio": {
+        "group_balanced_delta": -0.2126263988645453,
+        "group_bootstrap_95_ci": [
+          -0.22930700690053293,
+          -0.19693287965141984
+        ]
+      },
+      "background_mean_ratio": {
+        "group_balanced_delta": -0.3373998317136719,
+        "group_bootstrap_95_ci": [
+          -0.3592499973500174,
+          -0.31132019013309026
+        ]
+      },
+      "versus_internal_C2": {
+        "psnr_db": {
+          "group_balanced_delta": -9.84212299711984,
+          "group_bootstrap_95_ci": [
+            -11.262383792198554,
+            -8.510881272475899
+          ]
+        },
+        "ssim": {
+          "group_balanced_delta": -0.07378538338593936,
+          "group_bootstrap_95_ci": [
+            -0.09914900854307597,
+            -0.05083531415273832
+          ]
+        },
+        "epi_corr": {
+          "group_balanced_delta": -0.0729830891154479,
+          "group_bootstrap_95_ci": [
+            -0.08596838023012744,
+            -0.05995053731990667
+          ]
+        },
+        "edge_strength_ratio": {
+          "group_balanced_delta": 0.12483523219726196,
+          "group_bootstrap_95_ci": [
+            0.08012706511345734,
+            0.1719018248322939
+          ]
+        },
+        "bright_mean_ratio": {
+          "group_balanced_delta": -0.2650740692490025,
+          "group_bootstrap_95_ci": [
+            -0.28093986546166205,
+            -0.2501623962413181
+          ]
+        },
+        "bright_p95_ratio": {
+          "group_balanced_delta": -0.2214549326155174,
+          "group_bootstrap_95_ci": [
+            -0.23692425678506424,
+            -0.2068598551862833
+          ]
+        },
+        "background_mean_ratio": {
+          "group_balanced_delta": -0.3328874171920941,
+          "group_bootstrap_95_ci": [
+            -0.35676605435221964,
+            -0.30602904447670765
+          ]
+        }
+      }
+    },
+    "residual": {
+      "psnr_db": {
+        "group_balanced_delta": -0.5380739132245492,
+        "group_bootstrap_95_ci": [
+          -0.6072117793295754,
+          -0.47131101205224946
+        ]
+      },
+      "ssim": {
+        "group_balanced_delta": -0.027729255194444812,
+        "group_bootstrap_95_ci": [
+          -0.03268905449804151,
+          -0.022384020513239785
+        ]
+      },
+      "epi_corr": {
+        "group_balanced_delta": -0.01597719969317834,
+        "group_bootstrap_95_ci": [
+          -0.018862221773534048,
+          -0.013053145408166088
+        ]
+      },
+      "edge_strength_ratio": {
+        "group_balanced_delta": -0.04909423934828256,
+        "group_bootstrap_95_ci": [
+          -0.0539417166775496,
+          -0.04411017566911757
+        ]
+      },
+      "bright_mean_ratio": {
+        "group_balanced_delta": -0.022186397707633428,
+        "group_bootstrap_95_ci": [
+          -0.026982974765831207,
+          -0.017599973270767615
+        ]
+      },
+      "bright_p95_ratio": {
+        "group_balanced_delta": -0.00930431048835864,
+        "group_bootstrap_95_ci": [
+          -0.01339421415086568,
+          -0.005320270738818429
+        ]
+      },
+      "background_mean_ratio": {
+        "group_balanced_delta": 0.014409030795667731,
+        "group_bootstrap_95_ci": [
+          0.007886674031971744,
+          0.020507236448201266
+        ]
+      },
+      "versus_internal_C2": {
+        "psnr_db": {
+          "group_balanced_delta": -0.5111074973060526,
+          "group_bootstrap_95_ci": [
+            -0.5762515305256041,
+            -0.44753562713803857
+          ]
+        },
+        "ssim": {
+          "group_balanced_delta": -0.030699004784141552,
+          "group_bootstrap_95_ci": [
+            -0.0361298867767564,
+            -0.024527570600845365
+          ]
+        },
+        "epi_corr": {
+          "group_balanced_delta": -0.013041666696585609,
+          "group_bootstrap_95_ci": [
+            -0.016835334164402405,
+            -0.008833056122761836
+          ]
+        },
+        "edge_strength_ratio": {
+          "group_balanced_delta": -0.06635774917964261,
+          "group_bootstrap_95_ci": [
+            -0.07157019498998586,
+            -0.06067936310292231
+          ]
+        },
+        "bright_mean_ratio": {
+          "group_balanced_delta": -0.030046364821885763,
+          "group_bootstrap_95_ci": [
+            -0.035058549194815054,
+            -0.02523370817588847
+          ]
+        },
+        "bright_p95_ratio": {
+          "group_balanced_delta": -0.01813284423933075,
+          "group_bootstrap_95_ci": [
+            -0.022211362251824737,
+            -0.014384366851389125
+          ]
+        },
+        "background_mean_ratio": {
+          "group_balanced_delta": 0.018921445317245555,
+          "group_bootstrap_95_ci": [
+            0.01204164880813594,
+            0.025585313095715625
+          ]
+        }
+      },
+      "versus_conditional_diffusion": {
+        "psnr_db": {
+          "group_balanced_delta": 9.331015499813791,
+          "group_bootstrap_95_ci": [
+            8.008035035637304,
+            10.72233353174425
+          ]
+        },
+        "ssim": {
+          "group_balanced_delta": 0.043086378601797815,
+          "group_bootstrap_95_ci": [
+            0.015351038216951067,
+            0.07322091945848838
+          ]
+        },
+        "epi_corr": {
+          "group_balanced_delta": 0.0599414224188623,
+          "group_bootstrap_95_ci": [
+            0.046985633320017206,
+            0.07375238277733344
+          ]
+        },
+        "edge_strength_ratio": {
+          "group_balanced_delta": -0.19119298137690457,
+          "group_bootstrap_95_ci": [
+            -0.2405534645245404,
+            -0.14574548193373826
+          ]
+        },
+        "bright_mean_ratio": {
+          "group_balanced_delta": 0.23502770442711676,
+          "group_bootstrap_95_ci": [
+            0.21903112061357385,
+            0.2521637228509171
+          ]
+        },
+        "bright_p95_ratio": {
+          "group_balanced_delta": 0.20332208837618668,
+          "group_bootstrap_95_ci": [
+            0.1888791108423728,
+            0.21860229863504477
+          ]
+        },
+        "background_mean_ratio": {
+          "group_balanced_delta": 0.3518088625093397,
+          "group_bootstrap_95_ci": [
+            0.32884053079063813,
+            0.3718709423189814
+          ]
+        }
+      },
+      "mean_draw_metrics_vs_conditional_diffusion": {
+        "psnr_db": {
+          "group_balanced_delta": 8.586482208808961,
+          "group_bootstrap_95_ci": [
+            7.452357066892279,
+            9.836623570882663
+          ]
+        },
+        "ssim": {
+          "group_balanced_delta": 0.10759440223969996,
+          "group_bootstrap_95_ci": [
+            0.07245082276236718,
+            0.1475573003819094
+          ]
+        },
+        "epi_corr": {
+          "group_balanced_delta": 0.10998447290046047,
+          "group_bootstrap_95_ci": [
+            0.09129256321708802,
+            0.1286876714433722
+          ]
+        },
+        "edge_strength_ratio": {
+          "group_balanced_delta": -0.3214688629524036,
+          "group_bootstrap_95_ci": [
+            -0.4018674967399256,
+            -0.2470960919167583
+          ]
+        },
+        "bright_mean_ratio": {
+          "group_balanced_delta": 0.23502770479073365,
+          "group_bootstrap_95_ci": [
+            0.21928803668762933,
+            0.2521119342296959
+          ]
+        },
+        "bright_p95_ratio": {
+          "group_balanced_delta": 0.18213003512347145,
+          "group_bootstrap_95_ci": [
+            0.16940140781059645,
+            0.1959108955024532
+          ]
+        },
+        "background_mean_ratio": {
+          "group_balanced_delta": 0.3518088624095232,
+          "group_bootstrap_95_ci": [
+            0.328464945690644,
+            0.3718724061676154
+          ]
+        }
+      }
+    }
+  },
+  "limitations": [
+    "4 draws 只支撑小样本描述性集合评分。",
+    "CRPS、energy score 与 adjacent variogram score 只作为 noisy pseudo-target 上的经验评分，不证明分布校准。",
+    "PSNR/SSIM 只衡量表示域 noisy pseudo-target 一致性。",
+    "SwinIR 本身是发布架构任务适配版，非 SAR 专用论文实现。",
+    "residual diffusion 依赖已在同一历史重复开发集上选择的 SwinIR checkpoint。",
+    "运行曾在 conditional 采样阶段外部中断；原始 168 张部分输出保留，完整采样由确定性固定噪声重新生成。"
+  ]
+}

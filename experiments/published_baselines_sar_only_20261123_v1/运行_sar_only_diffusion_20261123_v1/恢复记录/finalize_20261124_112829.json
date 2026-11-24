@@ -1,0 +1,12 @@
+{
+  "阶段": "finalize",
+  "状态": "失败",
+  "说明": "汇总两种扩散条件的逐图指标、来源组统计、配对 bootstrap 与资源记录",
+  "开始时间 Unix": 1795490909.4349048,
+  "命令": "experiments/published_baselines_sar_only_20261123_v1/continue_diffusion_run.py --stage finalize --run-dir experiments/published_baselines_sar_only_20261123_v1/运行_sar_only_diffusion_20261123_v1",
+  "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+  "错误类型": "TypeError",
+  "错误信息": "CSV 数值列以字符串读取，来源组统计对 mean_pixelwise_sample_std 调用 np.mean 失败",
+  "cuda_oom": false,
+  "修复后成功阶段": "恢复记录/finalize_20261124_113314.json"
+}

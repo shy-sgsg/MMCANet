@@ -1,0 +1,2 @@
+完整启动命令（含确定性环境变量）：
+CUBLAS_WORKSPACE_CONFIG=:16:8 /home/shy/anaconda3/envs/AISAR/bin/python -u experiments/published_baselines_sar_only_20261123_v1/train_swinir_sar.py --input-root /tmp/jdsr-c3a-20261123/data/derived/c2_fixed_inputs_c1_v2_20261031_v1 --output-dir experiments/published_baselines_sar_only_20261123_v1/运行_swinir_20261123_v3 --baseline-checkpoint /home/shy/AIR/SAR+AI/project/JDSR/experiments/phase_c2_c1_v2_20261031_v1/matrix/runs/x2_light__sar_only/checkpoints/best.pt --epochs 30 --batch-size 4 --patch-size 64 --learning-rate 0.0001 --seed 20261123

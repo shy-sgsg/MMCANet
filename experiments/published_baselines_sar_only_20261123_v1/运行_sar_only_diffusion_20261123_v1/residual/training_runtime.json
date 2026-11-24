@@ -1,0 +1,41 @@
+{
+  "training_seconds": 4458.507522118935,
+  "optimizer_updates": 12000,
+  "parameter_count": 958401,
+  "peak_allocated_mib": 549.9228515625,
+  "peak_reserved_mib": 634.0,
+  "elapsed_since_resume_start_seconds": 612.3284092439862,
+  "best_epoch": 30,
+  "best_development_group_balanced_epsilon_mse": 0.14460532228413933,
+  "resume_from_epoch": 24,
+  "recovered_training_log": "训练进度_diffusion_20261123_v1.log",
+  "recovered_per_image_validation_epochs": [
+    24
+  ],
+  "per_image_validation_epochs_unavailable": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23
+  ],
+  "interruption_cause": "训练进程在第 24 轮 checkpoint 后消失；内核日志未发现 OOM 记录，CUDA OOM 未被证实"
+}

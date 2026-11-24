@@ -387,3 +387,7 @@ ICMLA 2025 的对数正态乘性噪声 SDE 工作没有检验本项目的光学�
 ## 2026-11-23 C3-A 实验只收窄当前生成候选，不更新 Optical 假设
 
 冻结 C3-A 像素域 SAR-only Flow 的开发集 PSNR/SSIM/EPI 均落后于 SAR-only 确定性基线，未达到第二 seed 条件；因此停止当前配置。该结果对当前 C3-A 实现的可行性提供负向探索信号，但单 seed、反复使用 development 和固定低预算不足以否定所有生成式恢复假设。由于实验不含 Optical 输入、匹配/置换对照或新独立 development，它不支持或反证 Q1/H1，也不更新 C2 gate。C3-B 继续等待新独立 development 协议与单独授权。详见 [决策复核](C3-A%20SAR-only%20Flow%20决策复核_20261123.md)。
+
+## 2026-11-24 Conditional/Residual DDPM 实验只支持配置级负向观察
+
+同一历史 development 上的单 seed 观察显示：Conditional DDPM 表示域输出严重压低；Residual DDPM 较其改善，但 PSNR/SSIM/EPI 及结构比值仍低于确定性 SwinIR。故停止这两种具体实现配置，不将其结果提升为“生成模型普遍无用”的结论。四 draws 的经验样本 spread 和评分没有真分布或已知后验参照，不足以接受生成分布价值假设。由于完全不含 Optical，对 H1/Q1 不作任何更新；对测量/物理一致性假设也无检验。单 seed 与重复使用 development 限制可见于[决策复核](SAR-only%20Published%20Baseline%20与%20Diffusion%20决策复核_20261124.md)。

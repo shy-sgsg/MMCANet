@@ -339,3 +339,9 @@ ICLR 2026 的统计基准使用可精确采样的离散 Lévy 后验评测 DPS�
 ## 2026-11-23 C3-A SAR-only Flow 实测可行性复核
 
 冻结设置下 5 轮像素域 SAR-only Flow 的 best epoch 为 2，但在 200 个、19 个来源组隔离的 development 身份上，来源组配对 ΔPSNR、ΔSSIM、ΔEPI 均显著为负；像素均值点估计仍低于确定性 C2 SAR-only 基线。四 draw 稳定性和样本集合评分未抵消任务指标退化；4-draw 推理耗时约为单次确定性基线的 99.6 倍。按冻结规则停止当前配置，不跑第二 seed。结论只针对当前数据表示、目标、容量、预算与采样设置，不外推为对其他 Flow/Diffusion 的总体否定。数据和完整指标见 [C3-A 决策复核](C3-A%20SAR-only%20Flow%20决策复核_20261123.md)。
+
+## 2026-11-24 SAR-only DDPM 实测可行性复核
+
+在同一 C1 v2 train/development 身份和 seed `20261124` 下完成 30 轮 Conditional DDPM 与 SwinIR-centered Residual DDPM，并分别对 200 张 development 生成 4 draws。Conditional DDPM 的 pixel-mean PSNR 为 11.7661 dB，亮区均值比约 0.7426、背景均值比约 0.6810，显示当前直接 SAR 条件严重压暗。Residual DDPM 的 pixel-mean PSNR 为 21.0971 dB，但相对 SwinIR 任务适配 ΔPSNR 为 −0.5381 dB（95% CI [−0.6072,−0.4713]），SSIM/EPI 和边缘幅值亦显著较低；当前 quality-first 配置停止。
+
+Residual 采样 2,059.1 秒/200 张四 draw，SwinIR 单次推理 18.58 秒；四 draw 经验分数与样本离散度无真实分布/后验参照，不能称校准。两项 DDPM 结果是单 seed、历史复用 development 的表示域探索；不支持“所有扩散方法无效”、真实 SAR 辐射恢复或 C3-B 解锁。未来若重开生成研究，须先具备合格新 development，并明确生成分布任务价值及其可评价参照。详见[决策复核](SAR-only%20Published%20Baseline%20与%20Diffusion%20决策复核_20261124.md)。

@@ -1,0 +1,4 @@
+提交：5e6f2fd16b37b5447241ce0349b82ec101bae386
+分支：codex/published-baselines-diffusion-20261123
+工作区脏状态：True
+状态项数：435

@@ -1,0 +1,11 @@
+{
+  "阶段": "residual_sample",
+  "状态": "完成",
+  "说明": "从残差扩散 EMA checkpoint 完成 development 4-draw DDIM 采样",
+  "开始时间 Unix": 1795488734.457551,
+  "命令": "experiments/published_baselines_sar_only_20261123_v1/continue_diffusion_run.py --stage residual_sample --run-dir experiments/published_baselines_sar_only_20261123_v1/运行_sar_only_diffusion_20261123_v1",
+  "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+  "结束时间 Unix": 1795490831.2934034,
+  "已归档部分预测": null,
+  "完整样本数": 200
+}

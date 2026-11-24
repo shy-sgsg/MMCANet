@@ -1,0 +1,59 @@
+{
+  "checkpoint_selection": "每轮完整 development 推理，按来源组等权的平均 PSNR 最大值选择；同分保留较早轮次",
+  "final_evaluation": {
+    "background_mask": "固定 LR 20 百分位阈值并按 x2 最近邻展开",
+    "bright_mask": "固定 LR 99.5 百分位阈值并按 x2 最近邻展开",
+    "edge_mask": "HR noisy pseudo-target Sobel 幅值 90 百分位",
+    "evaluator": "MMCANetV2/phase_c3a_metrics.py 的表示域指标",
+    "input_target_range": "HR target data_range=1.0；LR 保留冻结表示域数值，不额外归一化",
+    "metrics": [
+      "psnr_db",
+      "ssim",
+      "epi_corr",
+      "edge_strength_ratio",
+      "bright_mean_ratio",
+      "bright_p95_ratio",
+      "background_mean_ratio"
+    ],
+    "paired_bootstrap": "先按来源组聚合配对差，再以来源组为单位进行 10000 次 bootstrap"
+  },
+  "resource_policy": "按用户明确指示，与当时已有 CUDA 评价进程并行启动；不采用 3 GiB 空闲显存门槛，以实际 CUDA OOM 为停止边界，不终止外部进程",
+  "协议编号": "SAR-only SwinIR 任务适配探索 v1",
+  "数据角色": {
+    "confirmation_payload_accessed": false,
+    "development": {
+      "来源组数": 19,
+      "样本数": 200
+    },
+    "development_scope": "历史重复使用的开发集，只支持探索，不作为独立泛化证据",
+    "optical_payload_loaded": false,
+    "test_set_accessed": false,
+    "train": {
+      "来源组数": 92,
+      "样本数": 1600
+    }
+  },
+  "模型": {
+    "任务适配": "单通道 SAR 输入/输出、x2 pixelshuffledirect、Sigmoid 输出",
+    "初始化": "随机初始化；不使用外部预训练权重",
+    "实现来源": "仓库 BasicSR/basicsr/archs/swinir_arch.py",
+    "方法边界": "发布结构的 SAR 任务适配实现；不是论文作者的 SAR 权重或完整复现",
+    "结构": "SwinIR 轻量结构，embed_dim=60, depths=(6,), num_heads=(6,), window_size=8, mlp_ratio=2.0"
+  },
+  "研究对象": "C1 v2 固定 x2_light 输入下的 SAR LR 到 noisy HR pseudo-target 映射",
+  "训练": {
+    "amp": false,
+    "augmentation": "仅 train 使用随机裁剪及水平翻转、垂直翻转、转置；development 不增强",
+    "batch_size": 4,
+    "data_loader_workers": 0,
+    "deterministic_algorithms": true,
+    "epochs": 30,
+    "learning_rate": 0.0001,
+    "loss": "L1",
+    "lr_patch_size": 64,
+    "optimizer": "Adam",
+    "seed": 20261123,
+    "target_patch_size": 128,
+    "weight_decay": 0.0
+  }
+}

@@ -1,5 +1,22 @@
 # 下一步行动
 
+## 2026-11-24 Research Decision Review 后的行动
+
+1. **保持停止：** 不追加当前像素域 SAR-only Flow、Conditional DDPM 或 SwinIR-centered Residual DDPM 的同配置 seed；当前结果不支持继续增加相同预算。
+2. **最高优先级：** 取得未用于既往训练/选模、正确配对且来源组和配准可核验的新 development 数据；冻结身份清单、来源分组和空间重叠审计。现有 C1 v2 的来源组已分配，历史 development 已复用，不能冒充独立泛化集。
+3. **重新判断 Optical 资格：** 在新 development 上先解决 C2 v2 gate 的未判定问题，预注册匹配 SAR-only 与 Optical 对照、置换/缺失/错位控制、随机种子和停止条件。只有可重复 Optical 增益通过后，才形成单独 C3-B 实施方案并另行授权。
+4. **保持边界：** 不读取受保护 confirmation/test 载荷，不训练 C3-B，不把四 draw spread/CRPS/energy score 称为校准不确定性，不将 8-bit noisy pseudo-target 指标解释为物理一致性。
+5. **审阅入口：** 当前完整结果、负结果和资源证据见 [2026-11-24 Research Decision Review](SAR-only%20Published%20Baseline%20与%20Diffusion%20决策复核_20261124.md) 和 [实验登记](EXPERIMENT_REGISTRY.md)。
+
+## 2026-11-23 SAR-only Published Baseline 与 Diffusion 实验启动计划（历史快照）
+
+1. **当前进行中：** 继续运行隔离 worktree 中 SwinIR-Light SAR 单通道任务适配训练至 30 轮；截至第 20 轮，当前最佳 development PSNR 为第 15 轮的 21.5696 dB。保存每轮日志与 last/best checkpoint。用户明确授权与已有评价并行，不设未知进程拦截或 3 GiB 门槛。
+2. **随后执行：** SwinIR 训练结束后完成固定 development 全量推理、逐图与来源组指标、亮点/结构分析、和 C2 内部基线的配对差及成本记录。
+3. **再随后：** 按已冻结的探索协议训练 SAR-only Conditional Diffusion 与 SwinIR-centered Residual Diffusion；若发生实际 CUDA OOM，保留失败 run 并按新目录回退 batch/梯度累积。
+4. **决策：** 完成 2 种扩散方法的 4-draw/20-step DDIM 评价、组级不确定性和成本比较后，做 Research Decision Review，决定 CONTINUE/PIVOT/STOP。所有 development 结果仅探索，不能作为独立泛化证据。
+5. **直接扩散先例：** 题名对应 CD-SW 公开仓库已浅克隆核对，维护者身份未核实；先解决 README/代码步数冲突、缺失训练入口/权重、输入退化不匹配与根目录许可缺失，再决定是否投入近似复现。FAIR-CSAR 官方数据页需注册/邮箱验证，整库约 250 GB；如作新 SAR 来源，先审阅 ImageInstruction 和场景映射，按 source scene 建立可审计子集，不下载全量数据。
+6. **受限方法：** 继续核验 DSRKD 可复现材料；没有作者实现/配置/权重时不伪造复现。HSFMamba/Optical 方法须等待 C2 gate 与新独立 development 资格，不读取历史 optical/confirmation/test 载荷，不进入本轮训练。
+
 ## 2026-11-23 C3-A 已完成；后续按数据协议推进
 
 1. **已关闭：** 冻结 C3-A SAR-only Flow 训练、development 推理、多样本 v3、样本分布补充评价、样本归档及 Research Decision Review 已完成。当前像素域 Flow 未达到第二 seed continuation 条件，不追加 seed。

@@ -1,0 +1,19 @@
+恢复阶段失败：AttributeError: 'Namespace' object has no attribute 'patch_size'
+Traceback (most recent call last):
+  File "/tmp/jdsr-c3a-final/experiments/published_baselines_sar_only_20261123_v1/continue_diffusion_run.py", line 409, in <module>
+    main()
+    ~~~~^^
+  File "/tmp/jdsr-c3a-final/experiments/published_baselines_sar_only_20261123_v1/continue_diffusion_run.py", line 389, in main
+    run_stage(args.stage, Path(args.run_dir))
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/jdsr-c3a-final/experiments/published_baselines_sar_only_20261123_v1/continue_diffusion_run.py", line 197, in run_stage
+    model, best_epoch, best_score, runtime, method_dir = experiment._train_variant(
+                                                         ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        "residual", train, development, residual_scale, run_dir, args, device, manifest["protocol_sha256"]
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/tmp/jdsr-c3a-final/experiments/published_baselines_sar_only_20261123_v1/train_sar_only_diffusion.py", line 331, in _train_variant
+    args.patch_size,
+    ^^^^^^^^^^^^^^^
+AttributeError: 'Namespace' object has no attribute 'patch_size'. Did you mean: 'batch_size'?

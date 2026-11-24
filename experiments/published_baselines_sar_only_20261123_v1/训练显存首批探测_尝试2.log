@@ -1,0 +1,24 @@
+/home/shy/anaconda3/envs/AISAR/lib/python3.13/site-packages/torch/functional.py:554: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at /pytorch/aten/src/ATen/native/TensorShape.cpp:4322.)
+  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]
+{
+  "结果": "首个全图训练步成功",
+  "设备": "NVIDIA GeForce RTX 3050 Laptop GPU",
+  "参数量": 408184,
+  "批次": 1,
+  "LR形状": [
+    1,
+    1,
+    128,
+    128
+  ],
+  "HR形状": [
+    1,
+    1,
+    256,
+    256
+  ],
+  "损失": 0.31875643134117126,
+  "峰值分配显存MiB": 581.4,
+  "峰值预留显存MiB": 658.0,
+  "耗时秒": 1.622
+}

@@ -614,3 +614,7 @@ ICMLA 2025 的乘性噪声去噪工作把 UC Merced Land Use 用作跨数据集�
 ## 2026-11-23 SAR-only Flow 结果不回答 Optical 增量价值
 
 C3-A 只输入 SAR LR，故 Flow 相对 SAR-only 确定性基线的负差不能支持或反驳“匹配 Optical 是否带来增量价值”。C2 v2 gate 仍未判定，且已有 development 被重复使用；confirmation 已访问后封存。需在来源可核验的新 development cohort 上比较 matched Optical、同任务 SAR-only 与置换/缺失/错位控制后，才能更新 Q1/H1。详见 [C3-A Research Decision Review](C3-A%20SAR-only%20Flow%20决策复核_20261123.md)。
+
+## 2026-11-24 SAR-only SwinIR/DDPM 结果不更新 Optical 效用
+
+本轮 SwinIR 及两种 DDPM 实验均未输入或读取 Optical；Conditional/Residual 的相对差只涉及 SAR-only 候选，不支持或反驳 H1/Q1，也不能说明 Optical 对模型是必要或无用。C2 v2 gate 仍未判定，历史 development 已复用。只有在新来源组和配准均可核验的 development 上，按预注册的 matched、SAR-only、置换、缺失及几何错位对照，才可更新 Optical 增量判断。详见[2026-11-24 SAR-only Research Decision Review](SAR-only%20Published%20Baseline%20与%20Diffusion%20决策复核_20261124.md)。

@@ -1,0 +1,10 @@
+{
+  "阶段": "finalize",
+  "状态": "完成",
+  "说明": "汇总两种扩散条件的逐图指标、来源组统计、配对 bootstrap 与资源记录",
+  "开始时间 Unix": 1795491194.2976818,
+  "命令": "experiments/published_baselines_sar_only_20261123_v1/continue_diffusion_run.py --stage finalize --run-dir experiments/published_baselines_sar_only_20261123_v1/运行_sar_only_diffusion_20261123_v1",
+  "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+  "结束时间 Unix": 1795491195.055805,
+  "输出数量": 2453
+}

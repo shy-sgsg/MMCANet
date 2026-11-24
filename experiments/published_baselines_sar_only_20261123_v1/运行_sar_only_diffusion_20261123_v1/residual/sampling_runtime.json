@@ -1,0 +1,11 @@
+{
+  "draw_count_per_image": 4,
+  "ddim_steps": 20,
+  "sampling_seconds_total": 2059.1265829079493,
+  "sampling_seconds_median_per_draw": 1.7335931670095306,
+  "repeat_same_noise_max_abs_difference": 0.0,
+  "best_epoch": 30,
+  "checkpoint_best_epoch": 30,
+  "peak_allocated_mib": 115.99169921875,
+  "peak_reserved_mib": 134.0
+}

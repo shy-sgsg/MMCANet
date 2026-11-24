@@ -887,3 +887,7 @@ ICLR 2026 的 *A Statistical Benchmark for Diffusion-Posterior-Sampling Algorith
 ## 2026-11-23 本地 C3-A 结果不新增文献主张
 
 本轮没有新增文献检索或改变相关工作矩阵；related_work_matrix.csv 保持不变。C3-A 结果只对本地像素域 SAR-only Flow 实现提供开发集观察，不能用于扩大或缩小已核验的文献新颖性边界。当前证据显示该实现未通过冻结的第二 seed continuation 规则；已有 SAR 单模态生成超分和联合恢复先例仍按各自来源等级登记。详见 [C3-A 决策复核](C3-A%20SAR-only%20Flow%20决策复核_20261123.md)。
+
+## 2026-11-24 本地 SwinIR/DDPM 实验不新增文献主张
+
+本轮完成 SwinIR 架构的 SAR 任务适配和两个 SAR-only DDPM 候选，没有新增文献来源；[related_work_matrix.csv](related_work_matrix.csv) 保持不变。SwinIR 数值只属于本地单通道任务适配，不是原论文 SAR 结果；Conditional/Residual DDPM 的负结果也不改变已发表方法的证据等级。模型决策、成本、分布评价边界见[本地 Research Decision Review](SAR-only%20Published%20Baseline%20与%20Diffusion%20决策复核_20261124.md)。

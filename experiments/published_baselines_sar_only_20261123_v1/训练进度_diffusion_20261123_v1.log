@@ -1,0 +1,65 @@
+/home/shy/anaconda3/envs/AISAR/lib/python3.13/site-packages/torch/functional.py:554: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at /pytorch/aten/src/ATen/native/TensorShape.cpp:4322.)
+  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]
+已核验 train=1600/development=200；SwinIR train-only residual RMS=0.095279；当前空闲显存=2594.8 MiB
+conditional 第 01/30 轮：训练 epsilon MSE=0.105680，开发组均衡 MSE=0.362289，峰值显存=521.9 MiB，耗时=77.6 秒
+conditional 第 02/30 轮：训练 epsilon MSE=0.054873，开发组均衡 MSE=0.132638，峰值显存=521.9 MiB，耗时=69.6 秒
+conditional 第 03/30 轮：训练 epsilon MSE=0.055524，开发组均衡 MSE=0.072714，峰值显存=521.9 MiB，耗时=69.6 秒
+conditional 第 04/30 轮：训练 epsilon MSE=0.054367，开发组均衡 MSE=0.054058，峰值显存=521.9 MiB，耗时=69.9 秒
+conditional 第 05/30 轮：训练 epsilon MSE=0.050846，开发组均衡 MSE=0.047193，峰值显存=521.9 MiB，耗时=69.8 秒
+conditional 第 06/30 轮：训练 epsilon MSE=0.047672，开发组均衡 MSE=0.044132，峰值显存=521.9 MiB，耗时=69.7 秒
+conditional 第 07/30 轮：训练 epsilon MSE=0.044772，开发组均衡 MSE=0.042492，峰值显存=521.9 MiB，耗时=69.8 秒
+conditional 第 08/30 轮：训练 epsilon MSE=0.046364，开发组均衡 MSE=0.041662，峰值显存=521.9 MiB，耗时=70.1 秒
+conditional 第 09/30 轮：训练 epsilon MSE=0.047673，开发组均衡 MSE=0.041039，峰值显存=521.9 MiB，耗时=69.8 秒
+conditional 第 10/30 轮：训练 epsilon MSE=0.043564，开发组均衡 MSE=0.040692，峰值显存=521.9 MiB，耗时=69.9 秒
+conditional 第 11/30 轮：训练 epsilon MSE=0.044227，开发组均衡 MSE=0.040404，峰值显存=521.9 MiB，耗时=69.5 秒
+conditional 第 12/30 轮：训练 epsilon MSE=0.046534，开发组均衡 MSE=0.040185，峰值显存=521.9 MiB，耗时=69.6 秒
+conditional 第 13/30 轮：训练 epsilon MSE=0.047496，开发组均衡 MSE=0.039982，峰值显存=521.9 MiB，耗时=69.7 秒
+conditional 第 14/30 轮：训练 epsilon MSE=0.046341，开发组均衡 MSE=0.039851，峰值显存=521.9 MiB，耗时=69.7 秒
+conditional 第 15/30 轮：训练 epsilon MSE=0.054619，开发组均衡 MSE=0.039744，峰值显存=521.9 MiB，耗时=70.0 秒
+conditional 第 16/30 轮：训练 epsilon MSE=0.044724，开发组均衡 MSE=0.039588，峰值显存=521.9 MiB，耗时=69.4 秒
+conditional 第 17/30 轮：训练 epsilon MSE=0.043742，开发组均衡 MSE=0.039498，峰值显存=521.9 MiB，耗时=69.6 秒
+conditional 第 18/30 轮：训练 epsilon MSE=0.046524，开发组均衡 MSE=0.039388，峰值显存=521.9 MiB，耗时=69.5 秒
+conditional 第 19/30 轮：训练 epsilon MSE=0.046480，开发组均衡 MSE=0.039284，峰值显存=521.9 MiB，耗时=69.8 秒
+conditional 第 20/30 轮：训练 epsilon MSE=0.042868，开发组均衡 MSE=0.039215，峰值显存=521.9 MiB，耗时=69.7 秒
+conditional 第 21/30 轮：训练 epsilon MSE=0.045886，开发组均衡 MSE=0.039091，峰值显存=521.9 MiB，耗时=69.3 秒
+conditional 第 22/30 轮：训练 epsilon MSE=0.043950，开发组均衡 MSE=0.039013，峰值显存=521.9 MiB，耗时=69.3 秒
+conditional 第 23/30 轮：训练 epsilon MSE=0.043769，开发组均衡 MSE=0.038954，峰值显存=521.9 MiB，耗时=69.5 秒
+conditional 第 24/30 轮：训练 epsilon MSE=0.048311，开发组均衡 MSE=0.038886，峰值显存=521.9 MiB，耗时=69.3 秒
+conditional 第 25/30 轮：训练 epsilon MSE=0.043261，开发组均衡 MSE=0.038824，峰值显存=521.9 MiB，耗时=69.8 秒
+conditional 第 26/30 轮：训练 epsilon MSE=0.039834，开发组均衡 MSE=0.038763，峰值显存=521.9 MiB，耗时=69.7 秒
+conditional 第 27/30 轮：训练 epsilon MSE=0.044033，开发组均衡 MSE=0.038640，峰值显存=521.9 MiB，耗时=69.7 秒
+conditional 第 28/30 轮：训练 epsilon MSE=0.042968，开发组均衡 MSE=0.038593，峰值显存=521.9 MiB，耗时=69.8 秒
+conditional 第 29/30 轮：训练 epsilon MSE=0.045814，开发组均衡 MSE=0.038533，峰值显存=521.9 MiB，耗时=70.2 秒
+conditional 第 30/30 轮：训练 epsilon MSE=0.043051，开发组均衡 MSE=0.038502，峰值显存=521.9 MiB，耗时=70.2 秒
+conditional 已完成开发样本 25/200
+conditional 已完成开发样本 50/200
+conditional 已完成开发样本 75/200
+conditional 已完成开发样本 100/200
+conditional 已完成开发样本 125/200
+conditional 已完成开发样本 150/200
+conditional 已完成开发样本 175/200
+conditional 已完成开发样本 200/200
+residual 第 01/30 轮：训练 epsilon MSE=0.226626，开发组均衡 MSE=0.454444，峰值显存=536.6 MiB，耗时=82.3 秒
+residual 第 02/30 轮：训练 epsilon MSE=0.172847，开发组均衡 MSE=0.246976，峰值显存=536.6 MiB，耗时=73.0 秒
+residual 第 03/30 轮：训练 epsilon MSE=0.169035，开发组均衡 MSE=0.189749，峰值显存=536.6 MiB，耗时=74.5 秒
+residual 第 04/30 轮：训练 epsilon MSE=0.170302，开发组均衡 MSE=0.169689，峰值显存=536.6 MiB，耗时=70.3 秒
+residual 第 05/30 轮：训练 epsilon MSE=0.165790，开发组均衡 MSE=0.161549，峰值显存=536.6 MiB，耗时=69.9 秒
+residual 第 06/30 轮：训练 epsilon MSE=0.160611，开发组均衡 MSE=0.157584，峰值显存=536.6 MiB，耗时=69.4 秒
+residual 第 07/30 轮：训练 epsilon MSE=0.154112，开发组均衡 MSE=0.155400，峰值显存=536.6 MiB，耗时=92.9 秒
+residual 第 08/30 轮：训练 epsilon MSE=0.156352，开发组均衡 MSE=0.154117，峰值显存=536.6 MiB，耗时=199.1 秒
+residual 第 09/30 轮：训练 epsilon MSE=0.156399，开发组均衡 MSE=0.153112，峰值显存=536.6 MiB，耗时=231.8 秒
+residual 第 10/30 轮：训练 epsilon MSE=0.152362，开发组均衡 MSE=0.152374，峰值显存=536.6 MiB，耗时=231.3 秒
+residual 第 11/30 轮：训练 epsilon MSE=0.155361，开发组均衡 MSE=0.151833，峰值显存=536.6 MiB，耗时=232.6 秒
+residual 第 12/30 轮：训练 epsilon MSE=0.157323，开发组均衡 MSE=0.151375，峰值显存=536.6 MiB，耗时=227.6 秒
+residual 第 13/30 轮：训练 epsilon MSE=0.156743，开发组均衡 MSE=0.151009，峰值显存=536.6 MiB，耗时=226.9 秒
+residual 第 14/30 轮：训练 epsilon MSE=0.156101，开发组均衡 MSE=0.150828，峰值显存=536.6 MiB，耗时=227.3 秒
+residual 第 15/30 轮：训练 epsilon MSE=0.174366，开发组均衡 MSE=0.150480，峰值显存=536.6 MiB，耗时=226.5 秒
+residual 第 16/30 轮：训练 epsilon MSE=0.156525，开发组均衡 MSE=0.150059，峰值显存=536.6 MiB，耗时=223.6 秒
+residual 第 17/30 轮：训练 epsilon MSE=0.155194，开发组均衡 MSE=0.149688，峰值显存=536.6 MiB，耗时=251.7 秒
+residual 第 18/30 轮：训练 epsilon MSE=0.156421，开发组均衡 MSE=0.149386，峰值显存=536.6 MiB，耗时=256.6 秒
+residual 第 19/30 轮：训练 epsilon MSE=0.154059，开发组均衡 MSE=0.149050，峰值显存=536.6 MiB，耗时=232.6 秒
+residual 第 20/30 轮：训练 epsilon MSE=0.146139，开发组均衡 MSE=0.148636，峰值显存=536.6 MiB，耗时=129.3 秒
+residual 第 21/30 轮：训练 epsilon MSE=0.153221，开发组均衡 MSE=0.148062，峰值显存=536.6 MiB，耗时=98.7 秒
+residual 第 22/30 轮：训练 epsilon MSE=0.152628，开发组均衡 MSE=0.147480，峰值显存=536.6 MiB，耗时=106.3 秒
+residual 第 23/30 轮：训练 epsilon MSE=0.149439，开发组均衡 MSE=0.146971，峰值显存=536.6 MiB，耗时=109.8 秒
+residual 第 24/30 轮：训练 epsilon MSE=0.157424，开发组均衡 MSE=0.146542，峰值显存=536.6 MiB，耗时=103.2 秒

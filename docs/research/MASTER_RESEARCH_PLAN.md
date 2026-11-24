@@ -1,5 +1,17 @@
 # 总研究计划
 
+## 2026-11-24 SAR-only Published Baseline 与 Diffusion 决策完成
+
+SwinIR SAR 任务适配与两种 SAR-only DDPM 条件均已在 C1 v2 固定 train/development 上训练、评价并归档。SwinIR best epoch 30，组均衡 PSNR 21.6352 dB；Conditional DDPM 单 draw/pixel-mean PSNR 为 11.5083/11.7661 dB；SwinIR-centered Residual DDPM 为 20.0948/21.0971 dB。Residual pixel-mean 相对 SwinIR 的来源组配对 ΔPSNR 为 −0.5381 dB（95% CI [−0.6072, −0.4713]），主要结构指标也落后。按结果停止当前 Conditional 与 Residual DDPM 配置，不追加同类 seed。此单 seed、复用 development 结果不构成独立泛化证据；4-draw 评分不构成后验校准。
+
+用户授权忽略未知 CUDA 进程与 3 GiB 门槛、以实际 OOM 为资源边界；续训、采样与汇总日志未见 OOM。Residual 原进程在 epoch 24 后停止，原因未查明；随后从 checkpoint 恢复 optimizer/RNG 并完成至 epoch 30，同时披露 epoch 1–23 的 per-image 选模记录无法恢复。完整边界、配对统计、成本与 Research Decision Review 见 [决策复核](SAR-only%20Published%20Baseline%20与%20Diffusion%20决策复核_20261124.md)。
+
+C3-A Flow 当前像素域配置仍按既有 review 停止。此次 SAR-only 模型不包含 Optical，不能支持或否定 H1/Q1；C2 v2 gate 仍未判定、C3-B 未获授权。下一阶段先解决未使用且来源组身份/配准可核验的新 development split，并预登记新的数据、基线和停止协议；在此之前不启动 C3-B 或同类 SAR-only GPU 续训。
+
+## 2026-11-23 SAR-only Published Baseline 与 Diffusion 方法实验启动记录（历史快照）
+
+用户调整研究资源重点后，优先用可执行的发表架构任务适配和生成模型实验，检验 SAR-only noisy pseudo-target 联合恢复的可行性。当前在隔离 worktree `codex/published-baselines-diffusion-20261123` 中训练 SwinIR 任务适配版（seed `20261123`，30 轮）；第 20 轮 development 组均衡 PSNR 为 21.2941 dB，当前最佳为第 15 轮 21.5696 dB，训练仍在运行。已预登记后续 SAR-only Conditional Diffusion 与 SwinIR-centered Residual Diffusion（seed `20261124`，30 轮、20 步 DDIM、每图 4 draws）。两项均限 C1 v2 SAR-only train/development，不访问 optical、confirmation、test。新发现题名对应 CD-SW 公开仓库，但维护者与论文作者身份未核实，数据/扩散配置与文档不一致、无根目录许可/权重；需继续保留为待核验候选，不能写成精确复现。该方向探索不改 C3-A/C2 历史 gate；HSFMamba 等 optical 方法须待 C2 gate 和新的独立 development 资格解决。DSRKD 作者代码/权重未取得，不能以自研网络冒充复现。实验完成后对单次 draw 指标均值与像素均值分别按来源组配对 bootstrap，分析成本、图像结构、亮点和有限样本生成分数，再决定 CONTINUE/PIVOT/STOP。
+
 ## 2026-11-23 C3-A SAR-only Flow 执行与阶段决策
 
 冻结 C3-A v1 按 seed 20261105 完成 5 轮；best epoch 为 2。C1 v2 development 上，Flow 相对 C2 SAR-only 确定性联合重建基线的来源组配对 ΔPSNR 为 −3.0724 dB（95% 区间 [−3.4720, −2.6922]），ΔSSIM 为 −0.17818（[−0.20823, −0.15062]）；v3 四 draw 评价的 ΔEPI 为 −0.16871（[−0.18814, −0.14697]）。冻结 continuation 条件均未达到，停止当前像素域 Flow，不运行第二 seed。用户明确授权本次忽略并行 CUDA 与 3 GiB 预检门槛；冻结 protocol 未改，实测无 OOM。结果只描述复用 development，不代表独立泛化或物理一致性。SAR-only 负结果不回答 Optical 增量价值，C2 v2 gate 仍未判定，因此不晋级 C3-B。后续先取得未使用且来源映射可核验的新 development 影像组并冻结 split，再另行拟定匹配/错配 Optical 对照方案。详情见 [C3-A Research Decision Review](C3-A%20SAR-only%20Flow%20决策复核_20261123.md)。

@@ -1,0 +1,13 @@
+{
+  "阶段": "residual_train",
+  "状态": "失败",
+  "说明": "使用 train-only residual scale 和相同冻结预算训练 SwinIR 残差扩散 30 轮",
+  "开始时间 Unix": 1795451805.4886527,
+  "命令": "experiments/published_baselines_sar_only_20261123_v1/continue_diffusion_run.py --stage residual_train --run-dir experiments/published_baselines_sar_only_20261123_v1/运行_sar_only_diffusion_20261123_v1",
+  "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+  "错误类型": "AttributeError",
+  "错误信息": "'Namespace' object has no attribute 'patch_size'",
+  "cuda_oom": false,
+  "修复后成功阶段": "恢复记录/finalize_20261124_113314.json",
+  "失败日志": "../训练进度_diffusion_残差训练_20261124_v1.log"
+}

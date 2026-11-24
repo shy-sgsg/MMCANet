@@ -656,3 +656,7 @@ ICLR 2026 后验统计基准表明，分布采样质量可在精确后验可得�
 ## 2026-11-23 SAR-only Flow 负结果与新独立 development 缺口
 
 冻结的 C3-A 像素域 Flow 在已复用 development 上未达到任何第二 seed 继续条件，且 4-draw 推理显著慢于固定 SAR-only 确定性基线。该观察削弱了当前这一具体实现继续投入的理由，但不判断其他生成参数化。更直接的未解问题仍是匹配 Optical 的增量价值：C2 v2 gate 未判定，当前 development 已被复用，confirmation 已访问后封存。本地数字命名 2,000 对仍无 C1 身份映射。C3-B 前必须取得来源组身份和配准均可核验的新 development 数据，并冻结比较与停止规则；详见 [决策复核](C3-A%20SAR-only%20Flow%20决策复核_20261123.md)。
+
+## 2026-11-24 SAR-only DDPM 探索新增的实证缺口
+
+本地 30 轮 Conditional DDPM 和 SwinIR-centered Residual DDPM 在复用的 C1 v2 development 上均未超过确定性 SwinIR 任务适配；Residual 条件显著改善直接 SAR 条件的退化，但其 pixel-mean 仍落后于 SwinIR。4 draws 的 spread/CRPS/energy/variogram 没有已知后验或可信真分布作校准参照，因此“随机样本对任务有额外价值”仍未验证。当前负结果只停止这两个具体设置，不否定所有生成参数化。C3-B 的首要缺口仍是来源组与配准可核验的新 development，以及未判定的 C2 v2 gate；完整结果见[决策复核](SAR-only%20Published%20Baseline%20与%20Diffusion%20决策复核_20261124.md)。

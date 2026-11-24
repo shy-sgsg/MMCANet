@@ -1,0 +1,13 @@
+{
+  "Python": "3.13.7 | packaged by Anaconda, Inc. | (main, Sep  9 2025, 19:59:03) [GCC 11.2.0]",
+  "Python可执行文件": "/home/shy/anaconda3/envs/AISAR/bin/python",
+  "PyTorch": "2.8.0+cu128",
+  "CUDA运行时": "12.8",
+  "cuDNN": 91002,
+  "NumPy": "2.3.4",
+  "平台": "Linux-7.0.0-43-generic-x86_64-with-glibc2.43",
+  "GPU": "NVIDIA GeForce RTX 3050 Laptop GPU",
+  "GPU总显存字节": 3942383616,
+  "GPU启动前可用显存字节": 2943156224,
+  "磁盘启动前可用字节": 7039004672
+}

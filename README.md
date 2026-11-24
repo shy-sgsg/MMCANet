@@ -1,6 +1,8 @@
 # JDSR / MMCANet：SAR 联合去斑与超分辨率
 
-> **当前研究状态（2026-11-23）：** C3-A SAR-only Flow 训练、development 评价与 Research Decision Review 已完成；当前像素域 Flow 未达到追加 seed 条件，停止该配置。C3-B 尚未获授权，须先解决新的独立 development 数据协议。详见[决策复核](docs/research/C3-A%20SAR-only%20Flow%20决策复核_20261123.md)和[当前状态](docs/research/CURRENT_STATE.md)。
+> **当前研究状态（2026-11-24）：** C3-A 当前像素域 Flow 配置已按冻结条件停止；SAR-only SwinIR 任务适配、Conditional DDPM 和 SwinIR-centered Residual DDPM 均完成训练、development 评价与 Research Decision Review。两种 DDPM 当前设置均未达到确定性参照，停止同配置扩展。C2 v2 gate 仍未判定，C3-B 未获授权，须先解决新的独立 development 数据协议。详见[2026-11-24 决策复核](docs/research/SAR-only%20Published%20Baseline%20与%20Diffusion%20决策复核_20261124.md)、[Flow 决策复核](docs/research/C3-A%20SAR-only%20Flow%20决策复核_20261123.md)和[当前状态](docs/research/CURRENT_STATE.md)。
+
+> **本轮实验已完成：** 使用 C1 v2 固定 train 1,600/92 来源组、development 200/19 来源组，实际训练并评价 SwinIR SAR 适配、Conditional DDPM 与 Residual DDPM。未访问 Optical、confirmation 或 test 载荷；续训/采样/汇总日志未见 CUDA OOM，Residual 原训练进程在 epoch 24 后停止的原因未查明并已从 checkpoint 恢复。所有数字限于历史复用 development 上的探索观察，不是独立泛化或物理一致性证据。运行产物与方法身份见[基线谱系审计](docs/research/BASELINE_LINEAGE_AUDIT_20261123.md)、[发表方法注册表](docs/research/PUBLISHED_METHOD_REGISTRY_20261123.md)、[冻结扩散协议](docs/research/SAR_ONLY_DIFFUSION_EXPERIMENT_PROTOCOL_20261123.md)、[实验登记](docs/research/EXPERIMENT_REGISTRY.md)和[Research Decision Review](docs/research/SAR-only%20Published%20Baseline%20与%20Diffusion%20决策复核_20261124.md)。
 
 
 **正式研究总纲：** [v1.8 研究总纲](docs/research/RESEARCH_CHARTER.md)，于 2026-11-09 获用户明确批准。正式题目为“光学先验引导与 SAR 物理一致性约束的生成式联合去斑和超分辨率重建方法研究”。v1.8 增补 SAR 两阶段潜扩散先例，并明确单次生成、像素均值点估计和样本分布是不同评价对象；沿用冻结 C1 v2，不改变历史 gate、数据权限或训练状态。对当前 8-bit PNG 表示域实验，不作未经验证的辐射物理解释。

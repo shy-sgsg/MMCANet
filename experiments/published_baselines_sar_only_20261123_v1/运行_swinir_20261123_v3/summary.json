@@ -1,0 +1,133 @@
+{
+  "scope": "单 seed、重复使用的 development；仅探索，不作独立泛化或投稿主张",
+  "checkpoint_selection": {
+    "best_epoch": 30,
+    "development_group_balanced_psnr_db": 21.635174888033717
+  },
+  "SwinIR_SAR_adaptation": {
+    "sample_count": 200,
+    "source_group_count": 19,
+    "sample_mean": {
+      "psnr_db": 21.584343422253948,
+      "ssim": 0.35779117212725614,
+      "epi_corr": 0.3615035283964991,
+      "edge_strength_ratio": 0.2388355544882298,
+      "bright_mean_ratio": 0.9995683434605599,
+      "bright_p95_ratio": 0.9410750222206116,
+      "background_mean_ratio": 1.01864103525877
+    },
+    "sample_std": {
+      "psnr_db": 2.651642176941279,
+      "ssim": 0.07987055141159184,
+      "epi_corr": 0.16597557475840266,
+      "edge_strength_ratio": 0.12018187753299459,
+      "bright_mean_ratio": 0.01945535605319593,
+      "bright_p95_ratio": 0.030297420950659855,
+      "background_mean_ratio": 0.02178559118559321
+    },
+    "group_balanced_mean": {
+      "psnr_db": 21.635174888033717,
+      "ssim": 0.3597367462399409,
+      "epi_corr": 0.3586619059486083,
+      "edge_strength_ratio": 0.23785878700612392,
+      "bright_mean_ratio": 0.9998483005037718,
+      "bright_p95_ratio": 0.9415001048710927,
+      "background_mean_ratio": 1.018389026285929
+    }
+  },
+  "internal_C2_SAR_only": {
+    "sample_count": 200,
+    "source_group_count": 19,
+    "sample_mean": {
+      "psnr_db": 21.558346713417674,
+      "ssim": 0.3608023917569734,
+      "epi_corr": 0.3587078735835949,
+      "edge_strength_ratio": 0.2560176711103807,
+      "bright_mean_ratio": 1.007436991930008,
+      "bright_p95_ratio": 0.9499143561720849,
+      "background_mean_ratio": 1.0141079249978064
+    },
+    "sample_std": {
+      "psnr_db": 2.626735412857284,
+      "ssim": 0.07931704208588772,
+      "epi_corr": 0.1681412991441497,
+      "edge_strength_ratio": 0.12761920182139566,
+      "bright_mean_ratio": 0.019787288344254937,
+      "bright_p95_ratio": 0.028744218385110754,
+      "background_mean_ratio": 0.02334633716972675
+    },
+    "group_balanced_mean": {
+      "psnr_db": 21.608208472115223,
+      "ssim": 0.36270649582963754,
+      "epi_corr": 0.35572637295201553,
+      "edge_strength_ratio": 0.255122296837484,
+      "bright_mean_ratio": 1.0077082676180242,
+      "bright_p95_ratio": 0.9503286386220647,
+      "background_mean_ratio": 1.013876611764351
+    }
+  },
+  "paired_group_bootstrap": {
+    "psnr_db": {
+      "group_balanced_delta": 0.026966415918496595,
+      "group_bootstrap_95_ci": [
+        0.010793232983586873,
+        0.044226028752093714
+      ]
+    },
+    "ssim": {
+      "group_balanced_delta": -0.0029697495896967387,
+      "group_bootstrap_95_ci": [
+        -0.0038990164019484463,
+        -0.0020476610550717957
+      ]
+    },
+    "epi_corr": {
+      "group_balanced_delta": 0.002935532996592729,
+      "group_bootstrap_95_ci": [
+        0.00044991584469328386,
+        0.005335046422509631
+      ]
+    },
+    "edge_strength_ratio": {
+      "group_balanced_delta": -0.01726350983136005,
+      "group_bootstrap_95_ci": [
+        -0.020120437657824782,
+        -0.014549775412193036
+      ]
+    },
+    "bright_mean_ratio": {
+      "group_balanced_delta": -0.007859967114252337,
+      "group_bootstrap_95_ci": [
+        -0.008802665162599829,
+        -0.0068743376498017015
+      ]
+    },
+    "bright_p95_ratio": {
+      "group_balanced_delta": -0.008828533750972109,
+      "group_bootstrap_95_ci": [
+        -0.010127165684004149,
+        -0.007580730816679137
+      ]
+    },
+    "background_mean_ratio": {
+      "group_balanced_delta": 0.004512414521577826,
+      "group_bootstrap_95_ci": [
+        0.0028728496293987382,
+        0.00633398842797325
+      ]
+    }
+  },
+  "baseline_lineage": "项目内部 C2MatchedJoint，不是发表模型或强外部 baseline",
+  "stability": {
+    "SwinIR_repeat_inference_max_abs_difference": 0.0,
+    "internal_C2_repeat_inference_max_abs_difference": 0.0,
+    "diffusion_sample_distribution_evaluated": false
+  },
+  "interpretation_limits": [
+    "开发集此前已重复使用，存在历史选择污染风险。",
+    "单 seed 结果只适合作为探索观察。",
+    "HR 目标为归一化 8-bit 表示域 noisy pseudo-target，不代表 clean SAR 或辐射定标量。",
+    "SwinIR 为发布架构的 SAR 单通道任务适配实现；没有使用作者 SAR 权重，也不是完整复现。",
+    "内部 C2 baseline 不等于已发表强 baseline。"
+  ]
+}

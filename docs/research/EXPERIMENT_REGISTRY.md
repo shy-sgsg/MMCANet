@@ -1,5 +1,25 @@
 # 实验登记
 
+## 2026-11-24 SAR-only Published Baseline 与 Diffusion 探索（完成）
+
+- **决策复核：** [SAR-only Published Baseline 与 Diffusion 决策复核](SAR-only%20Published%20Baseline%20与%20Diffusion%20决策复核_20261124.md)。Flow 当前配置按 11 月 23 日冻结 review 停止；Conditional DDPM 和 SwinIR-centered Residual DDPM 均停止当前设置，不追加同类 seed。
+- **完整 run：** [扩散 manifest](../../experiments/published_baselines_sar_only_20261123_v1/运行_sar_only_diffusion_20261123_v1/manifest.json) 标记 `complete`；[汇总](../../experiments/published_baselines_sar_only_20261123_v1/运行_sar_only_diffusion_20261123_v1/summary.json)、[runtime](../../experiments/published_baselines_sar_only_20261123_v1/运行_sar_only_diffusion_20261123_v1/runtime.json)、逐 draw、pixel-mean、分布评分、source-group 与配对 bootstrap CSV 均已写出。完整 checkpoint/生成 NPY 保留在本机 run 目录。
+- **划分和权限：** 冻结 C1 v2 train 1,600/92 组、development 200/19 组；两臂只读取 SAR LR 与 noisy pseudo-target。test/confirmation/optical flags 均为 `false`。development 已历史复用，只支撑探索观察。
+- **SwinIR 任务适配：** seed `20261123`，30 epochs、batch 4、Adam `1e-4`、LR patch 64、随机初始化、单通道输出。best epoch 30；组均衡 PSNR/SSIM/EPI 分别为 `21.6352/0.3597/0.3587`。这是官方架构源码的 SAR 适配，不是作者 SAR 权重或原 recipe 复现。
+- **Conditional DDPM：** seed `20261124`，30 epochs、batch 4、1,000 diffusion steps、20-step DDIM、每图 4 draws。单次 draw 组均衡 PSNR `11.5083 dB`、SSIM `0.2131`、EPI `0.2076`；pixel-mean 对应 `11.7661/0.2889/0.2827`，亮区/背景均值比显示明显压暗。
+- **Residual DDPM：** 同预算，以 train-only residual scale (`RMS=0.0952794`, scale=`10.49545`) 围绕 SwinIR 预测残差。best epoch 30，组均衡 epsilon MSE `0.1446053`；单 draw/pixel-mean PSNR `20.0948/21.0971 dB`。pixel-mean 对 SwinIR 的来源组配对 ΔPSNR 为 `−0.5381 dB`（95% CI `[−0.6072,−0.4713]`）、ΔSSIM `−0.02773`、ΔEPI `−0.01598`；相对内部 C2 的差异方向相同。
+- **生成与资源：** 每臂 200 个 `[4,256,256]` arrays、800 行 per-draw 指标、200 行 pixel-mean、200 行分布评分；固定噪声重复推理最大误差为 0。总扩散训练/采样时间 `11,354.1 s`，峰值已分配/保留显存 `549.9/634.0 MiB`。Residual 四 draw 采样 `2,059.1 s`，SwinIR 单次 200 张推理 `18.58 s`。Residual epoch 24 后的原进程退出原因未查明；续训与采样日志未见 CUDA OOM。
+- **连续性说明：** Residual 原训练到 epoch 24 后进程停止，未找到 CUDA OOM 证据；由 last checkpoint 恢复 optimizer/RNG 后完成 epoch 25–30。控制台恢复了 1–24 轮 train log；per-image 选模指标仅保留 epoch 24–30（1,400 行），1–23 轮无法由被覆盖 checkpoint 重建，已在 runtime 和 review 中披露。
+
+## 2026-11-23 SAR-only Published Baseline 与 Diffusion 启动记录（历史快照）
+
+- **实验目录：** `experiments/published_baselines_sar_only_20261123_v1/`；新实验代码与文档在隔离分支 `codex/published-baselines-diffusion-20261123`，起点 `5e6f2fd`。
+- **数据与权限：** 沿用 C1 v2 固定 x2-light train 1,600 样本/92 组、development 200 样本/19 组的 SAR LR 与 noisy pseudo-target；校验固定输入 manifest/文件清单哈希。无 optical、confirmation、test 载荷或测量值读取。development 已有历史复用，全部结果只作探索观察。
+- **SwinIR SAR 任务适配：** 以 vendored SwinIR 源码构成单通道 x2 SwinIR-Light（embed 60、depths 6、heads 6、window 8），随机初始化，不加载自然图像权重；seed `20261123`，30 epochs、Adam `1e-4`、L1、batch 4、LR patch 64/HR patch 128。PID `851652` 正运行；第 20/30 轮结束，组均衡 development PSNR `21.2941 dB`，当前 best 为第 15 轮 `21.5696 dB`，峰值已分配显存 `558.4 MiB`，尚无 OOM。运行目录保存 best/last checkpoint、配置、manifest、环境、协议及训练日志；最终推理和指标尚未完成。
+- **资源授权：** 用户明确允许与已有 PID `589855` 评价并行，并要求取消未知 CUDA 进程拦截与 3 GiB 空闲阈值，以真实 OOM 为停止边界。运行时设备快照 RTX 3050 Laptop，显存总计 4,096 MiB、已用 1,738 MiB、空闲 2,023 MiB，GPU 利用率 100%。未终止外部进程。
+- **后续预登记：** SwinIR 完成后，使用同一 U-Net/训练预算比较 SAR-only Conditional Diffusion 和 SwinIR-centered Residual Diffusion（seed `20261124`，30 epochs、DDIM 20 步、4 draws）；对 per-draw 指标先逐图跨 draw 求平均与对像素均值图分别报告来源组配对 bootstrap。见[SAR-only 条件扩散探索协议](SAR_ONLY_DIFFUSION_EXPERIMENT_PROTOCOL_20261123.md)。若 CUDA 实际 OOM，保留失败证据并按协议在唯一新目录以 batch 2 + gradient accumulation 2 重启。
+- **身份与解释边界：** 本地 SwinIR 是发表通用架构的 SAR 任务适配，不是原论文 SAR 复现或其公开指标。项目内部 `C2MatchedJoint` 仅是内部对照。DSRKD 尚无可运行作者实现；HSFMamba 的 optical 实验未获当前 gate/新 development 资格。C3-A Flow 的历史 gate 和停止决策保持不变。
+
 ## C3-A GPU 启动前置核验历史记录（2026-11-23）
 
 以下记录描述用户资源豁免前的一次预检，不代表当前实验状态。随后按用户明确授权完成的训练与评价见本登记中的“C3-A SAR-only Flow 单 seed 训练与评价已完成”及 [研究决策复核](C3-A%20SAR-only%20Flow%20决策复核_20261123.md)。

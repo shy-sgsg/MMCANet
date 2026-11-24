@@ -1,0 +1,24 @@
+{
+  "training_seconds": 7406.686927247996,
+  "training_epochs": 30,
+  "training_samples_per_epoch": 1600,
+  "training_updates": 12000,
+  "swinir_parameter_count": 252784,
+  "internal_c2_parameter_count": 96209,
+  "swinir_evaluation": {
+    "image_count": 200,
+    "inference_seconds_total": 18.577151019926532,
+    "inference_seconds_median_per_image": 0.09296618450025562,
+    "repeat_inference_max_abs_difference": 0.0
+  },
+  "internal_c2_evaluation": {
+    "image_count": 200,
+    "inference_seconds_total": 1.4314469430537429,
+    "inference_seconds_median_per_image": 0.005958104993624147,
+    "repeat_inference_max_abs_difference": 0.0
+  },
+  "peak_allocated_mib": 494.66064453125,
+  "peak_reserved_mib": 574.0,
+  "cuda_free_memory_bytes_after_run": 2491678720,
+  "disk_free_bytes_after_run": 7043248128
+}
