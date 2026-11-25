@@ -1,5 +1,14 @@
 # 总研究计划
 
+## 2026-11-24 Phase D D0–D2 实验和 D1 基线更新
+
+D0 残差诊断已完成；当前 SwinIR-centered Residual DDPM 的四 draw 与像素均值均未超过 SwinIR，停止当前配置。D1 完成第二种发表通用架构 EDSR 的 SAR 单通道任务适配；EDSR 相对 SwinIR 的组等权 ΔPSNR 为 +0.0964 dB（19 组 bootstrap 95% CI [+0.0693,+0.1316]），但结构区间跨零，且只有一个 seed、使用了重复开发集。该结果可作为本地探索排序，不能认定外部 SAR 强基线已被超越。
+
+D2 observation-aware diffusion Pilot 已完成并 STOP。后续复核确认正观测 `y>0` 配负的算子值 `z<0` 时，当前双重 clamp 的正值似然对 `z` 梯度为零；原运行不修改，未来如重开须先设计对负振铃有恢复方向的统计模型。
+
+D5 正式 Optical-conditioned 研究保持关闭。官方数据记录入口返回 HTTP 429，匿名 rsync 目录查询认证失败；自动审查拒绝使用非官方来源披露的凭据。等待用户提供官方访问方式或明确授权后，才继续新 development 获取。继续保留 C2 v2 `UNJUDGED`、C3-B 关闭和保护集隔离要求。
+
+
 ## 2026-11-24 SAR-only Published Baseline 与 Diffusion 决策完成
 
 SwinIR SAR 任务适配与两种 SAR-only DDPM 条件均已在 C1 v2 固定 train/development 上训练、评价并归档。SwinIR best epoch 30，组均衡 PSNR 21.6352 dB；Conditional DDPM 单 draw/pixel-mean PSNR 为 11.5083/11.7661 dB；SwinIR-centered Residual DDPM 为 20.0948/21.0971 dB。Residual pixel-mean 相对 SwinIR 的来源组配对 ΔPSNR 为 −0.5381 dB（95% CI [−0.6072, −0.4713]），主要结构指标也落后。按结果停止当前 Conditional 与 Residual DDPM 配置，不追加同类 seed。此单 seed、复用 development 结果不构成独立泛化证据；4-draw 评分不构成后验校准。

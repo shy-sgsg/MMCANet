@@ -31,3 +31,14 @@
 - SwinIR 论文与官方代码：[论文](https://openaccess.thecvf.com/content/ICCV2021W/AIM/papers/Liang_SwinIR_Image_Restoration_Using_Swin_Transformer_ICCVW_2021_paper.pdf)、[作者仓库](https://github.com/JingyunLiang/SwinIR)。
 - 项目内部 checkpoint：上列 C2 matrix run manifest、checkpoint context/model config 和哈希；当前主状态汇总见 [CURRENT_STATE.md](CURRENT_STATE.md)。
 - Flow Research Decision Review：[C3-A 复核](C3-A%20SAR-only%20Flow%20决策复核_20261123.md)。
+
+
+## 2026-11-24：EDSR SAR 任务适配与配对来源核验
+
+EDSR 已按冻结 [D1 协议](PHASE_D1_EDSR_SAR_ADAPTATION_PROTOCOL_20261124.md) 完成单 seed、30 轮训练和 200 张 development 评价。该方法保留公开 EDSR 主干，改为 SAR 单通道 x2、随机初始化和 Sigmoid 输出，属于 `TASK_ADAPTED_PUBLISHED`，不是作者 SAR 权重或完整论文 recipe 复现。best epoch=29，参数 1,367,553，12,000 updates，完整运行累计 3,338.48 秒（含训练、逐轮 development 选模评估和最终 development 评价），200 张推理 21.92 秒，峰值分配显存 202.1 MiB；无 CUDA OOM。
+
+来源组等权 PSNR 为 EDSR 21.7316 dB、SwinIR 21.6352 dB；配对 ΔPSNR +0.0964 dB（19 个来源组 bootstrap 95% CI [+0.0693,+0.1316]）。ΔSSIM 与 ΔEPI 区间均跨零，结构/亮点结果没有支持明确优势的证据。该结果只有一个训练 seed，且 development 反复用于训练和 checkpoint 选择，不能声称独立泛化。
+
+审查发现 EDSR 原 runner 在训练前只核验 SwinIR prediction 文件集合和数值合同，没有记录来源 run/checkpoint 与逐文件 hash。本次训练后审计确认两种方法的 train/development manifest 与 `files.csv` 哈希一致，200 个当前预测 SHA-256 与 D2 运行清单一致。SwinIR 自身 best checkpoint hash 是训练后计算，原 SwinIR manifest 没有记录该哈希；其 `baseline_checkpoint_*` 实为 C2 内部对照权重，已单独核验。原始 EDSR run 未在读取前绑定 SwinIR 来源清单或逐文件预测 hash，因此这仍是训练后来源核验；正式新运行须预先绑定来源清单、任务权重和逐文件预测 hash。详见[配对基线来源审计](PHASE_D1_PAIRED_BASELINE_PROVENANCE_AUDIT_20261124.md)和[基线比较](../../experiments/published_baselines_sar_only_20261123_v1/baseline_comparison.md)。
+
+DSRKD 仍因缺少可核验作者实现、权重和完整训练协议而不可执行；本轮没有以自建网络冒充。`C2MatchedJoint` 继续单独标为 `INTERNAL_BASELINE`。

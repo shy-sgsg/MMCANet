@@ -1,5 +1,11 @@
 # 本项目的扩散方法可行性
 
+## 2026-11-24 观测约束扩散 Pilot STOP 当前设置
+
+后续代码审查发现正值观测的 clamp 梯度死区：`z<0,y>0` 时正值似然对 `z` 的梯度为零。该实现限制了本次 posterior guidance 的有效域，不能将先前静态审查表述为“无明确代码缺陷”；详见 [D2 Research Decision Review](PHASE_D2_RESEARCH_DECISION_REVIEW_20261124.md)。这不改变已停止 run，也不构成事后修复或继续训练理由。
+
+固定 C1 v2 `x2_light` 开发集上，五轮无条件 SAR noisy pseudo-target 先验完成训练，四个 20-step DDIM draw 均值 PSNR 为 10.7517 dB；pixel-mean PSNR 为 10.9763 dB，SwinIR SAR 适配版为 21.6352 dB。单 draw 的 EPI correlation 接近零，亮值保持不足；pixel-mean 的正值 Gamma 项降低，但 clamp 零支持违规率升至 48.85%（SwinIR 为 36.53%）。四个 draw 均明显落后，且 800 次生成耗时 1,604 秒。按冻结规则停止当前设置，不以“训练不足”追加相同配置。该失败只描述当前先验、似然近似、采样预算和重复使用的 development；不证明所有扩散后验方法无效。完整 Research Decision Review 见[本轮复核](PHASE_D2_RESEARCH_DECISION_REVIEW_20261124.md)。
+
 ## 2026-11-09 新增单步扩散与后验 Flow 先例
 
 CODSR 已在自然图像真实超分中实现单步扩散、梯度区域自适应生成先验和低质量输入特征调制；条件 Flow Matching 也已有面向模拟式贝叶斯后验采样的理论与实验工作。这些先例收窄通用机制的新颖性，但没有验证 SAR 表示域、去斑/超分联合任务、匹配 optical 增益、错配回退或本地观测似然。故它们不提高或降低本地 Flow/Diffusion 的可行性证据，也不触发模块移植、协议变更或 gate 晋级。来源与证据等级见[审查报告](../../experiments/literature_audits/flow_and_one_step_sr_prior_art_20261109_v1/审查报告.md)。

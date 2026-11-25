@@ -1,5 +1,15 @@
 # 下一步行动
 
+## 2026-11-24 Phase D 实验后的可执行事项
+
+1. **新 Optical 配对数据：** TUM 官方数据页与 ISPRS 发布公告确认 SEN1-2 为 282,384 对并通过 MediaTUM 官方记录按 CC-BY 发布；当前 MediaTUM 返回 HTTP 429，匿名 rsync 清单认证失败。等待官方可访问方式或用户给出的明确认证授权；解锁后先做包级元数据、来源组映射和 train/development 排除审计，只下载获准角色。不得按数值文件名拆分，不下载或读取 confirmation/test。
+2. **新 development 协议：** 有来源元数据后，冻结未用于既往训练/选模的来源组、配准检查、空间重叠规则、固定输入与评价/停止门槛，再开展 Optical 效用筛查。
+3. **D1 基线合同：** EDSR 与 SwinIR 结果仅限复用 development 探索；任何新 run 必须在训练前校验基线来源 manifest/checkpoint，并保存每张预测 SHA-256 和数据角色 flags。
+4. **D2 处理：** 当前 observation-aware diffusion 固定配置 STOP。若新数据和新协议满足资格，再定义对 `z<0,y>0` 有恢复梯度的似然/支持域模型，并用正/负算子值、零/正观测合同测试；不能直接续训当前 checkpoint。
+5. **方法谱系：** 保持 DSRKD `不可执行/无本地分数`，直到取得可核验的作者代码、权重、许可及训练协议；`C2MatchedJoint` 继续标为 `INTERNAL_BASELINE`。
+6. **阶段边界：** C2 v2 gate 仍未判定，C3-B 未获训练授权；不访问受保护 confirmation/test，不宣称独立泛化、clean SAR 恢复或真实物理一致性。
+
+
 ## 2026-11-24 Research Decision Review 后的行动
 
 1. **保持停止：** 不追加当前像素域 SAR-only Flow、Conditional DDPM 或 SwinIR-centered Residual DDPM 的同配置 seed；当前结果不支持继续增加相同预算。

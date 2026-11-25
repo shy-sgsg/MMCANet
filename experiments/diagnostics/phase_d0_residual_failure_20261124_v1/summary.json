@@ -1,0 +1,107 @@
+{
+  "run_id": "phase_d0_residual_failure_20261124_v1",
+  "status": "complete",
+  "scope": "只读 train/development SAR 残差诊断；不训练、不推理、不选择 checkpoint",
+  "input_root": "/tmp/jdsr-c3a-20261123/data/derived/c2_fixed_inputs_c1_v2_20261031_v1/x2_light",
+  "source_run_dir": "/home/shy/AIR/SAR+AI/project/JDSR-phaseD-20261124/experiments/published_baselines_sar_only_20261123_v1/运行_sar_only_diffusion_20261123_v1",
+  "source_run_manifest_sha256": "ffbf520c95f74fd66aff60bdaa2b14e03c8d89f6fafd2d17aa6a34b99b3f648b",
+  "source_run_code_sha256": "59d0318ecb6914de94c3a659b5f710d8a48d6c6ccc71db26a6d1c1e723044e9b",
+  "splits": {
+    "train": {
+      "role": "train",
+      "sample_count": 1600,
+      "source_group_count": 92,
+      "manifest_sha256": "64d335f06812859b96b884a5583092df76dd4b6fa181c3a842b18ed5d3bf6eeb",
+      "files_csv_sha256": "97f35201125dcb3830e9d0583d3350159f0d6757056c7acf13c4c1a0910466ad",
+      "test_set_accessed": false,
+      "test_set_used": false,
+      "confirmation_payload_accessed": false,
+      "optical_payload_loaded": false
+    },
+    "development": {
+      "role": "development",
+      "sample_count": 200,
+      "source_group_count": 19,
+      "manifest_sha256": "de3101a78105c05653b9779342cabe98d61a9cddac6153b25a7d6347d0ef0da9",
+      "files_csv_sha256": "70d762015b2b16a604d381758091ae3d282526a7137e9de51c6db827b60f2839",
+      "test_set_accessed": false,
+      "test_set_used": false,
+      "confirmation_payload_accessed": false,
+      "optical_payload_loaded": false
+    }
+  },
+  "test_set_accessed": false,
+  "test_set_used": false,
+  "confirmation_payload_accessed": false,
+  "optical_payload_loaded": false,
+  "cuda_used": false,
+  "bootstrap": {
+    "single_draw_cosine": {
+      "metric": "cosine",
+      "group_count": 19,
+      "group_balanced_mean": 0.012069029675282436,
+      "bootstrap_95_ci": [
+        -0.0016197134404339279,
+        0.026689912046046226
+      ],
+      "replicates": 10000,
+      "seed": 20261124
+    },
+    "single_draw_delta_mse_vs_base": {
+      "metric": "delta_mse_vs_base",
+      "group_count": 19,
+      "group_balanced_mean": 0.0035758659883651832,
+      "bootstrap_95_ci": [
+        0.0031573573426173984,
+        0.004012571399969969
+      ],
+      "replicates": 10000,
+      "seed": 20261124
+    },
+    "single_draw_oracle_alpha": {
+      "metric": "oracle_alpha",
+      "group_count": 19,
+      "group_balanced_mean": 0.01617116946073829,
+      "bootstrap_95_ci": [
+        -0.011726498977737584,
+        0.04447488949334452
+      ],
+      "replicates": 10000,
+      "seed": 20261124
+    },
+    "pixel_mean_cosine": {
+      "metric": "cosine",
+      "group_count": 19,
+      "group_balanced_mean": 0.018534350506755948,
+      "bootstrap_95_ci": [
+        -0.0035907393010135556,
+        0.04176821851615189
+      ],
+      "replicates": 10000,
+      "seed": 20261124
+    },
+    "pixel_mean_delta_mse_vs_base": {
+      "metric": "delta_mse_vs_base",
+      "group_count": 19,
+      "group_balanced_mean": 0.0010107035337068042,
+      "bootstrap_95_ci": [
+        0.0008300364769368633,
+        0.001203017115843397
+      ],
+      "replicates": 10000,
+      "seed": 20261124
+    },
+    "pixel_mean_oracle_alpha": {
+      "metric": "oracle_alpha",
+      "group_count": 19,
+      "group_balanced_mean": 0.035369524336821875,
+      "bootstrap_95_ci": [
+        -0.0346946786830459,
+        0.10638906654748495
+      ],
+      "replicates": 10000,
+      "seed": 20261124
+    }
+  },
+  "elapsed_seconds": 52.77163392800139
+}

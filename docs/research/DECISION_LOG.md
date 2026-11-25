@@ -8114,3 +8114,22 @@ C3-A 按冻结训练批量 4 和 256×256 分辨率完成纯合成 CPU 前向/�
 **决定。** 停止当前像素域 SAR-only Flow 配置，不追加第二 seed。此决定不否定其他生成方法，不回答 Optical 增量，不更改 C2 gate 或冻结协议。C3-B 不在本轮授权内。
 
 **C3-B 前置。** 当前 131 个来源组均已分配；development 已反复用于选择，confirmation 曾访问后封存；本地数字命名 2,000 对未映射到 C1。现阶段无法构造可信的新独立 development 清单。最低修复是取得未参与既往训练/选择、身份与来源组可核验的新配对数据，先冻结 train/development 与审计清单，再设计 Optical、SAR-only 和错配控制。
+
+
+## D-2026-11-24-002 — 完成 EDSR SAR 任务适配基线并停止当前 D2 Pilot
+
+- **问题。** D0 残差诊断后，是否能建立第二个可执行的发表架构 SAR 任务适配基线；D2 观测约束扩散 Pilot 是否具备继续资格；新 Optical 数据是否可安全取得？
+- **事实。** EDSR 单 seed 完成 30 轮，best epoch 29；C1 v2 重复 development 上组均衡 PSNR 21.7316 dB，相对 SwinIR ΔPSNR +0.0964 dB（19 组 bootstrap 95% CI [+0.0693,+0.1316]）。SSIM 与 EPI 配对区间跨零。运行 12,000 updates，无 CUDA OOM。
+- **来源限制。** EDSR、SwinIR train/development 的记录哈希一致，当前 200 张参考预测哈希与 D2 manifest 匹配；但 EDSR 原 run 未在读取前保存预测哈希。SwinIR manifest 也未记录自身 best checkpoint 的 SHA，且字段 `baseline_checkpoint_*` 实际指向 C2 内部权重。保留训练后来源审计并将结果限于探索比较。
+- **D2 审查修订。** 只读审查确认 `z<0,y>0` 时正值 Gamma 项因双重 clamp 对 `z` 梯度为零。现有 Pilot 结果与代码不改；STOP 固定配置。新测试记录该零梯度边界，后续若重开须在新协议前提出可覆盖负振铃的似然并验证边界。
+- **决定。** D1 两种通用发表架构任务适配 baseline 保留供本地探索，不能称为 SAR 专用发表方法复现或独立泛化证据。D2 当前候选 STOP，不追加同配置 seed，不启动 bridge C，不进入 C3-B。`C2 v2 gate` 仍为 `UNJUDGED`。
+- **数据与资源。** TUM 官方 SEN1-2 记录页面返回 HTTP 429；匿名 rsync 清单认证失败，自动审查拒绝使用非官方来源披露的口令。没有下载或读取 Optical、confirmation/test 载荷。根分区剩 36 GiB，`/tmp` 剩 1.5 GiB；只清理本轮确认已归档的重复日志与纯 `.pyc` 缓存约 1.02 MiB。
+- **记录。** [D2 Research Decision Review](PHASE_D2_RESEARCH_DECISION_REVIEW_20261124.md)、[D1 基线比较](../../experiments/published_baselines_sar_only_20261123_v1/baseline_comparison.md)、[D1 来源核验](PHASE_D1_PAIRED_BASELINE_PROVENANCE_AUDIT_20261124.md)、[新数据获取记录](PHASE_D_NEW_OPTICAL_DATA_ACQUISITION_20261124.md)。
+- **flags。** 当前 D1/D2 run 均记录 `test_set_accessed=false`、`test_set_used=false`、`confirmation_payload_accessed=false`、`optical_payload_loaded=false`；不据此覆盖项目历史累计访问记录。
+
+## D-2026-11-24-003 — 完成 EDSR 验证并维持新数据准入阻塞
+
+- **问题。** EDSR 基线、代码回归与官方新 Optical 数据入口是否足以支持继续生成式训练或 C3-B？
+- **证据。** EDSR 运行标记 `complete`、`cuda_oom=false`，完成 30 轮/12,000 次更新及 200 张 development 评价；来源组等权 ΔPSNR 对 SwinIR 为 +0.0964 dB（19 组 bootstrap 95% CI [+0.0693,+0.1316]），结构指标区间跨零。AISAR 下完整项目 `tests/` 为 188 项通过。计时字段覆盖训练和开发评价，已修正结果表口径。官方 TUM 页与 ISPRS 公告确认 SEN1-2 发布规模/许可及官方 MediaTUM 记录；记录访问 HTTP 429、匿名 rsync 清单认证失败，未下载或访问任何新载荷。
+- **决定。** EDSR/SwinIR 比较仅保留为历史 development 上的单 seed 探索观察。继续遵循 D2 STOP，不追加同配置训练。未取得可核验的新来源组和独立 development 前，不开展 Optical 条件训练或 C3-B；等待官方数据访问方式或用户明确的认证授权。
+- **资源与保护。** 收尾可用空间为根分区 16.71 GiB、`/tmp` 2.93 GiB；保留 checkpoint、生成样本、历史结果和主工作区 6,075 项用户修改。

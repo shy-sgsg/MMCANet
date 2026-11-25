@@ -1,0 +1,1 @@
+/home/shy/anaconda3/envs/AISAR/bin/python experiments/diagnostics/analyze_phase_d2_zero_support.py --input-root /home/shy/AIR/SAR+AI/project/JDSR/data/derived/c2_fixed_inputs_c1_v2_20261031_v1/x2_light

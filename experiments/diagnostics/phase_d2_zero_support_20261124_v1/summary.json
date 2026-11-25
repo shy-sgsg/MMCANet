@@ -1,0 +1,81 @@
+{
+  "run_id": "phase_d2_zero_support_20261124_v1",
+  "status": "complete",
+  "input_root": "/home/shy/AIR/SAR+AI/project/JDSR/data/derived/c2_fixed_inputs_c1_v2_20261031_v1/x2_light",
+  "output_dir": "/home/shy/AIR/SAR+AI/project/JDSR-phaseD-20261124/experiments/diagnostics/phase_d2_zero_support_20261124_v1",
+  "splits": {
+    "train": {
+      "role": "train",
+      "sample_count": 1600,
+      "source_group_count": 92,
+      "manifest_sha256": "64d335f06812859b96b884a5583092df76dd4b6fa181c3a842b18ed5d3bf6eeb",
+      "files_csv_sha256": "97f35201125dcb3830e9d0583d3350159f0d6757056c7acf13c4c1a0910466ad"
+    },
+    "development": {
+      "role": "development",
+      "sample_count": 200,
+      "source_group_count": 19,
+      "manifest_sha256": "de3101a78105c05653b9779342cabe98d61a9cddac6153b25a7d6347d0ef0da9",
+      "files_csv_sha256": "70d762015b2b16a604d381758091ae3d282526a7137e9de51c6db827b60f2839"
+    }
+  },
+  "summary": {
+    "train": {
+      "role": "train",
+      "sample_count": 1600,
+      "source_group_count": 92,
+      "manifest_sha256": "64d335f06812859b96b884a5583092df76dd4b6fa181c3a842b18ed5d3bf6eeb",
+      "files_csv_sha256": "97f35201125dcb3830e9d0583d3350159f0d6757056c7acf13c4c1a0910466ad",
+      "zero_pixel_count": 40530,
+      "pixel_count": 26214400,
+      "pooled_zero_fraction": 0.0015460968017578125,
+      "images_with_any_zero_count": 870,
+      "image_zero_fraction_median": 6.103515625e-05,
+      "image_zero_fraction_p10": 0.0,
+      "image_zero_fraction_p90": 0.00213623046875,
+      "image_zero_fraction_max": 0.21044921875,
+      "source_group_balanced_zero_fraction": 0.0015472169286928996,
+      "source_group_bootstrap_95_ci": [
+        0.0011145922093609578,
+        0.0020375766954695714
+      ],
+      "source_group_bootstrap_replicates": 10000,
+      "source_group_bootstrap_seed": 20261124,
+      "minimum_positive_lr_value": 2.0804415612474259e-07
+    },
+    "development": {
+      "role": "development",
+      "sample_count": 200,
+      "source_group_count": 19,
+      "manifest_sha256": "de3101a78105c05653b9779342cabe98d61a9cddac6153b25a7d6347d0ef0da9",
+      "files_csv_sha256": "70d762015b2b16a604d381758091ae3d282526a7137e9de51c6db827b60f2839",
+      "zero_pixel_count": 3167,
+      "pixel_count": 3276800,
+      "pooled_zero_fraction": 0.00096649169921875,
+      "images_with_any_zero_count": 99,
+      "image_zero_fraction_median": 0.0,
+      "image_zero_fraction_p10": 0.0,
+      "image_zero_fraction_p90": 0.00146484375,
+      "image_zero_fraction_max": 0.05340576171875,
+      "source_group_balanced_zero_fraction": 0.0009348016036184208,
+      "source_group_bootstrap_95_ci": [
+        0.00028791363729814594,
+        0.0017971903969796654
+      ],
+      "source_group_bootstrap_replicates": 10000,
+      "source_group_bootstrap_seed": 20261124,
+      "minimum_positive_lr_value": 1.4199681572790723e-05
+    }
+  },
+  "test_set_accessed": false,
+  "test_set_used": false,
+  "confirmation_payload_accessed": false,
+  "optical_payload_loaded": false,
+  "training_performed": false,
+  "cuda_used": false,
+  "python": "3.13.7",
+  "numpy": "2.3.4",
+  "python_executable": "/home/shy/anaconda3/envs/AISAR/bin/python",
+  "analysis_code_sha256": "5a83a32e56519f3e892b9e8d2b402621ccc9a0a525b3e2149d1ba9f58433ce4b",
+  "elapsed_seconds": 0.45664541199221276
+}

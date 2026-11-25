@@ -1,5 +1,9 @@
 # 研究假设
 
+## 2026-11-24 H-D2-B 在冻结 Pilot 上未通过；不更新 H1–H6
+
+SAR 表示域观测约束扩散的冻结假设要求输出质量不显著差于 SwinIR 并改善观测一致性。实际 5-epoch prior、20-step posterior 的四个 draw 平均 PSNR 为 10.7517 dB，pixel-mean 为 10.9763 dB，均显著低于 SwinIR 的 21.6352 dB；四个 draw（采样 seed `20261125`–`20261128`）的组等权 PSNR 均约 10.7–10.8 dB；训练 prior 只有一个 seed `20261124`。pixel-mean 正值 Gamma 项更低，但零值支持违规率更高，不能作为整体观测相容的通过证据。故 H-D2-B 在本次固定模型/协议下未获支持，STOP 当前候选。此观察来自历史复用 development，不是独立泛化或 SAR 物理真值证据，也不更新 H1–H6、C2 gate 或 Optical 条件资格。详见[Research Decision Review](PHASE_D2_RESEARCH_DECISION_REVIEW_20261124.md)。
+
 ## 2026-11-22 理论边界核验不更新 H1–H6
 
 LMMSE 复杂系数、退化边界和协方差求解回归通过，且 v1r2 小规模软件 smoke 通过；这只核对受限公式及实现。未使用 SAR/optical 项目图像、checkpoint 或训练，故不支持或反证 optical 增量、生成方法效用、观测一致性、可靠性回退及联合/级联比较。H1–H6、C2/C3 gate 均保持原状态。详见[LMMSE 边界记录](../../experiments/synthetic_cpu/optical_shift_frequency_lmmse_boundary_cpu_20261122_v1/报告.md)和[C-Transition 准备度审查](C_TRANSITION_READINESS_REVIEW.md)。

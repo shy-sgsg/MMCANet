@@ -1,5 +1,14 @@
 # 光学信息效用分析
 
+## 2026-11-24 新配对数据获取状态
+
+TUM 官方数据页仍列出 SEN1-2；本次 MediaTUM 记录打开返回 HTTP 429，匿名 rsync 顶层目录清单返回认证失败。未下载数据或读取 Optical/confirmation/test 载荷。认证信息只在非官方来源找到，自动审查拒绝使用；须由用户提供官方获取方式或明确认证授权后才继续。当前 C2 v2 gate 为 `UNJUDGED`，新独立 development 尚未形成，不能据现有 SAR-only 结果主张 Optical 增益或启动 C3-B。完整操作记录见[新数据获取报告](PHASE_D_NEW_OPTICAL_DATA_ACQUISITION_20261124.md)。
+
+
+## 2026-11-24 官方 SEN1-2 新来源组仍处于获取准备，未产生 Optical 效用证据
+
+官方 TUM Open Datasets 页面与 SEN1-2 原始论文将该资源列为 282,384 对 co-registered SAR–optical patch；本轮尝试读取 MediaTUM 1436631 包级文件清单时返回 HTTP 429，未核验当前文件包/许可/体积，也未下载或查看任何影像。新来源组计划要求按官方 source/ROI 身份排除旧 split 已用组，按场景而非 patch 划分 development 与后续 confirmation；细节和最小解锁条件见[数据获取进展](PHASE_D_NEW_OPTICAL_DATA_ACQUISITION_20261124.md)。C2 v2 仍 `UNJUDGED`，本轮未运行 optical 模型、未读取旧 confirmation/test、没有新增 Optical 增量结果。
+
 ## 2026-11-22 LMMSE 边界收尾不构成本地 optical utility
 
 新增复数传递/耦合、零耦合、零/极端平移、近奇异协方差及低高噪声边界回归共 18 项通过；小规模临时副本亦核对了 v1r2 实验输出链。该结论只适用于固定复高斯单频线性模型，状态为 `THEORY_VERIFIED_WITHIN_ASSUMPTIONS`。它不说明本地 optical 是否改善 SAR 重建。真实频率效用须等到未使用、来源可核验且配准依据足够的 development 数据，并与匹配 SAR-only 和错误 optical 控制比较。详见[C-Transition 准备度审查](C_TRANSITION_READINESS_REVIEW.md)与[边界报告](../../experiments/synthetic_cpu/optical_shift_frequency_lmmse_boundary_cpu_20261122_v1/报告.md)。
@@ -618,3 +627,7 @@ C3-A 只输入 SAR LR，故 Flow 相对 SAR-only 确定性基线的负差不能�
 ## 2026-11-24 SAR-only SwinIR/DDPM 结果不更新 Optical 效用
 
 本轮 SwinIR 及两种 DDPM 实验均未输入或读取 Optical；Conditional/Residual 的相对差只涉及 SAR-only 候选，不支持或反驳 H1/Q1，也不能说明 Optical 对模型是必要或无用。C2 v2 gate 仍未判定，历史 development 已复用。只有在新来源组和配准均可核验的 development 上，按预注册的 matched、SAR-only、置换、缺失及几何错位对照，才可更新 Optical 增量判断。详见[2026-11-24 SAR-only Research Decision Review](SAR-only%20Published%20Baseline%20与%20Diffusion%20决策复核_20261124.md)。
+
+## 2026-11-24 SEN1-2 官方许可已核实；包级访问仍受阻
+
+TUM 官方开放数据页列出 SEN1-2 为 282,384 对配准 SAR–Optical patch；ISPRS 官方公告确认其按 CC-BY 发布并指向 TUM MediaTUM 记录。当前 MediaTUM 请求返回 HTTP 429，匿名 rsync 清单需要认证，故尚无新来源组或独立 development。该来源事实不建立本地 `data/` 与 SEN1-2 的逐图映射，也不改变 C2 v2 `UNJUDGED` 或 C3-B 资格。详见[新数据获取报告](PHASE_D_NEW_OPTICAL_DATA_ACQUISITION_20261124.md)。

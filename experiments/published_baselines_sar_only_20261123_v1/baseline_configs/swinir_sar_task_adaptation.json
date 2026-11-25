@@ -1,0 +1,29 @@
+{
+  "身份": "TASK_ADAPTED_PUBLISHED",
+  "方法": "SwinIR SAR 单通道 ×2 任务适配版",
+  "上游实现": "BasicSR/basicsr/archs/swinir_arch.py",
+  "结构": {
+    "in_chans": 1,
+    "embed_dim": 60,
+    "depths": [6],
+    "num_heads": [6],
+    "window_size": 8,
+    "mlp_ratio": 2.0,
+    "upscale": 2,
+    "upsampler": "pixelshuffledirect",
+    "resi_connection": "1conv",
+    "输出激活": "Sigmoid"
+  },
+  "训练": {
+    "seed": 20261123,
+    "epochs": 30,
+    "batch_size": 4,
+    "lr_patch": 64,
+    "optimizer": "Adam",
+    "learning_rate": 0.0001,
+    "loss": "L1",
+    "初始化": "随机初始化；无外部预训练权重"
+  },
+  "运行目录": "experiments/published_baselines_sar_only_20261123_v1/运行_swinir_20261123_v3",
+  "结果边界": "C1 v2 已复用 development 上的探索性 SAR 任务适配，不是作者 SAR 权重或完整论文复现。"
+}

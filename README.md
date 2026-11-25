@@ -1,8 +1,8 @@
 # JDSR / MMCANet：SAR 联合去斑与超分辨率
 
-> **当前研究状态（2026-11-24）：** C3-A 当前像素域 Flow 配置已按冻结条件停止；SAR-only SwinIR 任务适配、Conditional DDPM 和 SwinIR-centered Residual DDPM 均完成训练、development 评价与 Research Decision Review。两种 DDPM 当前设置均未达到确定性参照，停止同配置扩展。C2 v2 gate 仍未判定，C3-B 未获授权，须先解决新的独立 development 数据协议。详见[2026-11-24 决策复核](docs/research/SAR-only%20Published%20Baseline%20与%20Diffusion%20决策复核_20261124.md)、[Flow 决策复核](docs/research/C3-A%20SAR-only%20Flow%20决策复核_20261123.md)和[当前状态](docs/research/CURRENT_STATE.md)。
+> **当前研究状态（2026-11-24）：** D0 残差诊断已完成；SwinIR 与 EDSR 两种发表通用架构的 SAR 单通道任务适配基线已完成，EDSR 在历史复用 development 上的组均衡 PSNR 高 0.0964 dB，但结构差异区间跨零且不构成独立泛化证据。D2 观测约束扩散 Pilot 已停止，复核发现正观测下的负振铃区域存在零梯度死区。C2 v2 gate 仍未判定，C3-B 未启动。新 Optical 数据获取因 MediaTUM 返回 429、rsync 认证失败且认证使用遭自动审查拒绝而阻塞；没有下载 Optical 或访问 confirmation/test 载荷。详见[当前状态](docs/research/CURRENT_STATE.md)、[D2 决策复核](docs/research/PHASE_D2_RESEARCH_DECISION_REVIEW_20261124.md)、[D1 基线比较](experiments/published_baselines_sar_only_20261123_v1/baseline_comparison.md)。
 
-> **本轮实验已完成：** 使用 C1 v2 固定 train 1,600/92 来源组、development 200/19 来源组，实际训练并评价 SwinIR SAR 适配、Conditional DDPM 与 Residual DDPM。未访问 Optical、confirmation 或 test 载荷；续训/采样/汇总日志未见 CUDA OOM，Residual 原训练进程在 epoch 24 后停止的原因未查明并已从 checkpoint 恢复。所有数字限于历史复用 development 上的探索观察，不是独立泛化或物理一致性证据。运行产物与方法身份见[基线谱系审计](docs/research/BASELINE_LINEAGE_AUDIT_20261123.md)、[发表方法注册表](docs/research/PUBLISHED_METHOD_REGISTRY_20261123.md)、[冻结扩散协议](docs/research/SAR_ONLY_DIFFUSION_EXPERIMENT_PROTOCOL_20261123.md)、[实验登记](docs/research/EXPERIMENT_REGISTRY.md)和[Research Decision Review](docs/research/SAR-only%20Published%20Baseline%20与%20Diffusion%20决策复核_20261124.md)。
+> **Phase D 执行记录：** 已完成 D0 Residual DDPM 失败分析、固定退化算子往返和零值支持审计；完成 EDSR 30 轮 SAR 任务适配及全 development 配对评价；完成 observation-aware diffusion 5 轮 Pilot 与 800 次后验 draw 评价并按结果 STOP。EDSR 与 D2 的全部运行限于 C1 v2 train/development SAR 输入；confirmation/test/Optical flags 均为 false。训练和评价过程无 CUDA OOM。已记录数据来源审计、配对限制与后续决策。
 
 
 **正式研究总纲：** [v1.8 研究总纲](docs/research/RESEARCH_CHARTER.md)，于 2026-11-09 获用户明确批准。正式题目为“光学先验引导与 SAR 物理一致性约束的生成式联合去斑和超分辨率重建方法研究”。v1.8 增补 SAR 两阶段潜扩散先例，并明确单次生成、像素均值点估计和样本分布是不同评价对象；沿用冻结 C1 v2，不改变历史 gate、数据权限或训练状态。对当前 8-bit PNG 表示域实验，不作未经验证的辐射物理解释。
@@ -73,6 +73,10 @@
 冻结训练矩阵已完成。正式 paired screen 入口为 [evaluate_phase_c2_screen.py](scripts/evaluate_phase_c2_screen.py)；执行因必需 median TBR 未定义而依协议失败关闭，不能报告 gate 通过或停止。另用 [evaluate_phase_c2_non_gate_diagnostic.py](scripts/evaluate_phase_c2_non_gate_diagnostic.py) 完成只用于探索的补充分析。该诊断不是协议晋级结果；单 seed、19 个来源组的结果仅为描述性探索，不支撑独立泛化结论。C2 v2 原 gate 保持不变；下一项独立 SAR-only 生成方法探索及其资源阻塞见 [C3-A 预登记记录](docs/research/EXPERIMENT_REGISTRY.md)。
 
 ## 重要研究记录
+
+- [Phase D D0 残差失败分析](docs/research/PHASE_D0_DIFFUSION_FAILURE_ANALYSIS.md)、[D2 Research Decision Review](docs/research/PHASE_D2_RESEARCH_DECISION_REVIEW_20261124.md)
+- [发表架构基线比较](experiments/published_baselines_sar_only_20261123_v1/baseline_comparison.md)、[基线复现报告](experiments/published_baselines_sar_only_20261123_v1/baseline_reproduction_report.md)、[D1 配对来源审计](docs/research/PHASE_D1_PAIRED_BASELINE_PROVENANCE_AUDIT_20261124.md)
+- [新 Optical 数据获取记录](docs/research/PHASE_D_NEW_OPTICAL_DATA_ACQUISITION_20261124.md)
 
 - [总研究计划](docs/research/MASTER_RESEARCH_PLAN.md)
 - [v1.8 逐节差异与采纳记录](docs/research/RESEARCH_CHARTER_CHANGELOG_20261107.md)

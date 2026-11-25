@@ -2824,3 +2824,34 @@ OpenAlex reports the IOP PDF as the only location and no repository full text, t
 - **预检修订：** 运行后移除按桌面进程名和 Python 脚本名无条件放行的分支；默认预检现会拦截所有其他 CUDA 进程并保留 3 GiB 门槛，只有显式用户授权旗标可豁免。该变更只影响未来预检，训练/推理代码与本次结果不变；实际 run 的执行脚本哈希保留在 manifest。
 - **报告：** [C3-A 决策复核](C3-A%20SAR-only%20Flow%20决策复核_20261123.md)。
 - **数据清单边界：** 完整 C1 来源清单含封存 confirmation 身份，未随提交发布；只在 run/input manifest 中记录其 SHA-256。未读取 confirmation/test 影像载荷。
+
+
+## 2026-11-24 Phase D D0–D2 与 D1 EDSR run
+
+### D0 残差失败分析与固定算子/零支持审计
+
+- D0 报告：[PHASE_D0_DIFFUSION_FAILURE_ANALYSIS.md](PHASE_D0_DIFFUSION_FAILURE_ANALYSIS.md)；固定协议：[诊断协议](PHASE_D0_DIFFUSION_FAILURE_ANALYSIS_PROTOCOL_20261124.md)。使用合法 train/development SAR 和已归档模型预测，不重新训练。观察到生成残差方向与目标残差相关性弱；四 draw pixel-mean 也未改善 SwinIR。单 seed、历史 development，仅支持停止当前残差配置。
+- 固定算子往返 run：`experiments/diagnostics/phase_d2_operator_roundtrip_20261124_v1/`，1800 张 train/development 低分辨输入逐位复现，最大误差 0。
+- 零支持 run：`experiments/diagnostics/phase_d2_zero_support_20261124_v1/`；train 精确零像素 0.154610%，development 0.096649%。显示域零是明确的支持点，不能无条件套用普通正值 Gamma 似然。
+
+### D2 SAR 表示域观测约束扩散 Pilot
+
+- 协议：[PHASE_D2_OBSERVATION_AWARE_PILOT_PROTOCOL_20261124.md](PHASE_D2_OBSERVATION_AWARE_PILOT_PROTOCOL_20261124.md)，SHA-256 `2d470e2814477cf0b43470ddf24a1b8d6d936a314899b88be5e6fda982b07d10`。5 轮先验训练后评价 200 张×4 draws×20 步；无 OOM，train/development flags 合规。运行与汇总位于 `experiments/runs/phase_d2_observation_aware_pilot_20261124_v1_retry01/` 和 `experiments/runs/phase_d2_observation_aware_eval_20261124_v1/`。
+- 结果明显落后 SwinIR，确定 STOP 当前方法；Research Decision Review 记录在[PHASE_D2_RESEARCH_DECISION_REVIEW_20261124.md](PHASE_D2_RESEARCH_DECISION_REVIEW_20261124.md)。独立审查补充：`z<0,y>0` 时正值似然梯度为零；定向测试复现，既有 run 不追溯修改。
+
+### D1 EDSR SAR 单通道任务适配
+
+- 协议：[PHASE_D1_EDSR_SAR_ADAPTATION_PROTOCOL_20261124.md](PHASE_D1_EDSR_SAR_ADAPTATION_PROTOCOL_20261124.md)，SHA-256 `5fcfa4a9a525aa05a9c59551615a948d794fefdbe887d24dd34bdfbcaad8845e`。run `experiments/runs/phase_d1_edsr_sar_20261124_v1/`：30 轮、best epoch 29、12,000 updates、200 张/19 组，参数 1,367,553，运行累计 3,338.48 秒，200 张推理 21.92 秒，峰值分配显存 202.1 MiB，`cuda_oom=false`。
+- development 组均衡 PSNR 21.7316 dB；相对 SwinIR 配对 ΔPSNR +0.0964 dB（95% CI [+0.0693,+0.1316]）。SSIM/EPI 等结构差区间跨零。仅支持历史 development 上的单 seed 探索比较。
+- 配对来源训练后审计：[来源报告](PHASE_D1_PAIRED_BASELINE_PROVENANCE_AUDIT_20261124.md)；逐预测 SHA-256 清单：[CSV](../../experiments/published_baselines_sar_only_20261123_v1/baseline_reference_prediction_sha256_20261124.csv)。EDSR 原 run 没有在读取前绑定参考预测 hash；SwinIR manifest 未保存自身任务 checkpoint hash；因此不作为正式独立 baseline 证据。
+
+### D5 新 Optical 配对数据获取
+
+- [数据获取记录](PHASE_D_NEW_OPTICAL_DATA_ACQUISITION_20261124.md)保留官方来源候选、拟议 source-group 排除原则及最小 development/confirmation 规模。当前 MediaTUM 记录返回 429、rsync 匿名目录清单要求认证；自动审查拒绝使用来自非官方网页的口令。未下载数据或访问保护载荷；C2 gate `UNJUDGED`、C3-B 仍关闭。
+
+## 2026-11-24 EDSR SAR 任务适配基线（完成）
+
+- **协议与数据：** seed `20261125`，30 轮、12,000 次更新；C1 v2 train 1,600 张/92 组与 development 200 张/19 组，仅用 SAR LR 和 noisy pseudo-target。confirmation、test、Optical 均未访问。
+- **运行与结果：** `experiments/runs/phase_d1_edsr_sar_20261124_v1/` 标记 `complete`、`cuda_oom=false`；best epoch 29，参数 1,367,553，组均衡 PSNR 21.7316 dB。相对 SwinIR 的来源组配对 ΔPSNR +0.0964 dB（95% CI [+0.0693,+0.1316]）；ΔSSIM/ΔEPI 区间跨零。
+- **运行成本：** 3,338.48 秒为含训练和 development 评价的完整运行累计计时；200 张 EDSR 推理 21.92 秒，峰值 allocated/reserved 为 202.1/234.0 MiB。
+- **验证：** AISAR 执行 `tests/` 共 188 项通过；完整输出见[基线比较](../../experiments/published_baselines_sar_only_20261123_v1/baseline_comparison.md)与[配对来源审计](PHASE_D1_PAIRED_BASELINE_PROVENANCE_AUDIT_20261124.md)。结果仅为单 seed、复用 development 的探索性观察。

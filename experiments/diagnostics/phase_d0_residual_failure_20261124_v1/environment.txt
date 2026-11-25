@@ -1,0 +1,4 @@
+Python: 3.13.7
+NumPy: 2.3.4
+CPU 后处理：是
+CUDA 使用：否

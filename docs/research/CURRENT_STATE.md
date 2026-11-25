@@ -1,5 +1,16 @@
 # 当前状态——权威快照（2026-11-24）
 
+## 2026-11-24 Phase D 实验与决策更新
+
+- **D0 残差失败分析：** 已完成训练/开发残差方向、尺度、频率组成和四 draw 与 pixel-mean 诊断。当前 Residual DDPM 的残差不能稳定修正 SwinIR；停止该固定配置，不把观察推广到所有生成模型。
+- **D1 已发表架构任务适配：** EDSR seed `20261125` 完成 30 轮、12,000 次更新，best epoch 29。C1 v2 development（200 张/19 组）组均衡 PSNR 为 21.7316 dB；相对 SwinIR 为 +0.0964 dB，19 组 bootstrap 95% CI [+0.0693,+0.1316]。ΔSSIM、ΔEPI 等结构指标区间跨零。单 seed、反复使用 development，仅为探索比较；EDSR 是通用发表架构任务适配，不是 SAR 专用发表方法的精确复现。详细结果见[基线比较](../../experiments/published_baselines_sar_only_20261123_v1/baseline_comparison.md)。
+- **D1 来源审计：** train/development 数据 manifest 和 `files.csv` 哈希与 SwinIR run 完全匹配；200 个当前预测哈希匹配 D2 评价记录。EDSR 原 run 未在读取前记录 SwinIR 文件哈希；SwINIR 自身 checkpoint 哈希也是训练后计算，且其 manifest 中 `baseline_checkpoint_*` 指向 C2 内部对照。该比较保持探索性，正式新 run 需在开跑前绑定基线 run、任务 checkpoint、split 和预测内容哈希。
+- **D2 观测约束 Pilot：** 5 轮先验训练、200 张×4 draws×20 步后验评价已完成，无 OOM。该固定方法质量明显落后 SwinIR，正值 Gamma 项改善不能补偿零支持违规和结构崩塌，STOP 当前设置。后续只读复核发现 `z<0,y>0` 时正值观测项经双重 clamp 后对 `z` 梯度为零；新增 6 项定向测试通过。该缺陷限制本次 guidance，不是唯一失败原因，也不追溯改写实验。
+- **D5 新配对数据：** TUM 官方页面列出 SEN1-2 282,384 对；ISPRS 公告确认 CC-BY 与 TUM 官方记录；mediaTUM 记录访问返回 HTTP 429。匿名 rsync 顶层清单查询认证失败；自动审查拒绝使用第三方页面披露的口令。本轮未下载任何数据、未访问 confirmation/test/Optical 载荷。获取新 development 数据的最小解锁是用户提供官方访问方式或明确的认证使用授权。
+- **阶段状态：** C2 v2 gate 仍为 `UNJUDGED`，C3-B 未启动；当前 SAR-only 结果不评价 Optical 增量。C3-A Flow、两种 DDPM、D2 posterior-guidance 和同配置扩展均停止。2026-11-24 收尾复测根分区可用 16.71 GiB、`/tmp` 可用 2.93 GiB；Phase D worktree 占 1.589 GiB、其中 `experiments/` 占 1.569 GiB，主仓库 `data/` 占 8.677 GiB。本轮清理两次专用 `.pyc` 临时缓存共 91 个文件（1,991,907 字节）；checkpoint、预测样本与研究记录均保留。
+- **验证补记：** AISAR 环境完整执行项目 `tests/`，188 项通过（9.07 秒）。
+
+
 ## 2026-11-24 Published Baseline 与 SAR-only Diffusion 实验完成
 
 - **执行范围：** 在隔离 worktree `codex/published-baselines-diffusion-20261123` 上完成 SwinIR SAR 单通道任务适配、SAR-only Conditional DDPM 与 SwinIR-centered Residual DDPM 的训练、development 推理、逐图/来源组统计和 Research Decision Review。用户明确授权忽略并行 CUDA 进程与 3 GiB 门槛、以真实 OOM 为边界。续训、采样和汇总日志未记录 CUDA OOM；Residual 原进程在 epoch 24 后停止，具体原因未查明，kernel log 也无 OOM 证据，后续从 checkpoint 完成训练。

@@ -1,5 +1,15 @@
 # 研究风险与证据边界
 
+## 2026-11-24 Phase D D1/D2 与新数据获取风险更新
+
+- **EDSR 结果范围：** EDSR 仅一个 seed；development 200 张/19 组已反复用于训练和选择。ΔPSNR 正向且区间不跨零是探索信号，不等于独立泛化、投稿级提升或发表 SAR 方法比较。SSIM/EPI/亮点区间包含零。
+- **基线内容绑定：** EDSR run 当时未在读取前核验 SwinIR 来源 manifest 或记录预测 SHA-256；SwinIR 自身任务 checkpoint 也未由 source manifest 记录其 SHA。训练后哈希审计将解释限定为探索性配对，不替代未来的预运行绑定合同。
+- **D2 guidance 实现缺口：** 当 `z<0,y>0`，频域振铃可让正值观测落在 clamp 零梯度区；posterior guidance 无法修正该残差。新增诊断测试验证这一实现事实。当前 Pilot 已停止，缺口不用于解释所有失败，也不支持按旧协议重跑。
+- **数据获取认证阻塞：** TUM 页面列出 SEN1-2 与原始论文，但 MediaTUM 记录返回 HTTP 429。匿名 rsync 清单返回认证失败；公开口令只在非官方来源找到，自动审查拒绝使用。未触及 payload；继续需官方凭据或用户明确批准。
+- **磁盘：** 2026-11-24 收尾复测根分区可用 16.71 GiB、`/tmp` 可用 2.93 GiB；Phase D worktree 约 1.589 GiB，主仓库 `data/` 约 8.677 GiB。`/tmp/gmti-cuda-run-20261124` 属于其他任务，未清理；本轮清理两次专用 `.pyc` 临时缓存共 91 个文件（1,991,907 字节）。checkpoint、预测样本和失败证据有复用价值，保留。
+- **阶段资格：** C2 v2 仍 `UNJUDGED`，新独立 development 尚未取得，C3-B 不启动；旧 development 不可当作新泛化验证。
+
+
 ## 2026-11-24 SAR-only Published Baseline / Diffusion 结果风险
 
 - **证据范围：** 所有模型结果来自单 seed 和历史重复使用的 C1 v2 development（200 张/19 组）；组 bootstrap 区间不消除 split 复用、来源地理独立性未知或多重试验风险，不能宣称独立泛化。

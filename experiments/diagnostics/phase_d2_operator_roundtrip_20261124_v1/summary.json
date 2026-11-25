@@ -1,0 +1,56 @@
+{
+  "run_id": "phase_d2_operator_roundtrip_20261124_v1",
+  "status": "complete",
+  "input_root": "/home/shy/AIR/SAR+AI/project/JDSR/data/derived/c2_fixed_inputs_c1_v2_20261031_v1/x2_light",
+  "output_dir": "/home/shy/AIR/SAR+AI/project/JDSR-phaseD-20261124/experiments/diagnostics/phase_d2_operator_roundtrip_20261124_v1",
+  "splits": {
+    "train": {
+      "role": "train",
+      "sample_count": 1600,
+      "source_group_count": 92,
+      "manifest_sha256": "64d335f06812859b96b884a5583092df76dd4b6fa181c3a842b18ed5d3bf6eeb",
+      "files_csv_sha256": "97f35201125dcb3830e9d0583d3350159f0d6757056c7acf13c4c1a0910466ad",
+      "generator_sha256_recorded": "33af6723e795bd7f917fc7200a21956cacbd60c3a789105fb51044bf7582cc3b",
+      "degradation_dependency_sha256_recorded": "b7c0e9208a132792824bdde4296d7d3650587a144bf7ab4ec34bb161e0cb7bd1"
+    },
+    "development": {
+      "role": "development",
+      "sample_count": 200,
+      "source_group_count": 19,
+      "manifest_sha256": "de3101a78105c05653b9779342cabe98d61a9cddac6153b25a7d6347d0ef0da9",
+      "files_csv_sha256": "70d762015b2b16a604d381758091ae3d282526a7137e9de51c6db827b60f2839",
+      "generator_sha256_recorded": "33af6723e795bd7f917fc7200a21956cacbd60c3a789105fb51044bf7582cc3b",
+      "degradation_dependency_sha256_recorded": "b7c0e9208a132792824bdde4296d7d3650587a144bf7ab4ec34bb161e0cb7bd1"
+    }
+  },
+  "operator_sha256": "b7c0e9208a132792824bdde4296d7d3650587a144bf7ab4ec34bb161e0cb7bd1",
+  "analysis_code_sha256": "95204f36132837e9b27c18f63523e9f7bd0b4b22f59b7434924582fad89eb33c",
+  "max_abs_tolerance": 1e-07,
+  "test_set_accessed": false,
+  "test_set_used": false,
+  "confirmation_payload_accessed": false,
+  "optical_payload_loaded": false,
+  "training_performed": false,
+  "gpu": "NVIDIA GeForce RTX 3050 Laptop GPU",
+  "torch": "2.8.0+cu128",
+  "cuda_runtime": "12.8",
+  "python": "3.13.7",
+  "python_executable": "/home/shy/anaconda3/envs/AISAR/bin/python",
+  "memory_total_bytes": 3942383616,
+  "memory_free_before_bytes": 2887974912,
+  "peak_allocated_bytes": 3473408,
+  "peak_reserved_bytes": 4194304,
+  "cuda_oom": false,
+  "command": [
+    "/home/shy/anaconda3/envs/AISAR/bin/python",
+    "experiments/diagnostics/verify_phase_d2_operator_roundtrip.py",
+    "--input-root",
+    "/home/shy/AIR/SAR+AI/project/JDSR/data/derived/c2_fixed_inputs_c1_v2_20261031_v1/x2_light"
+  ],
+  "rows_completed": 1800,
+  "failed_sample_count": 0,
+  "max_abs_error": 0.0,
+  "mean_absolute_error": 0.0,
+  "memory_free_after_bytes": 2864906240,
+  "elapsed_seconds": 25.296633894002298
+}

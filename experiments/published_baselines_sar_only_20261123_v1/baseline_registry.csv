@@ -1,0 +1,5 @@
+﻿方法,方法身份,原论文任务,本地适配说明,作者代码/权重状态,复现状态,运行或证据,解释边界
+SwinIR,TASK_ADAPTED_PUBLISHED,通用图像超分/去噪/压缩伪影恢复,单通道 SAR ×2；embed_dim=60/depths=(6,)/heads=(6,)/window=8；Sigmoid 输出,仓库含 vendored 架构源码；未使用作者 SAR 权重,30 轮随机初始化任务适配已完成,experiments/published_baselines_sar_only_20261123_v1/运行_swinir_20261123_v3,不是作者 SAR 权重或原论文完整训练方案复现；development 已复用
+EDSR,TASK_ADAPTED_PUBLISHED,通用单图像超分,单通道 SAR ×2；64 特征/16 残差块/PixelShuffle；Sigmoid 输出,仓库含 vendored 架构源码；未使用作者 SAR 权重,30 轮任务适配与 development 评价已完成；best epoch=29；见 baseline_results.csv,experiments/runs/phase_d1_edsr_sar_20261124_v1；docs/research/PHASE_D1_EDSR_SAR_ADAPTATION_PROTOCOL_20261124.md,不是作者 SAR 权重或原论文完整训练方案复现；development 已复用
+DSRKD,ORIGINAL_PUBLISHED_METHOD,SAR 联合去斑与超分辨率,未创建冒名任务适配实现,当前已核验材料没有可运行作者代码/权重；许可与完整复现细节未核实,不可执行/不报告本地数值,docs/research/PUBLISHED_METHOD_REGISTRY_20261123.md,需先取得可核验作者实现、权重和任务协议
+C2MatchedJoint,INTERNAL_BASELINE,SAR-only 联合恢复内部对照,项目内部 SAR-only 对照结构,项目源码与历史 checkpoint 可用,历史运行已完成,experiments/phase_c2_c1_v2_20261031_v1/matrix/runs/x2_light__sar_only/checkpoints/best.pt,不得混称已发表方法或唯一外部学术基线

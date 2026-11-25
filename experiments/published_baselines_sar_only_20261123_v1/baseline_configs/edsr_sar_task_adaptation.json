@@ -1,0 +1,48 @@
+{
+  "身份": "TASK_ADAPTED_PUBLISHED",
+  "方法": "EDSR SAR 单通道 ×2 任务适配版",
+  "上游实现": "BasicSR/basicsr/archs/edsr_arch.py",
+  "结构": {
+    "num_in_ch": 1,
+    "num_out_ch": 1,
+    "num_feat": 64,
+    "num_block": 16,
+    "res_scale": 1,
+    "upscale": 2,
+    "img_range": 1.0,
+    "单通道均值": 0.5,
+    "输出激活": "Sigmoid"
+  },
+  "训练": {
+    "seed": 20261125,
+    "epochs": 30,
+    "batch_size": 4,
+    "lr_patch": 64,
+    "optimizer": "Adam",
+    "learning_rate": 0.0001,
+    "loss": "L1",
+    "初始化": "随机初始化；无外部预训练权重"
+  },
+  "协议": "docs/research/PHASE_D1_EDSR_SAR_ADAPTATION_PROTOCOL_20261124.md",
+  "运行目录": "experiments/runs/phase_d1_edsr_sar_20261124_v1",
+  "结果边界": "单 seed、历史重复使用的 C1 v2 development 探索比较；不是独立泛化证据、作者 SAR 权重或完整论文方案复现。",
+  "执行状态": "冻结训练与 development 评价完成",
+  "结果摘要": {
+    "best_epoch": 29,
+    "development_sample_count": 200,
+    "development_source_group_count": 19,
+    "group_balanced_psnr_db": 21.731605939413274,
+    "paired_delta_psnr_vs_swinir_db": 0.09643105137955459,
+    "paired_delta_psnr_group_bootstrap_95ci_db": [
+      0.06934301083734279,
+      0.13162321609555036
+    ],
+    "parameter_count": 1367553,
+    "training_updates": 12000,
+    "training_seconds": 3338.4825377509987,
+    "inference_seconds_for_200_images": 21.919357627950376,
+    "peak_allocated_mib": 202.1,
+    "cuda_oom": false,
+    "run_manifest": "experiments/runs/phase_d1_edsr_sar_20261124_v1/manifest.json"
+  }
+}
