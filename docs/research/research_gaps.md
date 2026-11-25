@@ -1,3 +1,11 @@
+## 2026-11-26 有限空间 pilot 已结束；跨城区证据与局部高回波支持仍缺
+
+SARptical 柏林 pilot 已完成，但双三次锚定 Flow Bridge 落后任务适配 SwinIR，且当前高回波 mask 在 0/8 development 组达到冻结最小像素数；当前配置已停止。该结果只覆盖单城区 SAR dB noisy pseudo-target 与 bicubic ×2 表示域任务。下一轮若开展，需先获得多采集区域、来源组及足迹可核验的 development，并在新预登记协议中确保局部高回波统计有效；不能使用本次开发集事后降低阈值。BigEarthNet 官方 train/validation 的来源代理交叉和八邻接仍未解决，官方 validation 不能直接替代独立来源组。结果见[Research Decision Review](PHASE_D_SARPTICAL_SPATIAL_PILOT_RESULTS_20261126.md)。
+
+## 2026-11-25 单城区空间 pilot 与跨来源恢复证据仍缺
+
+SARptical metadata 容许 28 个 250 m 网格组/1,528 个保守内缩 SAR patch，有限空间划分已用于检验 SAR-only 表示域训练流程；其单一柏林城区、noisy dB target 和中心级 SAR/Optical 配准不足以验证 clean SAR 去斑、跨城泛化或 Optical 像素增量。BigEarthNet v2/reBEN 具有多国 SAR scenes 与 geospatial split，但官方 train/validation 的 acquisition 时间代理共享 241 组，分别覆盖两角色绝大多数记录；另有 23,453 对八邻接 patch。官方 validation 因此暂不具备来源独立资格。须从官方 train+validation 重划，并核验完整 source scene、空间足迹、本地 C1 身份与 10 m 产品适配。pilot 已完成；详情见[空间 pilot 设计](PHASE_D_SARPTICAL_SPATIAL_PILOT_DESIGN_20261125.md)、[结果复核](PHASE_D_SARPTICAL_SPATIAL_PILOT_RESULTS_20261126.md)、[数据源审计](PHASE_D_BROAD_SAR_DATA_SOURCE_AUDIT_20261125.md)和[BigEarthNet 元数据审计](PHASE_D_BIGEARTHNET_METADATA_AUDIT_20261125.md)。
+
 ## 2026-11-24 D2 观测梯度缺口
 
 当前正值观测项在 `z<0,y>0` 区域经双重 clamp 后梯度为零；这会使 posterior guidance 无法修复负振铃与正观测的冲突。未来要提出明确定义的支持域模型和边界测试，当前 D2 配置已停止。详见 [审查复核](PHASE_D2_RESEARCH_DECISION_REVIEW_20261124.md)。

@@ -1,5 +1,24 @@
 # 下一步行动
 
+## 2026-11-26 Phase D SARptical pilot 收尾后的行动
+
+1. **停止当前生成候选：** 不延长或重复本次 bicubic-anchored Flow Bridge。结果表明该设置在单城区 SAR noisy pseudo-target 上显著落后 SwinIR，且背景偏差护栏失败；完整配对分析见[Research Decision Review](PHASE_D_SARPTICAL_SPATIAL_PILOT_RESULTS_20261126.md)。
+2. **高回波评价设计：** 本次冻结高回波 mask 在 306 张开发图中均不足 16 像素。新协议启动前，必须只用训练/开发设计阶段的预登记规则确认目标数/来源组足够；不得用本次结果反向调阈值或掩膜。
+3. **新来源数据：** 继续寻找多采集区域、来源场景身份与空间足迹可核验的 SAR development。BigEarthNet v2 官方 train/validation acquisition 代理跨 split 且有大量空间近邻，暂不直接作独立开发；先完成 scene/足迹/本地 C1 crosswalk。
+4. **生成式路线：** 先做有明确假设的确定性/可预测残差诊断和前瞻协议设计；不因这次 Flow 失败就追加普通 Flow/Diffusion 训练。只有新机制、数据资格、基线合同、资源预算与授权均满足后才启动 GPU。
+5. **保持阶段边界：** C2 v2 仍 `UNJUDGED`，C3-B 关闭；本 pilot 未加载 Optical，不能回答 optical 增量价值，不访问受保护 confirmation/test。
+
+以下 2026-11-25 段落是开跑前执行计划快照，已由本节的实际运行状态取代。
+
+## 2026-11-25 Phase D：有限 pilot 与更广数据并行
+
+以下为正式训练前计划快照；SARptical pilot 已完成，按 2026-11-26 更新的行动执行。
+
+1. **先确认 SARptical 完整设计：** 用户已接受 pilot 范围；请审阅[书面方案](PHASE_D_SARPTICAL_SPATIAL_PILOT_DESIGN_20261125.md)。获批后再冻结 split manifest、实现 train/development-only loader 和训练/评价入口，按预登记方法执行 EDSR、SwinIR 与 bicubic-anchored Flow Bridge。
+2. **执行边界：** confirmation 只保留 split metadata，不读载荷；不加载 Optical；所有训练与评价写唯一 run 目录，保存 checkpoint、逐图/来源组指标和 Research Decision Review。
+3. **更广 source audit：** BigEarthNet 官方 metadata 已下载并校验。官方 train/validation acquisition 代理有广泛跨角色重叠；不得直接沿用官方 validation。非测试集合有 306 个时间代理组，数量平衡可行但空间邻接仍未解决。本地 C1 train/development staging 缺少坐标/采集时间，跨数据集身份未证明。下一步只在 BigEarthNet train+validation 行中核验真实 source scene、空间足迹/缓冲，并查找 C1 官方 ROI 地理/时间 crosswalk；test 继续封存。通过后才计划在挂载卷上获取 S1 压缩归档并按清单流式提取 SAR 子集。详见[元数据报告](PHASE_D_BIGEARTHNET_METADATA_AUDIT_20261125.md)。
+4. **阶段权限：** C2 v2 `UNJUDGED`、C3-B 关闭；新数据审计与 SAR-only pilot 均不构成 Optical utility 证据，也不改历史 gate。
+
 ## 2026-11-24 Phase D 实验后的可执行事项
 
 1. **新 Optical 配对数据：** TUM 官方数据页与 ISPRS 发布公告确认 SEN1-2 为 282,384 对并通过 MediaTUM 官方记录按 CC-BY 发布；当前 MediaTUM 返回 HTTP 429，匿名 rsync 清单认证失败。等待官方可访问方式或用户给出的明确认证授权；解锁后先做包级元数据、来源组映射和 train/development 排除审计，只下载获准角色。不得按数值文件名拆分，不下载或读取 confirmation/test。

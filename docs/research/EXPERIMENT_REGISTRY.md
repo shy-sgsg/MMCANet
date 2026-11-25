@@ -1,5 +1,33 @@
 # 实验登记
 
+## 2026-11-26 SARptical 空间 pilot（完成；停止当前 Flow Bridge）
+
+- **run id：** `phase_d_sarptical_spatial_pilot_20261126_retry01`；外部持久卷目录：`/run/media/shy/C61C9A341C9A200B/Codex_JDSR_runs/phase_d_sarptical_spatial_pilot_20261126_retry01`。
+- **协议/数据：** [冻结设计](PHASE_D_SARPTICAL_SPATIAL_PILOT_DESIGN_20261125.md)；SARptical 新归档 SHA-256 `044cfa600e301f3b1f3d72d38f2182c4e74453d9403a0aab66076d6308c567f9`。train/development 为 916/306 张、12/8 个空间组；confirmation 306 张/8 组只保留 split metadata，不读取 payload；test 和 Optical flags 均为 false。
+- **方法：** bicubic、TASK_ADAPTED_PUBLISHED EDSR/SwinIR、bicubic-anchored Flow Bridge 候选。30 epoch 上限、seed `20261125`、每个可训练方法 6,870 更新；Flow `sigma=0.5`、Heun 8 步、4 draws。
+- **结果：** group-balanced PSNR/SSIM/EPI 分别为 bicubic `25.2596/0.72469/0.56042`、EDSR `26.3034/0.80280/0.78122`、SwinIR `26.3322/0.80315/0.78657`、Flow 单 draw `23.6911/0.69033/0.65049`、Flow pixel mean `25.4980/0.76864/0.73969`。Flow 单 draw 对 SwinIR 的 ΔPSNR `−2.6412 dB`，95% 来源组 bootstrap CI `[−2.7286,−2.5647]`；ΔSSIM `−0.11282`、ΔEPI `−0.13608`。高回波 ROI 有效组 `0/8`，背景偏差 8/8 组恶化；决定 `STOP_CURRENT_FLOW_BRIDGE_CONFIGURATION`。
+- **解释限制：** 单柏林城区、单 seed、SAR dB noisy pseudo-target、bicubic ×2 表示域；不证明 clean SAR 去斑、跨城/传感器泛化、SAR 物理一致性或 Optical 增量。pixel mean 为点估计，不代表单 draw 或生成分布。
+- **审查材料：** [Research Decision Review](PHASE_D_SARPTICAL_SPATIAL_PILOT_RESULTS_20261126.md)；run 内保存 `manifest.json`、配置/环境/命令、train/dev/confirmation split metadata、input manifest、checkpoint、训练日志、逐图和来源组统计、全部预测、资源记录及最终化重放记录。重放指标与原 CSV 一致，无 CUDA OOM。
+- **失败记录：** 首次损坏 ZIP 与第二次入口 `NameError` 均保留为独立失败目录；有效 run 使用重新下载且通过获准 SAR 载荷核验的归档。最终汇总恢复仅重放保存 checkpoint/缓存，无重训、重选模型、改阈值或 protected payload 访问。
+
+## 2026-11-25 SARptical 空间 pilot（开跑前候选快照，未运行）
+
+本节为正式运行前的历史候选快照，最终状态以 2026-11-26 完成记录为准。
+
+- **候选 run id：** `phase_d_sarptical_spatial_pilot_20261125_v1`。
+- **协议：** [SARptical pilot 设计稿](PHASE_D_SARPTICAL_SPATIAL_PILOT_DESIGN_20261125.md)，状态为待用户确认；尚未建立 split manifest 或 run 目录。
+- **候选输入：** SAR-only；250 m 全局 UTM 网格、75 m 内缩；train/development/confirmation 候选为 916/306/306 样本、12/8/8 组。Optical 不读；confirmation 不读。
+- **候选方法：** bicubic、任务适配 EDSR、任务适配 SwinIR、bicubic-anchored conditional Flow Bridge。
+- **当前结果：** 无训练、推理或模型评价结果。不可将候选配置或坐标组统计报告为实验性能。
+
+## 2026-11-25 BigEarthNet v2 metadata source audit（非模型实验）
+
+- **输入：** 官方 `metadata.parquet` 与 `metadata_for_patches_with_snow_cloud_or_shadow.parquet`；MD5 均匹配 Zenodo。
+- **操作：** 核对全量唯一 patch 与 split 标签数；仅对 train/validation 计算来源命名和空间格网代理交叉。test 行仅参与 split 计数及不展示 `patch_id` 的全文件唯一性检查，未读取影像或测量值。
+- **结果：** 官方 train/validation 的 acquisition 时间代理共享 241 组、tile-acquisition 代理共享 267 组；完整 patch ID 无交集。UTM tile+H/V 格点代理同格交集为 0，八邻接为 23,453 对。仅非测试 train+validation 可供 306 个时间代理组；数量平衡候选未写入 manifest。首轮八邻接计数因脚本筛选条件漏计，修正值以专项报告为准。
+- **决定：** 官方 validation 不直接作为独立来源组 development；后续候选必须从官方 train+validation 重划，并先核验实际产品足迹、空间邻接和本地 C1 重合。此登记不是训练 run，也未生成 split manifest。
+- **证据：** [专项报告](PHASE_D_BIGEARTHNET_METADATA_AUDIT_20261125.md)。未访问任何影像、未训练/推理、未用 GPU。
+
 ## 2026-11-24 SAR-only Published Baseline 与 Diffusion 探索（完成）
 
 - **决策复核：** [SAR-only Published Baseline 与 Diffusion 决策复核](SAR-only%20Published%20Baseline%20与%20Diffusion%20决策复核_20261124.md)。Flow 当前配置按 11 月 23 日冻结 review 停止；Conditional DDPM 和 SwinIR-centered Residual DDPM 均停止当前设置，不追加同类 seed。

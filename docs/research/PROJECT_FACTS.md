@@ -1,5 +1,31 @@
 # 项目事实与证据分类
 
+## 2026-11-26 SARptical pilot 执行事实
+
+- 复取归档大小 `1,115,515,719` 字节、SHA-256 `044cfa600e301f3b1f3d72d38f2182c4e74453d9403a0aab66076d6308c567f9`。与首次损坏副本相比坐标 MAT 哈希相同，空间角色清单和 train/development 输入身份一致；获准 1,222 个 SAR MAT 全部通过 ZIP CRC、`ampCrop`、112×112 与有限值检查。
+- 本次角色为 train 916 张/12 组，development 306 张/8 组，confirmation 306 张/8 组；confirmation payload、历史 test、Optical payload 均未读取。数据覆盖柏林单城区。
+- run `phase_d_sarptical_spatial_pilot_20261126_retry01` 完成 bicubic、EDSR、SwinIR、Flow Bridge 训练和 development 评价。EDSR/SwinIR/Flow 分别 6,870 更新，Flow 对最强确定性 SwinIR 的 ΔPSNR 为 −2.6412 dB（95% group-bootstrap CI [−2.7286,−2.5647]）；决定停止当前 Flow 配置。
+- run 的配置、split/input manifest、checkpoint hashes、训练日志、逐图/组统计、预测、环境、资源和决策记录保存在外部持久卷；本地 Research Decision Review 见[报告](PHASE_D_SARPTICAL_SPATIAL_PILOT_RESULTS_20261126.md)。
+
+## 2026-11-25 SARptical 归档与空间元数据事实
+
+以下段落记录 2026-11-25 的开跑前元数据快照；载荷检查与正式运行状态以本文件 2026-11-26 段落及[结果复核](PHASE_D_SARPTICAL_SPATIAL_PILOT_RESULTS_20261126.md)为准。
+
+- 本地官方归档 `data_external/SARptical_20261125/SARptical_data.zip` 大小 `1,115,515,719` 字节、SHA-256 `eb4c9191d95c1334ab385f3989a8718ada5cfbac464fab29d8544f9a7da97772`。ZIP central directory 列出 8,840 个 SAR `*_ampPatch.mat` 与 10,108 个 Optical PNG；单个 SAR 点可关联多个 Optical patch。
+- 作者 README 将 SAR 文件描述为 dB 幅度 patch；`selectedPntXYZ.mat` 含 8,840 行 ID/UTM/Z 坐标。根据公开说明，SAR 和 Optical patch 中心约 1–2 m 对应，图像几何仍不同并仅近似对齐。
+- 250 m 全局 UTM 网格和 75 m 内缩缓冲的 metadata-only 统计为 28 组/1,528 点。seed `187762` 的候选 12/8/8 组分配为 916/306/306 点。仅为设计计算，split 尚未建立，图像载荷尚未读取。
+- 2026-11-25 实测根分区可用 `6.1 GiB`，`/tmp` 可用 `7.5 GiB`，挂载 NTFS 卷可用约 `90 GiB`。
+
+记录见[SARptical pilot 设计](PHASE_D_SARPTICAL_SPATIAL_PILOT_DESIGN_20261125.md)与[更广 SAR 数据源审计](PHASE_D_BROAD_SAR_DATA_SOURCE_AUDIT_20261125.md)。
+
+## 2026-11-25 BigEarthNet v2 官方元数据事实
+
+- 官方主 metadata 与补充雪/云 metadata 的 MD5 分别为 `55687065e77b6d0b0f1ff604a6e7b49c`、`fe31856f4986d446c9468b59d6387c91`；文件行数为 480,038 与 69,450，合计 549,488 个唯一 `patch_id`。split 标签计数 train/validation/test 为 272,544/139,577/137,367。
+- 仅 train/validation 的 `s1_name` 前五段 acquisition 时间代理有 241 个共享组；tile 级前六段代理有 267 个共享组。完整 patch ID 无跨角色重复。
+- train/validation 空间格点代理（UTM tile+H/V 序号）交集为 0，八邻接格点对为 23,453。首轮 12,050 因计数脚本漏计而废弃；代理键未核验完整 Sentinel-1 产品足迹或实际米制边距。
+- 仅合并官方 train+validation 有 412,121 个 patch 与 306 个 acquisition 时间代理组；数量平衡示例 seed `33012` 产生 214/46/46 组、288,527/61,841/61,753 个 patch。它未核验空间缓冲，不是 split manifest。
+- 该次审计仅读取元数据；test 只用于 split 计数与不展示 `patch_id` 的全量行唯一性检查，未解析或分组其 ID，不读取影像、来源/空间字段或测量值。详见[专项审计](PHASE_D_BIGEARTHNET_METADATA_AUDIT_20261125.md)。
+
 ## 2026-11-23 C3-A 训练与评价事实
 
 - C3-A SAR-only Flow run `phase_c3a_sar_only_flow_c1_v2_20261105_v1_attempt2_20261123` 按 seed `20261105` 完成 5 epochs，best epoch 为 2；训练时间记录为 1,663.71 秒，峰值已分配 GPU 显存为 189,086,208 字节。运行含一次 `UnpicklingError` 后恢复；训练与评价均无 OOM。

@@ -1,4 +1,31 @@
-# 当前状态——权威快照（2026-11-24）
+# 当前状态——权威快照（2026-11-26）
+
+## 2026-11-26 SARptical 空间 pilot 已完成：停止当前 Flow Bridge
+
+- **状态与结论：** 已在隔离 worktree 完成 SARptical 柏林城区 SAR-only spatial pilot 的训练、development 推理、来源组统计和 Research Decision Review。决策为 `STOP_CURRENT_FLOW_BRIDGE_CONFIGURATION`。Flow 单次 draw 相对最强确定性 SwinIR 的来源组等权 ΔPSNR 为 −2.6412 dB（95% CI [−2.7286, −2.5647]），ΔSSIM 为 −0.11282、ΔEPI 为 −0.13608；背景绝对偏差在 8/8 组恶化。
+- **有效范围：** train/development 仅用 SAR：916/306 张、12/8 个 250 m 空间组；SAR noisy dB pseudo-target 的 bicubic ×2 表示域重建。高回波 ROI 每图仅 0–6 像素，低于冻结 16 像素下限，故 0/8 组可估计并按冻结规则未通过；未事后调整阈值。confirmation payload、历史 test 和 Optical payload 均未访问。该单城区 pilot 不证明 clean-reference 去斑、跨城泛化、真实物理一致性或 Optical 增量。
+- **运行产物：** 外部持久卷 run `phase_d_sarptical_spatial_pilot_20261126_retry01` 保留配置、数据/split/input manifest、checkpoint、训练日志、逐图及来源组指标、生成样本、资源记录和 manifest；研究结论见[Research Decision Review](PHASE_D_SARPTICAL_SPATIAL_PILOT_RESULTS_20261126.md)。RTX 3050 Laptop GPU 4 GiB 上训练与推理完成，无 OOM；结束时外部卷余约 87.77 GiB。
+- **代码与运行异常：** 更换损坏归档后，训练入口顺序错误在首次优化器调用前失败；保留失败 run，添加回归测试后在唯一重试目录完成。最终器曾因亮回波项全 NA 而中止，修复后只重放已保存 checkpoint/缓存，逐图指标核对一致；没有重训或改变决策门槛。
+- **阶段边界与下一步：** 不追加同配置 Flow 训练，不进入 C3-B。继续查找可核验、多城区/来源组的 SAR 开发数据；新方法需预先解决亮回波 ROI 有效性并另立协议。BigEarthNet 官方 train/validation 的来源代理交叉与空间邻接尚未解决，不能直接作为独立 development。
+
+此前“完整设计待确认”的段落是开跑前快照；本节记录最终执行状态并取代其待运行表述。
+
+## 2026-11-25 SARptical 空间 pilot 设计与更广数据源审计
+
+- **范围与授权：** 用户已接受在 SARptical 上做有限 SAR-only 空间分组 pilot，并要求同时寻找更广数据源。已取得本地归档并完成 README、坐标和 ZIP 目录元数据核验；SAR/Optical 图像载荷尚未解码，当前不做 Optical 效用研究。具体训练设计已写入[SARptical pilot 设计稿](PHASE_D_SARPTICAL_SPATIAL_PILOT_DESIGN_20261125.md)，待用户确认该完整设计；确认前不生成 split、不写实验代码、不训练。
+- **SARptical 元数据观察：** 归档大小 `1,115,515,719` 字节，SHA-256 `eb4c9191d95c1334ab385f3989a8718ada5cfbac464fab29d8544f9a7da97772`；包含 8,840 个 SAR dB patch 和 10,108 个 Optical patch。以 250 m 全局 UTM 网格、75 m 内缩计算得到 28 组/1,528 个点；候选 12/8/8 组划分为 916/306/306 个点。该划分目前只是 metadata-only 设计值，尚未冻结或用于模型选择。
+- **更广数据源：** BigEarthNet v2/reBEN 官方元数据已校验并完成 train/validation 交叉审计，见[专项报告](PHASE_D_BIGEARTHNET_METADATA_AUDIT_20261125.md)。`s1_name` acquisition 时间代理 241 组跨官方 train/validation，覆盖两边绝大多数记录；官方 validation 暂不作为独立来源组开发集。若继续，仅可从官方 train+validation 重新按场景组与空间邻近约束设计新划分；官方 test payload 和来源组信息未读。SEN12MS 与 QXS-SAROPT 仍为备选。
+- **磁盘与 GPU：** 复测根分区可用 `6.05 GiB`、`/tmp` 可用 `7.45 GiB`、挂载 NTFS 卷可用 `89.15 GiB`；工作树占 `2.7 GiB`、其中实验目录 `1.6 GiB`、SARptical 归档 `1.1 GiB`。元数据审计未用 GPU；较大训练/数据载荷启动前需按真实输出估算空间并选定存储位置。
+- **阶段边界：** C2 v2 仍为 `UNJUDGED`，C3-B 不启动；SARptical confirmation 分组将保留但 payload 不读。历史 confirmation/test 与 Optical 载荷未访问，已有论文不修改。
+
+## 2026-11-25 BigEarthNet 元数据审计补记
+
+- 两份官方 Parquet 均与 Zenodo MD5 匹配：主文件 480,038 行、补充云/雪文件 69,450 行，合计 549,488 个唯一 patch；官方角色计数 train/validation/test 为 272,544/139,577/137,367。
+- 只对 train/validation 计算来源代理交叉：241 个 acquisition 时间代理跨角色，共覆盖 97.86% train 和 99.95% validation 记录；tile-acquisition 代理交叉 267 组。patch ID 无重复，空间格网代理无同格重复但有 23,453 对八邻接 patch；首轮 12,050 因计数脚本漏计已废弃。
+- 非测试 train+validation 合并后有 306 个 acquisition 时间代理组；纯计数平衡候选为 214/46/46 组、288,527/61,841/61,753 个 patch。该候选未落盘、未核空间隔离，不是 split manifest。
+- 这些命名/格网代理不是完整产品足迹或米制距离核验。官方 validation 不能直接作来源独立 development。未读 test 影像或测量值，未分析其来源字段；未下载 S1 archive、未训练。
+- 本地 C1 train/development staging 只有 `ROIs1158_spring`、`ROIs2017_winter` 与数字 ROI/patch 标识，没有坐标或 acquisition 时间；无法据此判断与 BigEarthNet 是否地理/采集重叠。confirmation/test staging 未读取。跨项目独立性需要官方 ROI 地理/时间 crosswalk。
+- 下一步：先完成 SARptical pilot 书面方案确认；若并行推进 BigEarthNet，只在官方 train+validation 范围内重组来源场景并查证空间足迹、本地 C1 重叠，再决定是否下载 SAR 子集。
 
 ## 2026-11-24 Phase D 实验与决策更新
 

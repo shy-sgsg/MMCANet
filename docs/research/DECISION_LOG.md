@@ -1,5 +1,32 @@
 # 决策记录
 
+## D-2026-11-26-001 — 停止当前 SARptical 双三次锚定 Flow Bridge
+
+- **触发。** 用户接受 SARptical 单城区有限 SAR-only 空间 pilot；本条记录冻结设计下的完整训练、development 评价与 Research Decision Review。
+- **事实。** 新下载 SARptical 归档 SHA-256 为 `044cfa600e301f3b1f3d72d38f2182c4e74453d9403a0aab66076d6308c567f9`。获准的 train/development SAR 载荷 1,222 项通过 CRC、字段、尺寸与有限值检查；12/8/8 组对应 916/306/306 张。confirmation payload、test 和 Optical payload 未访问。
+- **结果。** SwinIR 为最强确定性参考，group-balanced PSNR/SSIM/EPI=`26.3322/0.80315/0.78657`。Flow 单 draw=`23.6911/0.69033/0.65049`；对 SwinIR 的 PSNR 差 `−2.6412 dB`，8 组 bootstrap 95% CI `[−2.7286,−2.5647]`。SSIM/EPI 均下降；背景偏差 8/8 组恶化。高回波 mask 每图 0–6 像素，低于冻结的 16 像素下限，因此有效组 0/8，按预定 fail-closed 规则护栏失败，不作事后阈值修订。
+- **决定。** `STOP_CURRENT_FLOW_BRIDGE_CONFIGURATION`；不延长训练、不追加同配置 seed、不改变冻结 mask。该决定只针对本次候选、数据域和柏林空间组开发集，不推广到所有 Flow/Diffusion。
+- **成本/运行。** EDSR/SwinIR/Flow 各完成 6,870 更新；在 RTX 3050 Laptop GPU 与其他任务并行下无 OOM。Flow 单 draw 重放 54.68 秒、SwinIR 11.56 秒；四 draw 215.59 秒。运行与完整材料在外部卷 `phase_d_sarptical_spatial_pilot_20261126_retry01`。
+- **边界。** SAR dB noisy pseudo-target 上的 bicubic ×2 表示域重建；不代表 clean SAR 去斑、跨城泛化、物理一致性或 Optical 效用。C2 v2 仍 `UNJUDGED`，C3-B 不解锁，论文不改。
+- **后续。** 核验新来源数据的场景和空间隔离，并在新协议实施前确保高回波 ROI 可估。BigEarthNet 官方 train/validation 暂不能直接用作独立 development。完整结果见[Research Decision Review](PHASE_D_SARPTICAL_SPATIAL_PILOT_RESULTS_20261126.md)。
+
+## D-2026-11-25-001 — 接受 SARptical 有限空间 pilot 范围，先审阅冻结设计
+
+- **触发。** 当前 C1 v2 development 已复用，用户接受在 SARptical 做有限 SAR-only 空间分组 pilot，同时继续寻找更广数据源。
+- **已核实依据。** 本地官方归档含 8,840 个 SAR dB patch；UTM 坐标 metadata 经 250 m 网格和 75 m 内缩统计后得到 28 组、1,528 个可用点。候选角色数为 12/8/8 组、样本数为 916/306/306。SARptical 覆盖单一柏林城区，Optical patch 仅中心近似对应。
+- **决定。** 继续该有限 pilot 的设计与数据源审计。具体方法、训练预算和停止规则见[SARptical pilot 设计稿](PHASE_D_SARPTICAL_SPATIAL_PILOT_DESIGN_20261125.md)；稿件已待用户审阅。确认前不实现、不创建 split、不解码图像或训练。
+- **边界。** 只拟使用 SAR；新 confirmation payload 保持封存。C2 v2 仍 `UNJUDGED`，C3-B 不启动；不访问历史 confirmation/test，不修改论文。
+- **后续来源。** BigEarthNet v2/reBEN 暂列更广来源优先候选，但需先核实源场景跨 split、本地 C1 重合及存储提取路径，详见[数据源审计](PHASE_D_BROAD_SAR_DATA_SOURCE_AUDIT_20261125.md)。
+
+## D-2026-11-25-002 — BigEarthNet 官方 validation 不作来源独立开发集
+
+- **触发。** 更广来源审计取得官方 BigEarthNet v2 两份 metadata，并需要判断原 train/validation 是否能直接用于新 SAR-only development。
+- **事实。** 两文件 MD5 匹配 Zenodo；共 549,488 个唯一 patch。仅 train/validation 的 `s1_name` 前五段 acquisition 时间代理共享 241 组，覆盖 train 97.86%、validation 99.95% 记录；tile-acquisition 代理共享 267 组。完整 patch ID 无重复；UTM tile+H/V 格点代理无同格重复但有 23,453 对八邻接 patch。仅非测试 train+validation 有 306 个时间代理组，可按样本数形成 214/46/46 组的平衡估算，但未形成划分。详情见[审计报告](PHASE_D_BIGEARTHNET_METADATA_AUDIT_20261125.md)。首轮八邻接计数 12,050 已因漏计而废弃。
+- **解释边界。** 命名代理不是已核验完整产品 ID；八邻接还未换算实际足迹/距离。官方 split 是地理划分且没有重复完整 patch，但不能据此主张 source-scene 独立。
+- **决定。** 官方 validation 暂不用于独立开发选模。若继续使用 BigEarthNet，只从官方 train+validation 元数据确定新来源组划分，先核验 S1 scene 身份、空间邻近和本地 C1 重合；官方 test 影像、来源字段和测量值保持未访问。此决定不等于已生成新 split 或批准训练。
+- **后续。** SARptical pilot 完整设计仍待用户确认；BigEarthNet 不下载影像归档，直到分组审计与存储提取协议通过。
+- **C1 来源交叉。** train/development staging CSV 只含 `ROIs1158_spring`、`ROIs2017_winter` 等 ROI/patch 序号，没有地理坐标或 acquisition 时间。该证据不足以判断与 BigEarthNet 是否重叠；在取得官方 crosswalk 前，不宣称跨项目独立。
+
 ## D-2026-11-24-001 — 停止当前 SAR-only DDPM 设置并保持 C3-B 关闭
 
 - **问题。** 在用户指定的 SAR-only 生成模型优先探索中，是否继续扩展 Conditional DDPM 或 SwinIR-centered Residual DDPM；当前结果是否足以进入 Optical 条件 C3-B？

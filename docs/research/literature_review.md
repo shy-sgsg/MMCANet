@@ -1,5 +1,9 @@
 # 初步文献综述
 
+## 2026-11-26 SARptical pilot 不增加文献主张
+
+本轮完成的是 SARptical 柏林单城区的 SAR-only 空间分组模型实验，没有引入或核验新的相关论文；本地 Flow Bridge 负结果不改变已有先例判断，因此[相关工作矩阵](related_work_matrix.csv)无新增文献行。实验只说明该固定 Flow 候选在本次开发数据上未超过任务适配 SwinIR，不能据此扩大或收窄所有扩散/流模型的文献结论。结果见[SARptical Research Decision Review](PHASE_D_SARPTICAL_SPATIAL_PILOT_RESULTS_20261126.md)。
+
 ## 通用后验 Flow 与单步扩散超分先例 — 2026-11-09
 
 CODSR 是 CVPR 2026 的自然图像单步扩散超分工作：论文提出梯度图驱动的区域自适应生成先验激活、低质量输入特征调制和文本区域对齐；训练使用自然图像与合成 Real-ESRGAN 退化。它收窄“单步扩散超分”及“区域自适应先验”这类宽泛新颖性，但未处理 SAR、配对 optical、去斑或 SAR 观测模型。Zhai、Jeong 与 Ročková 的 AISTATS 2026 工作在模拟式贝叶斯推断中，用联合数据/参数 Flow Matching 生成后验样本并讨论可信集；它收窄通用条件 Flow 后验采样的新颖性，但不是图像恢复或 SAR 工作。二者均不构成本地方法效果、光学增量或物理观测证据，不改变假设状态与 gate。详见[一手来源审查](../../experiments/literature_audits/flow_and_one_step_sr_prior_art_20261109_v1/审查报告.md)。

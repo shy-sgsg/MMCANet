@@ -1,5 +1,19 @@
 # 总研究计划
 
+## 2026-11-26 SARptical 空间 pilot 结果与路线决策
+
+用户接受的有限 SAR-only 空间 pilot 已完成：以 250 m UTM 网格与 75 m 内缩形成 12/8/8 组、916/306/306 张 train/development/封存 confirmation；仅读取 train/development SAR。EDSR、SwinIR、bicubic-anchored Flow Bridge 均完成 30 轮预算训练和固定 development 推理。SwinIR 的 PSNR/SSIM/EPI 略高于 EDSR；Flow 单次 draw 相对 SwinIR ΔPSNR −2.6412 dB（8 组 bootstrap 95% CI [−2.7286,−2.5647]），且 SSIM、EPI 和背景偏差护栏失败。高回波 ROI 0/8 组有效，按冻结规则失败，不事后改 mask。故停止当前 Flow Bridge，不做同配置续训。数据只覆盖柏林城区，不能支持独立城区泛化或 clean SAR 去斑主张。完整结果与成本见[Research Decision Review](PHASE_D_SARPTICAL_SPATIAL_PILOT_RESULTS_20261126.md)。
+
+下一步聚焦新来源数据的来源组/空间足迹核验，以及为新协议预先保证局部高回波统计可估；BigEarthNet 官方 train/validation 仍有来源代理交叉和空间邻接问题。C2 v2 继续 `UNJUDGED`，C3-B 保持关闭；本 pilot 没有 Optical 输入，不改变 Optical 效用判断。不得把本次负结果推广为全部 Flow/Diffusion 无效。
+
+## 2026-11-25 新来源空间 pilot 与跨来源数据候选
+
+本节为 pilot 开跑前的规划快照；模型结果和当前路线以 2026-11-26 本节之前的执行结论为准。
+
+用户已批准 SARptical 单城区的 SAR-only 空间 pilot 范围。精确方案拟用 250 m UTM 网格与 75 m 缓冲，训练/开发/封存角色为 12/8/8 组；在完整设计确认前不生成划分或运行模型。模型候选为 EDSR、SwinIR 与双三次锚定条件 Flow Bridge。该 pilot 只评表示域 ×2 noisy SAR pseudo-target 重建，不代表 clean SAR 去斑或 Optical 增益。
+
+并行数据源审计优先考虑 BigEarthNet v2/reBEN：官方 10 国、312 个 S1 场景、54.4 GB SAR 包，含 geospatial split 与 source patch metadata；数据为 10 m GRD dB，没有 clean SAR 参考。官方 metadata 审计发现，`s1_name` acquisition 时间代理有 241 组跨 train/validation，分别覆盖 97.86% 和 99.95% 的记录；另有 23,453 对同 tile 八邻接 patch。故官方 validation 暂不具备来源独立开发集资格。本地 C1 train/development staging 缺少坐标和采集时间，跨数据源独立性也未证明。若继续，只从官方 train+validation 按可核验来源组重划，并补核空间足迹、近邻和本地 C1 crosswalk；官方 test 保持不用。详见[来源审计](PHASE_D_BROAD_SAR_DATA_SOURCE_AUDIT_20261125.md)与[元数据报告](PHASE_D_BIGEARTHNET_METADATA_AUDIT_20261125.md)。C2 v2 与 C3-B 状态不变。
+
 ## 2026-11-24 Phase D D0–D2 实验和 D1 基线更新
 
 D0 残差诊断已完成；当前 SwinIR-centered Residual DDPM 的四 draw 与像素均值均未超过 SwinIR，停止当前配置。D1 完成第二种发表通用架构 EDSR 的 SAR 单通道任务适配；EDSR 相对 SwinIR 的组等权 ΔPSNR 为 +0.0964 dB（19 组 bootstrap 95% CI [+0.0693,+0.1316]），但结构区间跨零，且只有一个 seed、使用了重复开发集。该结果可作为本地探索排序，不能认定外部 SAR 强基线已被超越。

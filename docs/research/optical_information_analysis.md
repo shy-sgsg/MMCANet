@@ -1,5 +1,15 @@
 # 光学信息效用分析
 
+## 2026-11-26 SARptical pilot 未提供 Optical 效用证据
+
+本轮完整 SAR-only spatial pilot 未解码或加载任何 Optical 影像；即使 SARptical 有中心近似匹配的多视图影像，也没有测量 matched Optical 相对 SAR-only 的增量。故本次不支持或反证 H1/Q1，不改变 C2 v2 `UNJUDGED`、C3-B 关闭状态或 optical 数据准入要求。单城区结果与数据配准限制见[SARptical Research Decision Review](PHASE_D_SARPTICAL_SPATIAL_PILOT_RESULTS_20261126.md)。
+
+## 2026-11-25 SARptical 配对数据尚无 Optical 效用证据
+
+SARptical 官方归档已获取并核验文件名录与中心坐标，数据集中存在多视图 Optical PNG；当前批准的 pilot 只用 SAR patch 和空间组元数据，未解码 Optical 像素。作者资料说明 SAR/Optical patch 中心约 1–2 m 对应，但成像几何不同、仅近似对齐，因此不能直接视为像素级配准。该数据获取不改变 H1/Q1、C2 v2 gate 或 C3-B 资格。证据与后续分组方案见[SARptical pilot 设计](PHASE_D_SARPTICAL_SPATIAL_PILOT_DESIGN_20261125.md)。
+
+BigEarthNet v2 提供一对一 S1/S2 patch 元数据，官方介绍称影像时间接近；本轮仅下载并审计元数据，没有读取 Optical 载荷。官方 train/validation 的 S1 acquisition 时间代理高度共享，因此暂不把官方 validation 用作独立开发。若后续考虑 Optical，仍须单独核对时间差、地理变换与像素配准，并先满足 C2 v2/C3-B 资格；数据集的配对标签本身不构成 Optical 增量证据。详见[BigEarthNet 元数据审计](PHASE_D_BIGEARTHNET_METADATA_AUDIT_20261125.md)。
+
 ## 2026-11-24 新配对数据获取状态
 
 TUM 官方数据页仍列出 SEN1-2；本次 MediaTUM 记录打开返回 HTTP 429，匿名 rsync 顶层目录清单返回认证失败。未下载数据或读取 Optical/confirmation/test 载荷。认证信息只在非官方来源找到，自动审查拒绝使用；须由用户提供官方获取方式或明确认证授权后才继续。当前 C2 v2 gate 为 `UNJUDGED`，新独立 development 尚未形成，不能据现有 SAR-only 结果主张 Optical 增益或启动 C3-B。完整操作记录见[新数据获取报告](PHASE_D_NEW_OPTICAL_DATA_ACQUISITION_20261124.md)。

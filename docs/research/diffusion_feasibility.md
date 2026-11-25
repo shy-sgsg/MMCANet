@@ -1,5 +1,9 @@
 # 本项目的扩散方法可行性
 
+## 2026-11-26 SARptical bicubic-anchored Flow Bridge 停止当前配置
+
+Flow Bridge 使用双三次上采样作为低频锚点，在 SARptical 柏林单城区的空间开发集上仍明显落后 SwinIR：单次 draw 的 ΔPSNR 为 −2.6412 dB（8 组 bootstrap 95% CI [−2.7286,−2.5647]），ΔSSIM −0.11282、ΔEPI −0.13608；四 draw pixel mean 仍低 0.8342 dB。高回波 mask 未达到每图 16 像素有效下限，背景绝对偏差在 8/8 组恶化。按冻结规则停止该配置，不加 seed、不延长训练、不调阈值。一次单城区 pilot 不否定其他 flow/diffusion 建模，但下一候选需提出实质不同的可证伪机制、解决高回波可估性并使用合格的新开发来源组。详见[Research Decision Review](PHASE_D_SARPTICAL_SPATIAL_PILOT_RESULTS_20261126.md)。
+
 ## 2026-11-24 观测约束扩散 Pilot STOP 当前设置
 
 后续代码审查发现正值观测的 clamp 梯度死区：`z<0,y>0` 时正值似然对 `z` 的梯度为零。该实现限制了本次 posterior guidance 的有效域，不能将先前静态审查表述为“无明确代码缺陷”；详见 [D2 Research Decision Review](PHASE_D2_RESEARCH_DECISION_REVIEW_20261124.md)。这不改变已停止 run，也不构成事后修复或继续训练理由。

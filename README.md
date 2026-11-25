@@ -1,6 +1,6 @@
 # JDSR / MMCANet：SAR 联合去斑与超分辨率
 
-> **当前研究状态（2026-11-24）：** D0 残差诊断已完成；SwinIR 与 EDSR 两种发表通用架构的 SAR 单通道任务适配基线已完成，EDSR 在历史复用 development 上的组均衡 PSNR 高 0.0964 dB，但结构差异区间跨零且不构成独立泛化证据。D2 观测约束扩散 Pilot 已停止，复核发现正观测下的负振铃区域存在零梯度死区。C2 v2 gate 仍未判定，C3-B 未启动。新 Optical 数据获取因 MediaTUM 返回 429、rsync 认证失败且认证使用遭自动审查拒绝而阻塞；没有下载 Optical 或访问 confirmation/test 载荷。详见[当前状态](docs/research/CURRENT_STATE.md)、[D2 决策复核](docs/research/PHASE_D2_RESEARCH_DECISION_REVIEW_20261124.md)、[D1 基线比较](experiments/published_baselines_sar_only_20261123_v1/baseline_comparison.md)。
+> **当前研究状态（2026-11-26）：** SARptical 柏林单城区 SAR-only 空间 pilot 已完成，当前双三次锚定 Flow Bridge 决策为 STOP：相对最强 SwinIR 任务适配基线 ΔPSNR −2.6412 dB，SSIM/EPI 下降，背景偏差 8/8 组恶化；高回波 mask 0/8 组可估。train/development SAR 使用 916/306 张、12/8 组；confirmation payload、历史 test 和 Optical payload 均未访问。结果是单城区表示域 noisy pseudo-target 探索，不证明 clean SAR 去斑、独立城区泛化或 Optical 增量。继续寻找来源与足迹可核验的新 SAR development；BigEarthNet 官方 train/validation 的场景代理交叉及空间邻接问题仍未解决。C2 v2 保持 `UNJUDGED`，C3-B 关闭。见[当前状态](docs/research/CURRENT_STATE.md)、[Research Decision Review](docs/research/PHASE_D_SARPTICAL_SPATIAL_PILOT_RESULTS_20261126.md)、[冻结设计](docs/research/PHASE_D_SARPTICAL_SPATIAL_PILOT_DESIGN_20261125.md)和[数据源审计](docs/research/PHASE_D_BROAD_SAR_DATA_SOURCE_AUDIT_20261125.md)。
 
 > **Phase D 执行记录：** 已完成 D0 Residual DDPM 失败分析、固定退化算子往返和零值支持审计；完成 EDSR 30 轮 SAR 任务适配及全 development 配对评价；完成 observation-aware diffusion 5 轮 Pilot 与 800 次后验 draw 评价并按结果 STOP。EDSR 与 D2 的全部运行限于 C1 v2 train/development SAR 输入；confirmation/test/Optical flags 均为 false。训练和评价过程无 CUDA OOM。已记录数据来源审计、配对限制与后续决策。
 

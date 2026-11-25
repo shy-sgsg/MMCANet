@@ -1,5 +1,30 @@
 # 研究风险与证据边界
 
+## 2026-11-26 SARptical pilot 已观察到的风险
+
+- **局部亮回波不可评价：** 冻结高回波阈值在 306 张 development 中产生 0–6 个像素的 mask，低于 16 像素下限，因此 0/8 来源组可用于护栏。按冻结规则判失败并停止当前 Flow；不能把 NA 解释为通过，也不能回看该 development 后调低阈值。
+- **单城区外推边界：** SARptical 只覆盖柏林一处城区。空间网格减少局部 patch 相邻，但八组 development 不是跨城、跨轨道或跨传感器独立确认。
+- **监督目标：** target 是 SAR dB noisy observation；bicubic ×2 是表示域受控退化。当前 PSNR/SSIM 仅衡量对 noisy pseudo-target 的重建一致性，不是 clean-reference 去斑证据。
+- **候选失败与开销：** Flow 单 draw 对 SwinIR ΔPSNR −2.6412 dB，SSIM/EPI 也下降；背景偏差 8/8 组恶化。单 draw 推理约为 SwinIR 的 4.73 倍，四 draw 为 18.65 倍。该成本/结果针对本配置，不泛化至所有生成模型。
+- **记录完整性：** 两个早期失败 run（损坏归档、训练入口 `NameError`）保留；有效重试和 finalizer replay 的逐图指标一致。finalizer 不重训、不改 checkpoint 或评价门槛。
+- **数据与保护集：** 获准的 916/306 train/development SAR 样本已用；306 张 confirmation 仅保留分组 metadata，未读图像载荷；test 和 Optical payload 未读。外部结果目录含 checkpoint/预测，不入 Git。
+
+完整证据和决策见[2026-11-26 Research Decision Review](PHASE_D_SARPTICAL_SPATIAL_PILOT_RESULTS_20261126.md)。
+
+## 2026-11-25 SARptical pilot 与更广来源数据风险
+
+本节是执行前风险快照；“完整设计尚待确认”和“图像载荷尚未解码”的状态已由 2026-11-26 运行记录取代。
+
+- **空间覆盖：** SARptical 仅覆盖柏林单一城区。候选 spatial-block split 为 28 组、角色 12/8/8；即使 pilot 通过，也不是跨城或跨地区独立泛化证据。
+- **目标解释：** SAR target 为 dB 幅度观测，没有 clean SAR ground truth。拟议 x2 bicubic 是表示域受控退化，模型指标衡量 noisy pseudo-target 一致性，不能证明真实去斑。
+- **模态对齐：** 官方资料只支持 SAR/Optical patch 中心近似对应，成像几何不同。当前 pilot 不读 Optical；未来不能直接将其用作像素级监督。
+- **更广数据：** BigEarthNet v2/reBEN 的 `s1_name` acquisition 时间代理在官方 train/validation 间有 241 个共享组，覆盖两角色 97.86%/99.95% 的记录；这不是完整产品级 scene ID。patch 单元代理无同格交集，但有 23,453 对八邻接格点，足迹/米制间距未核。官方 validation 不可直接用作独立来源组 development；必须重划且保留 test payload 不用。数据为 10 m 分类 patch，无 clean SAR reference。
+- **跨数据源身份：** C1 v2 train/development staging 只提供 `ROIs1158_spring`、`ROIs2017_winter` 和数字 scene/patch ID，没有坐标或采集时间。由于 BigEarthNet 同为 Sentinel 数据，不能证明本地 C1 与其不重叠；需要官方 ROI 地理/时间 crosswalk 或可核验的不同源数据。
+- **容量与路径：** 根卷可用 6.05 GiB、`/tmp` 可用 7.45 GiB、挂载 NTFS 卷可用 89.15 GiB；BigEarthNet S1 压缩档约 54.4 GB。大载荷只可在核实来源组、C1 重合和流式提取方案后下载；不完整解包，训练前重算峰值空间。
+- **协议审批：** 高层 pilot 范围已获用户接受；完整方法设计尚待用户确认，确认前不生成 split、不读 SAR payload、不训练。
+
+证据见[SARptical pilot 设计](PHASE_D_SARPTICAL_SPATIAL_PILOT_DESIGN_20261125.md)、[数据源审计](PHASE_D_BROAD_SAR_DATA_SOURCE_AUDIT_20261125.md)与[BigEarthNet 元数据报告](PHASE_D_BIGEARTHNET_METADATA_AUDIT_20261125.md)。
+
 ## 2026-11-24 Phase D D1/D2 与新数据获取风险更新
 
 - **EDSR 结果范围：** EDSR 仅一个 seed；development 200 张/19 组已反复用于训练和选择。ΔPSNR 正向且区间不跨零是探索信号，不等于独立泛化、投稿级提升或发表 SAR 方法比较。SSIM/EPI/亮点区间包含零。

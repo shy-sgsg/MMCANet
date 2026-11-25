@@ -1,5 +1,9 @@
 # 研究假设
 
+## 2026-11-26 SARptical Flow Bridge 未通过；不更新 H1–H6
+
+冻结的有限 SAR-only 空间 pilot 中，bicubic-anchored Flow Bridge 单 draw 相对任务适配 SwinIR 的来源组等权 ΔPSNR 为 −2.6412 dB（95% CI [−2.7286, −2.5647]），SSIM 与 EPI 同样下降，背景偏差 8/8 组恶化；高回波 ROI 0/8 组可估。故停止当前 Flow Bridge 配置。观察只针对柏林单城区、一个 seed、SAR dB noisy pseudo-target 与固定 bicubic ×2 表示域任务，不推广到所有生成方法。未加载 Optical，因此不支持或反证 H1–H6，不更新 C2 gate 或 C3-B 资格。详见[Research Decision Review](PHASE_D_SARPTICAL_SPATIAL_PILOT_RESULTS_20261126.md)。
+
 ## 2026-11-24 H-D2-B 在冻结 Pilot 上未通过；不更新 H1–H6
 
 SAR 表示域观测约束扩散的冻结假设要求输出质量不显著差于 SwinIR 并改善观测一致性。实际 5-epoch prior、20-step posterior 的四个 draw 平均 PSNR 为 10.7517 dB，pixel-mean 为 10.9763 dB，均显著低于 SwinIR 的 21.6352 dB；四个 draw（采样 seed `20261125`–`20261128`）的组等权 PSNR 均约 10.7–10.8 dB；训练 prior 只有一个 seed `20261124`。pixel-mean 正值 Gamma 项更低，但零值支持违规率更高，不能作为整体观测相容的通过证据。故 H-D2-B 在本次固定模型/协议下未获支持，STOP 当前候选。此观察来自历史复用 development，不是独立泛化或 SAR 物理真值证据，也不更新 H1–H6、C2 gate 或 Optical 条件资格。详见[Research Decision Review](PHASE_D2_RESEARCH_DECISION_REVIEW_20261124.md)。
