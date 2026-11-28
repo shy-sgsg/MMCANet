@@ -1,5 +1,12 @@
 # 总研究计划
 
+## 2026-11-28 Task B 生成候选决策与广域数据路线
+
+Phase E Task B 两项预登记候选均已跑完并停止当前配置：候选 A 中心残差 DDIM 相对 EDSR 组等权 ΔPSNR −19.2125 dB；候选 B 矩匹配似然引导 DDIM ΔPSNR −17.4368 dB。两者都在同一 70 个已用于选择的 development 组上未通过 gate，不能推广到真实 SAR 或全部生成方法；候选数已达本轮上限，禁止在该 cohort 上事后调参。完整报告见[结果与 Research Decision Review](PHASE_E_TASKB_GLOBAL_PILOT_RESULTS_20261128.md)。
+
+AllClear 官方 train/validation ROI 地理中心元数据筛查已完成：显式清单 19,013/997 个 ID 互斥且都有地理记录，validation 最近 train 中心距离最小 11.120 km；对应 tx12 JSON 仅覆盖清单内 18,679/984 个 ROI。共享 ROI 表另有 34 个 train 行不在显式清单或 JSON 中，版本来源仍待核。按 target S2 到最近 S1 时间戳，约 48% 在 48 小时内、约 65% 在 72 小时内。此候选仍须核实本地身份交叉、footprint、SAR 表示域和配对目标；原任务是 S2 云去除，没有 clean SAR target。Umbra 目前只有有限多时相 SAR 粗筛，不能支持 Optical 增量；GUSO 因约 413 GB、request-gated 与书面许可要求暂不拉取。confirmation/test/Optical 影像继续封存；C2 v2 `UNJUDGED`，C3-B 关闭。
+
+
 ## 2026-11-26 SARptical 空间 pilot 结果与路线决策
 
 用户接受的有限 SAR-only 空间 pilot 已完成：以 250 m UTM 网格与 75 m 内缩形成 12/8/8 组、916/306/306 张 train/development/封存 confirmation；仅读取 train/development SAR。EDSR、SwinIR、bicubic-anchored Flow Bridge 均完成 30 轮预算训练和固定 development 推理。SwinIR 的 PSNR/SSIM/EPI 略高于 EDSR；Flow 单次 draw 相对 SwinIR ΔPSNR −2.6412 dB（8 组 bootstrap 95% CI [−2.7286,−2.5647]），且 SSIM、EPI 和背景偏差护栏失败。高回波 ROI 0/8 组有效，按冻结规则失败，不事后改 mask。故停止当前 Flow Bridge，不做同配置续训。数据只覆盖柏林城区，不能支持独立城区泛化或 clean SAR 去斑主张。完整结果与成本见[Research Decision Review](PHASE_D_SARPTICAL_SPATIAL_PILOT_RESULTS_20261126.md)。

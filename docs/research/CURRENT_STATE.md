@@ -1,4 +1,21 @@
-# 当前状态——权威快照（2026-11-26）
+# 当前状态——权威快照（2026-11-28）
+
+## 2026-11-28 AllClear train/validation ROI 元数据筛查完成；版本差异待核
+
+- **观察：** AllClear 官方显式 train/validation 清单为 19,013/997 个 ROI，互斥且全部匹配地理表；validation 到最近 train 中心距离最小/中位数为 11.120/15.729 km，997 个中心均超过 5 km。`tx12` JSON 只覆盖清单内的 18,679/984 个 ROI（另有 334/13 个清单 ROI 无 tx12 实例），未出现显式清单外 ID。中心距离筛查不证明完整影像 footprint 隔离。
+- **时间配对：** train/validation 的 `tx12` JSON 含 109,840/5,633 个序列实例。按 target S2 时间到最近 S1 时间戳，48 小时内比例为 48.8%/48.3%，72 小时内为 65.3%/65.4%；时间邻近不证明像素配准或地表稳定。
+- **发现的版本冲突：** 同归档 `rois_metadata.csv` 标记 train 的行数为 19,047，比显式 train 清单多 34 行；validation 两边均为 997。显式清单数与作者论文最终统计一致；额外 34 行不在 tx12 JSON cohort，但来源/版本仍待核。可限定使用显式清单与对应 JSON，不纳入额外行。
+- **边界：** 只读取 train/validation ROI 坐标；test 专属清单/JSON 未打开，shared CSV 的 test 行未用于统计或保存坐标；任何 SAR/Optical 影像载荷均未读取。AllClear 原任务是 S2 云去除、S1 辅助模态，且没有 clean SAR target；不构成 SAR restoration 或 Optical 增益证据。数据集为 CC BY-NC 4.0。
+- **来源与产物：** 官方元数据归档 SHA-256 `7e941a8670b5cb9d7ac8d395521e1c7160838e5705b9751805b126ebcd701a63`；临时 317,384,463 字节归档已在分析后清理。复算见[筛查结果](../../experiments/data_audits/allclear_train_val_metadata_20261128_v1/筛查结果.json)和[脚本](../../experiments/data_audits/allclear_train_val_metadata_20261128_v1/audit_allclear_train_val_metadata.py)。
+- **下一步：** 核实 34 个共享表 train 角色差异；再审本地身份交叉、SAR 产品/时序目标、footprint/像素配准与最小下载体积；通过后才提出新的独立开发协议。C2 v2 仍为 `UNJUDGED`，C3-B 关闭。
+
+## 2026-11-28 Phase E 两项生成候选停止；转向广域配对来源核验
+
+- **模型决定：** Mendeley GT25 VV 多时相伪参考上的 Task B 表示域合成 pilot 已完成。中心残差 DDIM 与单位系数矩匹配似然引导 DDIM 均未通过冻结 gate；候选 A 相对 EDSR ΔPSNR −19.2125 dB，候选 B −17.4368 dB。两项均为同 70 个 development 来源组上的单 seed 探索，不代表真实 SAR 恢复、物理似然或 independent generalization。两个候选名额已用完，不继续同协议训练/调参。详细指标、成本和 decision review 见[Phase E 结果](PHASE_E_TASKB_GLOBAL_PILOT_RESULTS_20261128.md)。
+- **权限与运行：** train/development 为 327/70 张、327/70 个粗空间组；confirmation payload、历史 test 和 Optical payload 均未读取。RTX 3050 Laptop GPU 运行完成且无 OOM；训练、checkpoint、逐图结果、四组样本、source-group 统计与资源记录保留在外置持久卷。索引见[Phase E 归档](../../experiments/phase_e_taskb_model_results_20261128_v1/归档索引.json)。
+- **更广数据：** Umbra 公开前缀元数据筛查得到 101 个唯一 STAC 条目、42 个 bbox 粗分组；仅 10 组有同平台/极化/looks 重复采集候选（11 对），尚无对齐、稳定性或定标证据，不足以当作训练 split。AllClear train/validation 中心点距离筛查通过粗筛，但发现共享表比显式 train 清单多 34 个角色行，且没有 clean SAR target；暂不冻结协议。GUSO 覆盖虽广，但 request-gated、约 413 GB，且需要学术用途/二次开发书面许可，目前不进入数据拉取路线。完整来源比较见[广域数据路线复核](PHASE_E_BROAD_SAR_DATA_ROUTE_REVIEW_20261128.md)。
+- **阶段状态：** SARptical 柏林空间 pilot 保持已完成/当前 Flow Bridge STOP；C2 v2 仍为 `UNJUDGED`，C3-B 继续关闭。AllClear 的数据集主任务方向与本项目相反（S2 目标、S1 辅助），只有完成 train/validation ROI 距离、本地重叠和数据域审计后，才考虑另立 SAR 输出恢复协议。
+
 
 ## 2026-11-26 SARptical 空间 pilot 已完成：停止当前 Flow Bridge
 

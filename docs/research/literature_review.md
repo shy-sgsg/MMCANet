@@ -1,5 +1,10 @@
 # 初步文献综述
 
+## 2026-11-28 广域配对数据来源更新，不新增 SAR 恢复方法主张
+
+本轮核验了 AllClear、GUSO、OSDataset2.0 和 Umbra 等来源，没有新增一项可直接作为 SAR 去斑/超分强基线的方法。AllClear 是以 Sentinel-2 云去除为主任务、Sentinel-1 为辅助的全球多时相数据；train/validation 元数据显式清单为 19,013/997 个 ROI，中心距离筛查未发现 5 km 内近邻；tx12 JSON 实际覆盖 18,679/984 个 ROI。共享角色表比显式 train 清单多 34 行，版本待核。目标 S2 时间戳到最近 S1 的 48h 内比例约 48%，72h 内约 65%。该筛查不读取影像，不能证明 footprint 隔离、clean SAR 质量或反向 optical-guided SAR restoration 有效。GUSO 和 OSDataset2.0 面向 SAR–Optical 配准，QXS-SAROPT 面向 SAR–optical fusion/匹配；这些资源收窄“没有配对跨模态资源”的说法，但配准、分类或翻译配对不等于 SAR clean-reference。来源限制和访问成本见[广域数据路线报告](PHASE_E_BROAD_SAR_DATA_ROUTE_REVIEW_20261128.md)。相关工作矩阵增补 AllClear 数据集条目；本地假设和阶段门槛不变。
+
+
 ## 2026-11-26 SARptical pilot 不增加文献主张
 
 本轮完成的是 SARptical 柏林单城区的 SAR-only 空间分组模型实验，没有引入或核验新的相关论文；本地 Flow Bridge 负结果不改变已有先例判断，因此[相关工作矩阵](related_work_matrix.csv)无新增文献行。实验只说明该固定 Flow 候选在本次开发数据上未超过任务适配 SwinIR，不能据此扩大或收窄所有扩散/流模型的文献结论。结果见[SARptical Research Decision Review](PHASE_D_SARPTICAL_SPATIAL_PILOT_RESULTS_20261126.md)。

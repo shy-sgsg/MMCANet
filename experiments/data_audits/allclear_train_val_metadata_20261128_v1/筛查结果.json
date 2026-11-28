@@ -1,0 +1,141 @@
+{
+  "audit_id": "allclear_train_val_metadata_20261128_v1",
+  "source_url": "https://allclear.cs.cornell.edu/dataset/allclear/metadata.tar.gz",
+  "source_archive_sha256": "7e941a8670b5cb9d7ac8d395521e1c7160838e5705b9751805b126ebcd701a63",
+  "access_scope": "仅读取 train 与 validation ROI ID 清单、对应的空间记录和 S1/S2 时间配对元数据；共享 ROI 元数据表中的 test 行只用于角色过滤，不参与统计且不保存坐标；未打开 test 专属文件，未读取任何 SAR 或 Optical 影像载荷。",
+  "archive_scope_screen": {
+    "file_members": 23,
+    "extensions": {
+      "csv": 6,
+      "json": 14,
+      "txt": 3
+    },
+    "image_payload_members": 0,
+    "note": "归档成员名与扩展名仅用于确认文件类型；test 文件内容未打开。"
+  },
+  "split_counts": {
+    "listed_train_roi_ids": 19013,
+    "listed_validation_roi_ids": 997,
+    "matched_train_metadata_rows": 19013,
+    "matched_validation_metadata_rows": 997,
+    "train_table_role_rows": 19047,
+    "validation_table_role_rows": 997,
+    "train_table_rows_not_in_explicit_list": 34,
+    "validation_table_rows_not_in_explicit_list": 0,
+    "overlapping_roi_ids": 0,
+    "missing_metadata_rows": {
+      "train": 0,
+      "validation": 0
+    }
+  },
+  "distinct_projected_crs_counts": {
+    "train": 88,
+    "validation": 71
+  },
+  "spatial_screen": {
+    "method": "将 ROI 元数据中心经纬度转换到单位球面，以 KD-tree 计算每个 validation 中心到最近 train 中心的大圆距离；这是中心点近邻筛查，不是影像 footprint 重叠证明。",
+    "distance_quantiles_km": {
+      "min": 11.119508022564945,
+      "p25": 11.12551260074042,
+      "median": 15.728577137514437,
+      "p75": 32.14196888942878,
+      "p90": 58.7654963091558,
+      "p95": 82.11127565648655,
+      "max": 295.3076061641936
+    },
+    "validation_centers_with_nearest_train_below_threshold": {
+      "250m": 0,
+      "500m": 0,
+      "1000m": 0,
+      "2500m": 0,
+      "5000m": 0
+    },
+    "exact_center_coordinate_matches": 0
+  },
+  "dataset_json_screens": {
+    "train": {
+      "dataset_instances": 109840,
+      "dataset_unique_roi_ids": 18679,
+      "listed_roi_ids": 19013,
+      "dataset_roi_ids_not_in_explicit_list": 0,
+      "explicit_list_roi_ids_without_dataset_instances": 334,
+      "s1_frames": 505677,
+      "s2_toa_frames": 1318080,
+      "target_frames": 109840,
+      "time_pairing": {
+        "all_s2_input_frames_to_nearest_s1_frame": {
+          "n": 949188,
+          "gap_hours_quantiles": {
+            "min": 4.619166666666667,
+            "median": 53.12652777777778,
+            "p90": 148.83638888888888,
+            "p95": 220.88351388888887,
+            "max": 1471.0755555555556
+          },
+          "pairs_within_48_hours": 430569,
+          "fraction_within_48_hours": 0.4536182505467831,
+          "pairs_within_72_hours": 579682,
+          "fraction_within_72_hours": 0.6107135783427519
+        },
+        "s2_target_frames_to_nearest_s1_frame": {
+          "n": 79099,
+          "gap_hours_quantiles": {
+            "min": 4.621111111111111,
+            "median": 52.761944444444445,
+            "p90": 136.34083333333334,
+            "p95": 163.1136111111111,
+            "max": 1313.0816666666667
+          },
+          "pairs_within_48_hours": 38581,
+          "fraction_within_48_hours": 0.48775585026359375,
+          "pairs_within_72_hours": 51617,
+          "fraction_within_72_hours": 0.6525619792917736
+        },
+        "interpretation": "仅按 train/validation 元数据时间戳计算最近日期差。官方数据加载器写明 max_diff=2 天，但实现使用 timedelta.days > 2 判拒，因此约为 72 小时边界；同时报告 48 小时更严格筛查。时间接近不代表像素配准或图像质量。"
+      }
+    },
+    "validation": {
+      "dataset_instances": 5633,
+      "dataset_unique_roi_ids": 984,
+      "listed_roi_ids": 997,
+      "dataset_roi_ids_not_in_explicit_list": 0,
+      "explicit_list_roi_ids_without_dataset_instances": 13,
+      "s1_frames": 26822,
+      "s2_toa_frames": 67596,
+      "target_frames": 5633,
+      "time_pairing": {
+        "all_s2_input_frames_to_nearest_s1_frame": {
+          "n": 49884,
+          "gap_hours_quantiles": {
+            "min": 4.623055555555555,
+            "median": 54.84958333333333,
+            "p90": 148.81566666666666,
+            "p95": 220.87047222222225,
+            "max": 1372.8108333333332
+          },
+          "pairs_within_48_hours": 22276,
+          "fraction_within_48_hours": 0.44655600994306793,
+          "pairs_within_72_hours": 30116,
+          "fraction_within_72_hours": 0.603720631865929
+        },
+        "s2_target_frames_to_nearest_s1_frame": {
+          "n": 4157,
+          "gap_hours_quantiles": {
+            "min": 4.6225,
+            "median": 52.778055555555554,
+            "p90": 128.35044444444446,
+            "p95": 161.10805555555555,
+            "max": 1252.8133333333333
+          },
+          "pairs_within_48_hours": 2006,
+          "fraction_within_48_hours": 0.48255953812845803,
+          "pairs_within_72_hours": 2717,
+          "fraction_within_72_hours": 0.6535963435169594
+        },
+        "interpretation": "仅按 train/validation 元数据时间戳计算最近日期差。官方数据加载器写明 max_diff=2 天，但实现使用 timedelta.days > 2 判拒，因此约为 72 小时边界；同时报告 48 小时更严格筛查。时间接近不代表像素配准或图像质量。"
+      }
+    }
+  },
+  "interpretation": "AllClear 的角色清单可提供大量显式 train/validation ROI 组；本审计只用元数据中心筛查 train 与 validation 的空间近邻。距离筛查不替代影像 footprint、时间配准、SAR 数据域或任务适配审计。",
+  "task_boundary": "AllClear 原始基准是以 Sentinel-2 为主目标的云去除，S1 是辅助模态；没有干净 SAR 恢复参考，不能直接作为 SAR 去斑/超分真值，也不构成 Optical 对 SAR 恢复的增益证据。"
+}

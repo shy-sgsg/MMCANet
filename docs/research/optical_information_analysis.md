@@ -1,5 +1,10 @@
 # 光学信息效用分析
 
+## 2026-11-28 新发现的广域数据源尚无 Optical 效用证据
+
+本轮只分析 AllClear train/validation 元数据，没有读取或解码任何新 Optical 图像。显式 ROI 清单互斥，validation 到最近 train 中心距离最小 11.120 km；tx12 JSON 仅覆盖清单内 18,679/984 个 ROI。共享角色表多出 34 个 train 行，来源待核。target S2 到最近 S1 时间戳约 48% 在 48 小时内、约 65% 在 72 小时内；实际像素配准尚未检查。AllClear 的作者任务是 S2 云去除并把 S1 作为辅助模态，不能据此推断 Optical 能改善 SAR 输出。未来需先核角色、footprint、本地旧集交叉、SAR/Optical 配准和任务目标，再决定是否有资格设计新的 Optical 效用实验。Umbra 不含 Optical；其 SAR 重访条目不支持 Q1/H1。当前 C2 v2 `UNJUDGED`，C3-B 关闭。详见[广域数据路线复核](PHASE_E_BROAD_SAR_DATA_ROUTE_REVIEW_20261128.md)。
+
+
 ## 2026-11-26 SARptical pilot 未提供 Optical 效用证据
 
 本轮完整 SAR-only spatial pilot 未解码或加载任何 Optical 影像；即使 SARptical 有中心近似匹配的多视图影像，也没有测量 matched Optical 相对 SAR-only 的增量。故本次不支持或反证 H1/Q1，不改变 C2 v2 `UNJUDGED`、C3-B 关闭状态或 optical 数据准入要求。单城区结果与数据配准限制见[SARptical Research Decision Review](PHASE_D_SARPTICAL_SPATIAL_PILOT_RESULTS_20261126.md)。

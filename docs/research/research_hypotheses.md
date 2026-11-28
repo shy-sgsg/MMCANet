@@ -1,5 +1,13 @@
 # 研究假设
 
+## 2026-11-28 AllClear 元数据筛查不更新 H1–H6
+
+AllClear train/validation ROI 元数据呈现较远的中心点近邻，但共享角色表比显式 train 清单多 34 行；tx12 JSON 覆盖 18,679/984 个清单内 ROI，target S2 到最近 S1 时间戳只有约 65% 在 72 小时内。数据集原任务为 Optical 云去除且没有 clean SAR target。全程未读 Optical 或 SAR 影像，因此该筛查不支持或反证 H1–H6，不改变 C2 `UNJUDGED`、C3-B 关闭或任何阶段 gate。详见[筛查结果](../../experiments/data_audits/allclear_train_val_metadata_20261128_v1/筛查结果.json)。
+
+## 2026-11-28 Phase E 表示域生成候选失败不更新 H1–H6
+
+中心残差 DDIM 与单位矩匹配似然引导 DDIM 均未超过 EDSR，且结构/重投影护栏失败。这是单个 GT25 表示域合成代理、70 个已复用 development 组和单 seed 的观察；既不检验匹配 Optical 对 SAR 输出的增量，也不代表物理 SAR 后验。因此不支持或反证 H1–H6，不改变 C2 `UNJUDGED` 或 C3-B gate。完整范围见[Phase E 研究决策复核](PHASE_E_TASKB_GLOBAL_PILOT_RESULTS_20261128.md)。
+
 ## 2026-11-26 SARptical Flow Bridge 未通过；不更新 H1–H6
 
 冻结的有限 SAR-only 空间 pilot 中，bicubic-anchored Flow Bridge 单 draw 相对任务适配 SwinIR 的来源组等权 ΔPSNR 为 −2.6412 dB（95% CI [−2.7286, −2.5647]），SSIM 与 EPI 同样下降，背景偏差 8/8 组恶化；高回波 ROI 0/8 组可估。故停止当前 Flow Bridge 配置。观察只针对柏林单城区、一个 seed、SAR dB noisy pseudo-target 与固定 bicubic ×2 表示域任务，不推广到所有生成方法。未加载 Optical，因此不支持或反证 H1–H6，不更新 C2 gate 或 C3-B 资格。详见[Research Decision Review](PHASE_D_SARPTICAL_SPATIAL_PILOT_RESULTS_20261126.md)。

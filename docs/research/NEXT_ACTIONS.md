@@ -1,5 +1,15 @@
 # 下一步行动
 
+## 2026-11-28 Phase E 候选停止后的下一步
+
+1. **核清 AllClear 角色差异：** `rois_metadata.csv` 比显式 train ROI 清单多 34 个 train 角色行；它们未进入显式清单及对应 tx12 JSON。确认该差异对应的公开数据版本，并核查 334/13 个没有 tx12 序列的 train/validation ROI 原因；只访问 train/validation 元数据，不打开 test 专属文件。
+2. **继续做数据资格审计：** 以显式 train/validation 清单与 tx12 JSON 为候选边界，核查与项目已用数据的身份交叉、S1/S2 采集时间、配准与空间 footprint、S1 表示/退化以及目标是否能支持 SAR restoration；估算具体子集占用。当前 target S2 到最近 S1 的时间戳中位数约 52.8 小时，约 65% 在 72 小时内；AllClear 原基准没有 clean SAR target。
+3. **协议前置条件：** 只有来源角色版本一致、可形成新的互斥来源组、许可证满足用途，且任务目标有可解释评价参照后，才冻结新的 train/development 协议与模型比较、资源和停止规则。当前不生成正式 split、不训练、不读载荷。
+4. **Umbra 后续路线：** 仅 10 个 bbox 粗组件含 11 对同平台/极化/looks 重访；若继续，先核产品域、像素配准、场景变化和实际可用组数，不把 bbox 粗分组当 split，也不据此推断 Optical 增益。
+5. **停止项：** 不在已重复使用的 Phase E 70 组上继续训练或调参；不再尝试相同 Task B 第三候选。C2 v2 仍 `UNJUDGED`，C3-B 未解锁，需新的合格 development 数据和独立 Optical 效用协议。
+6. **本轮归档：** 两候选完整运行材料与 Umbra/AllClear 元数据筛查及数据路线决策已归档；大 checkpoint、生成样本与元数据临时包不入 Git。见[Phase E 模型结果](PHASE_E_TASKB_GLOBAL_PILOT_RESULTS_20261128.md)、[广域来源路线](PHASE_E_BROAD_SAR_DATA_ROUTE_REVIEW_20261128.md)和[AllClear 筛查结果](../../experiments/data_audits/allclear_train_val_metadata_20261128_v1/筛查结果.json)。
+
+
 ## 2026-11-26 Phase D SARptical pilot 收尾后的行动
 
 1. **停止当前生成候选：** 不延长或重复本次 bicubic-anchored Flow Bridge。结果表明该设置在单城区 SAR noisy pseudo-target 上显著落后 SwinIR，且背景偏差护栏失败；完整配对分析见[Research Decision Review](PHASE_D_SARPTICAL_SPATIAL_PILOT_RESULTS_20261126.md)。

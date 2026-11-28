@@ -1,0 +1,276 @@
+{
+  "实验编号": "phase_e_taskb_global_pilot_20261128_v1",
+  "说明": "结构化归档索引；大体积 checkpoint、生成图像和逐图 CSV 保留在外置持久卷，不复制到 Git。",
+  "代码状态": {
+    "git_head": "af852296ea637e17e1cecb7ece3ede8b530e5f63",
+    "git_dirty": true,
+    "注释": "run manifest 记录代码在当时为 dirty；以下列出隔离克隆中同名协议与脚本的 SHA-256，便于核对。"
+  },
+  "协议文件": [
+    {
+      "路径": "docs/research/PHASE_E_TASK_B_GLOBAL_SENTINEL1_PILOT_PROTOCOL_20261126.md",
+      "sha256": "c9b4443e72a8ae71e8eae3f809c44027897a6360e2f0e916a036b0211c6cd9f8"
+    },
+    {
+      "路径": "docs/research/PHASE_E_TASK_B_GLOBAL_SENTINEL1_PILOT_PROTOCOL_20261126_V2.md",
+      "sha256": "84f8341ff2f4155f1259983d3e3f174be614773fdeb0dab8ac923798b37b322b"
+    },
+    {
+      "路径": "docs/research/PHASE_E_TASK_B_GLOBAL_SENTINEL1_PILOT_PROTOCOL_20261126_V3.md",
+      "sha256": "0a5e929d941c0806943f4788f0ac4e0ddfc55d247d83f55c99655e9adc576767"
+    },
+    {
+      "路径": "docs/research/PHASE_E_TASK_B_GLOBAL_LIKELIHOOD_GUIDED_DDIM_PROTOCOL_20261128_V1.md",
+      "sha256": "ac2fc6b345391773c31b3bb49a4dffa0420e102cb1e305c56cf3281f431e5a59"
+    }
+  ],
+  "运行目录": {
+    "候选A": {
+      "绝对路径": "/run/media/shy/C61C9A341C9A200B/Codex_JDSR_runs/phase_e_global_taskb_pilot_20261126_v3/training_recovery_20261128_v3",
+      "manifest": {
+        "status": "completed",
+        "elapsed_seconds": 1965.9062941639859,
+        "peak_cuda_memory_bytes": 431749632,
+        "manifest_file_sha256": "d07e5b12d8afbec4f393f3866c94ec6a2bd60b132e13eb85b93f14d7d4423543"
+      },
+      "评估文件": {
+        "研究决策复核.json_sha256": "cc24a7d9a40365284d566ae686d0882a78e6c33dbb111bfc151ce750f06617b5",
+        "development_method_summary.csv_sha256": "67b0d0f7f0c00234f63952d7d98188e5d7e52c67517c6d0c0fc9c814595d7f24",
+        "development_per_image_metrics.csv_sha256": "e11d46f56216bd9bd829a152185726f7343815a7ffdcde474e639dcfea20d2e3",
+        "development_group_metrics.csv_sha256": "42caf7ed0443fdebe62f6a879a31cc849b669330019c2de5f39c1c7bb4085db1"
+      },
+      "访问标记": {
+        "confirmation_payload_accessed": false,
+        "test_payload_accessed": false,
+        "optical_payload_loaded": false
+      },
+      "保存内容": [
+        "checkpoint",
+        "命令/环境",
+        "训练或采样日志",
+        "70张development逐图指标",
+        "来源组指标",
+        "生成样本",
+        "运行资源",
+        "Research Decision Review JSON"
+      ]
+    },
+    "候选B": {
+      "绝对路径": "/run/media/shy/C61C9A341C9A200B/Codex_JDSR_runs/phase_e_global_taskb_pilot_20261126_v3/likelihood_guided_20261128_v1r1",
+      "manifest": {
+        "status": "completed",
+        "elapsed_seconds": 2377.6532836130064,
+        "peak_cuda_memory_bytes": 1825469952,
+        "manifest_file_sha256": "0cd474c5c0be3d4c6a26f0f531bf472b3fc38564833bbf71e0ccea40fa365276"
+      },
+      "评估文件": {
+        "研究决策复核.json_sha256": "9a502ac78fddb8a020ecf158ef851fe9d0f8e6d5284f8beb690cca74bc09dd59",
+        "development_method_summary.csv_sha256": "29cc13d37583291ead1b656eab4c311ed56ccdfd45b9c9578fa641659612b843",
+        "development_per_image_metrics.csv_sha256": "47270f1f37193f269be368dc9cce95b143ff0d831654a1902a12e2792338f4b3",
+        "development_group_metrics.csv_sha256": "c7cfeb10538b71923e9950066ba6e345853b244c663fc4126a6b2fa7e37f92ec"
+      },
+      "访问标记": {
+        "confirmation_payload_accessed": false,
+        "test_payload_accessed": false,
+        "optical_payload_loaded": false
+      },
+      "保存内容": [
+        "checkpoint",
+        "命令/环境",
+        "训练或采样日志",
+        "70张development逐图指标",
+        "来源组指标",
+        "生成样本",
+        "运行资源",
+        "Research Decision Review JSON"
+      ]
+    }
+  },
+  "固定输入": {
+    "input_manifest_sha256": "68cf0cf236a4f9a951a265945f2755f793969a73edbc6c3ba3b2ae2c0e0f5489",
+    "split_manifest_sha256": "be592c09133e152517300b37ccec2e81217d0450794162e8135f1f4a7a24032b",
+    "样本与来源组": {
+      "train": 327,
+      "development": 70,
+      "封存_confirmation": 70
+    },
+    "访问标记": {
+      "confirmation_payload_accessed": false,
+      "test_payload_accessed": false,
+      "optical_payload_loaded": false
+    }
+  },
+  "源代码文件": [
+    {
+      "路径": "experiments/phase_e_data_inventory.py",
+      "sha256": "287a96451c5c256cae20c77b2e505eeaec021f8dd14e3a5ca2928f3e9e517f2c"
+    },
+    {
+      "路径": "experiments/phase_e_data_protocol.py",
+      "sha256": "2c9f1ecdeeb53dfcbfc14b45cfae1207833be92ae64661902ede9c6359b6e940"
+    },
+    {
+      "路径": "experiments/phase_e_prepare_taskb_data.py",
+      "sha256": "806d7a0443bc7a967a4f8d3396646ef19c037bc839a7fefcc14bd6dc6cd8f398"
+    },
+    {
+      "路径": "experiments/phase_e_taskb_data.py",
+      "sha256": "0858cfb346334456ef142500f252b85a5e5a4a6f5c2c669970e9303b6ac88d58"
+    },
+    {
+      "路径": "experiments/phase_e_taskb_likelihood_guided_eval.py",
+      "sha256": "31ef9a5f0f1b0d4ded69d447f3b5880edaa126a0fcf594d8946585c6b1bfbc38"
+    },
+    {
+      "路径": "experiments/phase_e_taskb_metrics.py",
+      "sha256": "1a8c24ee9882240328679c79b9dbc2f993e139a493f23ff3407d6ece4d6cbacb"
+    },
+    {
+      "路径": "experiments/phase_e_taskb_models.py",
+      "sha256": "0dc54562b98a1546d8277381ced007429e457cf6916b9b5ad5b72698b5dc2549"
+    },
+    {
+      "路径": "experiments/phase_e_taskb_operator.py",
+      "sha256": "98e8e525091a0e6bbac9879a30636feeb623516239f29bc4da8e9557c5daad40"
+    },
+    {
+      "路径": "experiments/phase_e_train_taskb_pilot.py",
+      "sha256": "39bb3837b7a2957a15cb1aef8c586fe20c270104273e9df68401524c9a3816be"
+    }
+  ],
+  "指标摘要": {
+    "候选A": {
+      "EDSR": {
+        "background_mean_ratio": 1.0690780461519134,
+        "bright_mean_ratio": 0.8806809844845443,
+        "bright_p95_ratio": 0.9255986230808414,
+        "edge_strength_ratio": 0.2588750333816866,
+        "epi_corr": 0.2593102181969564,
+        "epi_coverage": 1.0,
+        "epi_missing_sample_count": 0,
+        "epi_valid_sample_count": 70,
+        "method": "EDSR",
+        "psnr_db": 24.665749854925977,
+        "reprojection_mae": 0.23515692725921633,
+        "sample_count": 70,
+        "source_group_count": 70,
+        "ssim": 0.5186670418835003
+      },
+      "均值校正点估计": {
+        "background_mean_ratio": 1.0621931979351815,
+        "bright_mean_ratio": 0.8767136571613331,
+        "bright_p95_ratio": 0.9313222433803651,
+        "edge_strength_ratio": 0.297839650326235,
+        "epi_corr": 0.21673594054582265,
+        "epi_coverage": 1.0,
+        "epi_missing_sample_count": 0,
+        "epi_valid_sample_count": 70,
+        "method": "均值校正点估计",
+        "psnr_db": 24.318134197601413,
+        "reprojection_mae": 0.23382809143181343,
+        "sample_count": 70,
+        "source_group_count": 70,
+        "ssim": 0.5108601669867403
+      },
+      "DDIM_单次": {
+        "background_mean_ratio": 0.9320013885313717,
+        "bright_mean_ratio": 0.5363130624813455,
+        "bright_p95_ratio": 1.1179900947474257,
+        "edge_strength_ratio": 10.420649459845883,
+        "epi_corr": 0.00039993085701377055,
+        "epi_coverage": 1.0,
+        "epi_missing_sample_count": 0,
+        "epi_valid_sample_count": 70,
+        "method": "DDIM_单次",
+        "psnr_db": 5.453242691364306,
+        "reprojection_mae": 0.3330336210152273,
+        "sample_count": 70,
+        "source_group_count": 70,
+        "ssim": 0.0028723943747383514
+      },
+      "DDIM_四次抽样像素均值": {
+        "background_mean_ratio": 0.9310950978403862,
+        "bright_mean_ratio": 0.5351872505344002,
+        "bright_p95_ratio": 0.8633129050779595,
+        "edge_strength_ratio": 5.2132689704497714,
+        "epi_corr": 0.00032179907706536684,
+        "epi_coverage": 1.0,
+        "epi_missing_sample_count": 0,
+        "epi_valid_sample_count": 70,
+        "method": "DDIM_四次抽样像素均值",
+        "psnr_db": 10.081093066285609,
+        "reprojection_mae": 0.2837544452787785,
+        "sample_count": 70,
+        "source_group_count": 70,
+        "ssim": 0.01174007879461637
+      },
+      "candidate_vs_EDSR": {
+        "delta_psnr_db": -19.21250716356167,
+        "psnr_bootstrap_95ci_db": [
+          -19.71419756416931,
+          -18.706868075436052
+        ],
+        "gate": false
+      }
+    },
+    "候选B": {
+      "candidate": {
+        "background_mean_ratio": 1.7899558685824657,
+        "bright_mean_ratio": 1.0601738199140553,
+        "bright_p95_ratio": 1.1179900947474257,
+        "edge_strength_ratio": 3.4739413950668725,
+        "epi_corr": -0.0017820772373916861,
+        "epi_coverage": 1.0,
+        "epi_missing_sample_count": 0,
+        "epi_valid_sample_count": 70,
+        "method": "似然引导_DDIM_单次",
+        "psnr_db": 7.228922330395556,
+        "reprojection_mae": 0.42133067949489195,
+        "sample_count": 70,
+        "source_group_count": 70,
+        "ssim": 0.12161649955617322
+      },
+      "EDSR": {
+        "background_mean_ratio": 1.0690780461519134,
+        "bright_mean_ratio": 0.8806809844845443,
+        "bright_p95_ratio": 0.9255986230808414,
+        "edge_strength_ratio": 0.2588750333816866,
+        "epi_corr": 0.2593102181969564,
+        "epi_coverage": 1.0,
+        "epi_missing_sample_count": 0,
+        "epi_valid_sample_count": 70,
+        "method": "EDSR",
+        "psnr_db": 24.665749854925977,
+        "reprojection_mae": 0.23515692725921633,
+        "sample_count": 70,
+        "source_group_count": 70,
+        "ssim": 0.5186670418835003
+      },
+      "candidate_vs_EDSR": {
+        "delta_psnr_db": -17.436827524530422,
+        "psnr_bootstrap_95ci_db": [
+          -18.075549219108293,
+          -16.79368709052567
+        ],
+        "gate": false
+      },
+      "四次像素均值": {
+        "method": "似然引导_DDIM_四次像素均值",
+        "source_group_count": "70",
+        "sample_count": "70",
+        "epi_valid_sample_count": "70",
+        "epi_missing_sample_count": "0",
+        "epi_coverage": "1.0",
+        "psnr_db": "8.96917468866359",
+        "ssim": "0.06327562653476138",
+        "epi_corr": "-0.004196775600158994",
+        "edge_strength_ratio": "2.3724276698925157",
+        "bright_mean_ratio": "1.0592570328697348",
+        "bright_p95_ratio": "1.1179900947474257",
+        "background_mean_ratio": "1.794266981111766",
+        "reprojection_mae": "0.40377493114360274"
+      }
+    }
+  },
+  "决定": "两项冻结生成候选都未通过预登记 gate；停止本 Task B 候选路线，不追加第三个候选。"
+}

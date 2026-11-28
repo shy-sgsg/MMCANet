@@ -1,5 +1,16 @@
 # 本项目的扩散方法可行性
 
+## 2026-11-28 AllClear 元数据筛查不改变生成候选决策
+
+AllClear 显式 train/validation ROI 清单有 19,013/997 个互斥 ID；对应 tx12 JSON 覆盖其中 18,679/984 个 ROI，target S2 时间到最近 S1 时间戳约 65% 在 72 小时内。共享元数据表多出 34 个 train 角色行，且该数据没有 clean SAR target。该结果只识别后续可能的数据来源，不提供扩散训练证据，也不解锁第三个 Task B 候选。先核实角色来源、时间配对与 SAR 任务目标，再另立冻结协议。详见[来源路线报告](PHASE_E_BROAD_SAR_DATA_ROUTE_REVIEW_20261128.md)。
+
+## 2026-11-28 GT25 表示域 Task B 两项生成候选均停止
+
+中心残差 DDIM 和单位系数矩匹配观测似然引导 DDIM 已按冻结协议完成，不满足继续 gate。候选 A 的单 draw PSNR 为 5.4532 dB，四 draw 像素均值为 10.0811 dB；候选 B 分别为 7.2289 和 8.9692 dB。最强 EDSR 为 24.6657 dB。候选 A 生成残差标准差约为目标残差的 8.06 倍且双端饱和；候选 B 仍饱和并增加观测重投影误差。按预登记决定停止本 Task B 候选路线，不追加第三配置或事后调系数。详细对照和限制见[Research Decision Review](PHASE_E_TASKB_GLOBAL_PILOT_RESULTS_20261128.md)。
+
+这只反证两项固定配置在多时相 GT25 表示域合成代理上的效用，不等于真实 SAR 后验、物理观测模型或其他生成方法的结论。新生成实验须等待新来源组数据和新冻结协议；C3-A/C3-B gate 不变。
+
+
 ## 2026-11-26 SARptical bicubic-anchored Flow Bridge 停止当前配置
 
 Flow Bridge 使用双三次上采样作为低频锚点，在 SARptical 柏林单城区的空间开发集上仍明显落后 SwinIR：单次 draw 的 ΔPSNR 为 −2.6412 dB（8 组 bootstrap 95% CI [−2.7286,−2.5647]），ΔSSIM −0.11282、ΔEPI −0.13608；四 draw pixel mean 仍低 0.8342 dB。高回波 mask 未达到每图 16 像素有效下限，背景绝对偏差在 8/8 组恶化。按冻结规则停止该配置，不加 seed、不延长训练、不调阈值。一次单城区 pilot 不否定其他 flow/diffusion 建模，但下一候选需提出实质不同的可证伪机制、解决高回波可估性并使用合格的新开发来源组。详见[Research Decision Review](PHASE_D_SARPTICAL_SPATIAL_PILOT_RESULTS_20261126.md)。

@@ -1,5 +1,27 @@
 # 实验登记
 
+## 2026-11-28 Phase E Task B 全球 Sentinel-1 表示域生成候选（完成；两项停止）
+
+- **run id：** `phase_e_taskb_global_pilot_20261128_v1`；外置持久卷根目录：`/run/media/shy/C61C9A341C9A200B/Codex_JDSR_runs/phase_e_global_taskb_pilot_20261126_v3/`。
+- **协议与数据：** [v3 冻结协议](PHASE_E_TASK_B_GLOBAL_SENTINEL1_PILOT_PROTOCOL_20261126_V3.md)和[候选 B 协议](PHASE_E_TASK_B_GLOBAL_LIKELIHOOD_GUIDED_DDIM_PROTOCOL_20261128_V1.md)。Mendeley GT25 VV 表示域伪参考；train/development/封存 confirmation=327/70/70，粗空间组=327/70/70。input SHA-256 `68cf0cf236a4f9a951a265945f2755f793969a73edbc6c3ba3b2ae2c0e0f5489`；split SHA-256 `be592c09133e152517300b37ccec2e81217d0450794162e8135f1f4a7a24032b`。
+- **结果：** EDSR 为最强学习基线，PSNR/SSIM/EPI=`24.66575/0.51867/0.25931`。候选 A DDIM 单次=`5.45324/0.00287/0.00040`，ΔPSNR `−19.21251 dB`，95% CI `[−19.71420,−18.70687]`。候选 B 似然引导单次=`7.22892/0.12162/−0.00178`，ΔPSNR `−17.43683 dB`，95% CI `[−18.07555,−16.79369]`。候选 B 像素均值 PSNR `8.96917 dB`；两候选均为 `gate=false`，停止当前 Task B 生成配置。
+- **复现与权限：** Python 3.13.7、PyTorch 2.8.0+cu128、CUDA 12.8、RTX 3050 Laptop GPU 4 GiB；无 OOM。候选 A 预算计费 4,409.95 秒，候选 B 2,377.65 秒（四 draw 采样 2,338.55 秒），候选 B 后总预算余 33,393.35 秒。run 保留 checkpoint、日志、逐图与来源组指标、draw 样本、资源与决策 JSON；confirmation/test/Optical 均未读。结构化索引与源文件哈希见[归档索引](../../experiments/phase_e_taskb_model_results_20261128_v1/归档索引.json)，研究复核见[结果报告](PHASE_E_TASKB_GLOBAL_PILOT_RESULTS_20261128.md)。结果只支撑该表示域合成 development 上的探索性停止，不支撑真实 SAR 或独立泛化结论。
+
+## 2026-11-28 Umbra 公开元数据与更广配对数据来源筛查（非模型实验）
+
+- **Umbra：** 只读公开 S3 XML 与 134 个 STAC sidecar，去重 101 个 item ID；按 bbox 重叠粗筛为 42 个位置组件，其中 10 组有 11 对同平台/极化/looks 重复采集。未下载任何影像。该粗分组不等于 source scene；配准、绝对定标、地表变化及 speckle 独立性仍未知。详见[Umbra 元数据清单](../../experiments/data_audits/umbra_open_data_metadata_screen_20261128_v1/元数据筛查清单.json)与[路线报告](PHASE_E_BROAD_SAR_DATA_ROUTE_REVIEW_20261128.md)。
+- **GUSO：** 作者仓库报告约 413 GB、request-gated 且有书面许可条件，本轮不拉取。数据集来源审查不训练、不访问新影像载荷、不改变 C2/C3 gate。
+
+## 2026-11-28 AllClear train/validation ROI 元数据筛查（非模型实验）
+
+- **输入：** AllClear 官方 `metadata.tar.gz`，下载大小 317,384,463 字节，SHA-256 `7e941a8670b5cb9d7ac8d395521e1c7160838e5705b9751805b126ebcd701a63`。筛选归档共 23 个文件成员（6 CSV、14 JSON、3 TXT），没有影像扩展名成员。
+- **访问范围：** 仅打开 `train_rois_19k.txt`、`val_rois_1k.txt` 和共享 `rois_metadata.csv`；只保留显式清单对应的 train/validation 坐标。未打开 test 专属清单/JSON，未保存 test 坐标；未读取任何 SAR 或 Optical 载荷。
+- **结果：** 显式清单为 19,013/997 个 ROI ID，互斥，且均匹配共享表地理行。共享表 train 角色共 19,047 行，比显式清单多 34 行；validation 两边均为 997。对应 `tx12` JSON 仅含清单内的 18,679/984 个 ROI，另有 334/13 个显式 ROI 无此 12 帧序列。validation 到最近 train 中心距离最小/中位数/最大为 11.120/15.729/295.308 km，所有 997 个 validation 中心均超过 5 km；距离仅基于中心坐标，不证明 footprint 隔离。
+- **时间配对观察：** train/validation JSON 共 109,840/5,633 个序列实例。每个 target S2 时间点到最近 S1 时间戳的样本中，48 小时内比例为 48.8%/48.3%，72 小时内为 65.3%/65.4%；这是时间戳距离，不是同日成像、像素配准或地表稳定证明。作者 loader 的 `max_diff=2` 以 `timedelta.days > 2` 拒绝，实际接受范围接近 72 小时。
+- **决定：** 34 个 train 角色差异和具体数据 JSON 版本未核清；不生成 split、不下载影像、不训练。AllClear 原任务以 S2 为云去除目标、S1 为辅助信息，无 clean SAR restoration target，不能据此主张 SAR 去斑或 Optical 对 SAR 输出增益。C2/C3 gate 不变。
+- **复现：** `python experiments/data_audits/allclear_train_val_metadata_20261128_v1/audit_allclear_train_val_metadata.py --archive <metadata.tar.gz>`。结果为[筛查结果 JSON](../../experiments/data_audits/allclear_train_val_metadata_20261128_v1/筛查结果.json)，脚本只写聚合统计。
+
+
 ## 2026-11-26 SARptical 空间 pilot（完成；停止当前 Flow Bridge）
 
 - **run id：** `phase_d_sarptical_spatial_pilot_20261126_retry01`；外部持久卷目录：`/run/media/shy/C61C9A341C9A200B/Codex_JDSR_runs/phase_d_sarptical_spatial_pilot_20261126_retry01`。

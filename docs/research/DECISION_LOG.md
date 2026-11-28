@@ -1,5 +1,27 @@
 # 决策记录
 
+## D-2026-11-28-001 — 停止 Phase E Task B 两项冻结生成候选
+
+- **事实：** 候选 A 中心残差 DDIM 与候选 B 单位系数矩匹配似然引导 DDIM 均按各自冻结协议完成。候选 A 相对 EDSR 的 development 组等权 ΔPSNR 为 −19.21251 dB（95% CI [−19.71420,−18.70687]）；候选 B 为 −17.43683 dB（95% CI [−18.07555,−16.79369]）。两项的继续 gate 均为 false。
+- **决定：** 停止当前 Task B 生成路线配置，不在已用于选择的 70 个 development 组上追加候选、修改似然系数或重训。剩余总 GPU 预算不自动解锁第三候选；需新来源或新协议。
+- **权限/成本：** 仅 train/development 327/70 样本、封存 confirmation 70；confirmation/test/Optical 载荷未读。RTX 3050 Laptop GPU 运行无 OOM，运行产物和失败证据保留在外置持久卷。完整依据见[Research Decision Review](PHASE_E_TASKB_GLOBAL_PILOT_RESULTS_20261128.md)。
+- **解释边界：** 结论只适用于多时相 GT25 伪参考上的表示域合成代理和本 seed；不说明真实 SAR restoration、physics likelihood 或其他生成方法是否有效。
+
+## D-2026-11-28-002 — 下一数据审计优先检查 AllClear train/validation 元数据
+
+- **依据：** Umbra 当前公开前缀虽有 SAR 重访线索，但只有 10 个 bbox 粗组件含同平台/极化/looks 重访候选（11 对），且尚未核验配准/定标；它不包含 Optical。GUSO 的大规模配对数据需要表单获取、约 413 GB，且作者要求学术使用及二次开发前书面许可。AllClear 官方资料报告 19,013 train 与 997 validation ROI、坐标/时间元数据和 S1/S2 影像，具备最好的低风险元数据审计起点。
+- **决定：** 下一步仅取 AllClear 元数据并只审 train/validation 的 ROI 分组、距离、本地旧数据重叠及最低样本/存储可行性；不调用会下载全部 ROI 的默认脚本，不访问 test/Optical 影像。未通过元数据与许可门槛前不冻结 split、不训练。
+- **边界：** AllClear 的原任务为以 S2 为目标、S1 为辅助的云去除；不能把公开 paired 数据本身视为 SAR 去斑/超分 ground truth 或 Optical 增益证据。详情见[广域数据路线报告](PHASE_E_BROAD_SAR_DATA_ROUTE_REVIEW_20261128.md)。
+
+## D-2026-11-28-003 — AllClear 显式清单与数据 JSON 可限定候选队列，仍待任务核验
+
+- **事实：** 官方显式 train/validation ROI 清单分别含 19,013/997 个 ID，互斥且均匹配共享地理表。validation ROI 中心到最近 train 中心距离最小 11.120 km、中位数 15.729 km，997 个中心均超过 5 km；这不是 footprint 重叠证明。对应 `tx12` JSON 只覆盖清单内 18,679/984 个 ROI，没有出现清单外 ID。同一 `rois_metadata.csv` 却含 19,047 个 train 角色行，比显式清单多 34 个；这 34 个未进入 `tx12` JSON。
+- **时间观察：** 每个 target S2 时间点到最近 S1 时间戳的 48h 内比例为 train/validation 48.8%/48.3%，72h 内为 65.3%/65.4%。官方 loader `max_diff=2` 使用 `timedelta.days > 2` 判拒，实际可接受至接近 72h；时间接近不证明配准。
+- **决定：** AllClear 是可继续做资格核验的广域候选；尚不冻结模型训练或下载影像。后续可限于显式 train/validation 清单与对应 JSON，另查额外 34 个表行的由来、本地数据身份交叉、footprint、SAR 表示及时间/目标适用性。
+- **权限与存储：** 只用官方元数据归档；test 专属清单/JSON 未打开，shared CSV 的 test 行不参与统计、不保存坐标；没有读取 SAR/Optical 影像载荷。临时 317 MB 归档在筛查后清理，仅留 SHA-256 与聚合结果。
+- **方法边界：** 原数据任务是 S2 云去除、S1 辅助模态，且没有 clean SAR target；元数据通过中心距离筛查不构成 Optical 对 SAR 恢复的效用证据，不改变 C2 `UNJUDGED` 或 C3-B 关闭状态。证据见[筛查结果](../../experiments/data_audits/allclear_train_val_metadata_20261128_v1/筛查结果.json)及[路线报告](PHASE_E_BROAD_SAR_DATA_ROUTE_REVIEW_20261128.md)。
+
+
 ## D-2026-11-26-001 — 停止当前 SARptical 双三次锚定 Flow Bridge
 
 - **触发。** 用户接受 SARptical 单城区有限 SAR-only 空间 pilot；本条记录冻结设计下的完整训练、development 评价与 Research Decision Review。

@@ -1,3 +1,7 @@
+## 2026-11-28 生成候选停止；新 development 来源协议仍缺
+
+两项表示域 Task B 生成方法都未达到冻结门槛，当前配置已停止。下一步需要新 development cohort，而不是在已复用的 70 个组上继续调参。AllClear train/validation 显式 ROI 清单为 19,013/997 且中心距离粗筛未见 5 km 内近邻，但共享表多 34 个 train 角色行，尚未解决版本一致性；同时原任务输出 Optical、缺 clean SAR target。还需核清 ROI/数据 JSON 版本、footprint、与本地旧集交叉、S1/S2 时间差和 SAR 表示，才能决定是否新建 SAR-only 任务。Umbra 只有少量未配准的同平台重访候选；GUSO 体量和二次开发许可不适合直接拉取。详见[广域数据路线](PHASE_E_BROAD_SAR_DATA_ROUTE_REVIEW_20261128.md)。
+
 ## 2026-11-26 有限空间 pilot 已结束；跨城区证据与局部高回波支持仍缺
 
 SARptical 柏林 pilot 已完成，但双三次锚定 Flow Bridge 落后任务适配 SwinIR，且当前高回波 mask 在 0/8 development 组达到冻结最小像素数；当前配置已停止。该结果只覆盖单城区 SAR dB noisy pseudo-target 与 bicubic ×2 表示域任务。下一轮若开展，需先获得多采集区域、来源组及足迹可核验的 development，并在新预登记协议中确保局部高回波统计有效；不能使用本次开发集事后降低阈值。BigEarthNet 官方 train/validation 的来源代理交叉和八邻接仍未解决，官方 validation 不能直接替代独立来源组。结果见[Research Decision Review](PHASE_D_SARPTICAL_SPATIAL_PILOT_RESULTS_20261126.md)。
