@@ -23,7 +23,7 @@
 | E0 历史结果与资源 | `DONE` | SARptical 与两项 Phase E 候选均已归档；GPU Pilot 无 OOM，临时元数据归档已清理。 |
 | E1 联合去斑/超分任务重构 | `RUNNING` | 已验证表示域 noisy pseudo-target 任务；可信 clean SAR 目标与正式任务协议仍需新数据资格审计。 |
 | E2 已发表强基线适配 | `DONE` | EDSR/SwinIR 确定性基线参与两个候选的同开发集比较；结论限于单 seed 表示域 Pilot，不等同于完整论文复现。 |
-| E3 新生成式方法 | `STOPPED_BY_EVIDENCE` | 中心残差 DDIM 与似然引导 DDIM 均未过冻结 gate；本轮两个候选名额已用完，不继续同协议训练或调参。 |
+| E3 新生成式方法 | `RUNNING` | 本轮中心残差 DDIM 与似然引导 DDIM 均未过冻结 gate，两个具体候选已 `STOPPED_BY_EVIDENCE`；本轮名额已用完，不继续同协议训练或调参，后续需依据新机制与合格数据另立方案。 |
 | E4 GPU Pilot 与模型实验 | `DONE` | 两项候选训练/推理/评价及资源记录完成；confirmation、历史 test 与 Optical 载荷未访问。 |
 | E5 新数据与独立协议 | `RUNNING` | Umbra/AllClear 元数据筛查完成；AllClear 的 34 个 train 角色差异、旧集身份交叉、footprint 与 SAR 任务资格待核。 |
 | E6 Optical 信息利用 | `HARD_BLOCKED` | C2 v2 仍 `UNJUDGED`，C3-B 未授权且缺新的合格 development 协议；未读取 Optical 载荷。 |
