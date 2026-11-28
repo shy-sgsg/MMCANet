@@ -16,6 +16,22 @@
 - **更广数据：** Umbra 公开前缀元数据筛查得到 101 个唯一 STAC 条目、42 个 bbox 粗分组；仅 10 组有同平台/极化/looks 重复采集候选（11 对），尚无对齐、稳定性或定标证据，不足以当作训练 split。AllClear train/validation 中心点距离筛查通过粗筛，但发现共享表比显式 train 清单多 34 个角色行，且没有 clean SAR target；暂不冻结协议。GUSO 覆盖虽广，但 request-gated、约 413 GB，且需要学术用途/二次开发书面许可，目前不进入数据拉取路线。完整来源比较见[广域数据路线复核](PHASE_E_BROAD_SAR_DATA_ROUTE_REVIEW_20261128.md)。
 - **阶段状态：** SARptical 柏林空间 pilot 保持已完成/当前 Flow Bridge STOP；C2 v2 仍为 `UNJUDGED`，C3-B 继续关闭。AllClear 的数据集主任务方向与本项目相反（S2 目标、S1 辅助），只有完成 train/validation ROI 距离、本地重叠和数据域审计后，才考虑另立 SAR 输出恢复协议。
 
+## Phase E 工作包状态（2026-11-28）
+
+| 工作包 | 状态 | 本轮证据与边界 |
+|---|---|---|
+| E0 历史结果与资源 | `DONE` | SARptical 与两项 Phase E 候选均已归档；GPU Pilot 无 OOM，临时元数据归档已清理。 |
+| E1 联合去斑/超分任务重构 | `RUNNING` | 已验证表示域 noisy pseudo-target 任务；可信 clean SAR 目标与正式任务协议仍需新数据资格审计。 |
+| E2 已发表强基线适配 | `DONE` | EDSR/SwinIR 确定性基线参与两个候选的同开发集比较；结论限于单 seed 表示域 Pilot，不等同于完整论文复现。 |
+| E3 新生成式方法 | `STOPPED_BY_EVIDENCE` | 中心残差 DDIM 与似然引导 DDIM 均未过冻结 gate；本轮两个候选名额已用完，不继续同协议训练或调参。 |
+| E4 GPU Pilot 与模型实验 | `DONE` | 两项候选训练/推理/评价及资源记录完成；confirmation、历史 test 与 Optical 载荷未访问。 |
+| E5 新数据与独立协议 | `RUNNING` | Umbra/AllClear 元数据筛查完成；AllClear 的 34 个 train 角色差异、旧集身份交叉、footprint 与 SAR 任务资格待核。 |
+| E6 Optical 信息利用 | `HARD_BLOCKED` | C2 v2 仍 `UNJUDGED`，C3-B 未授权且缺新的合格 development 协议；未读取 Optical 载荷。 |
+| E7 SAR 观测一致性与可靠性 | `RUNNING` | 已完成表示域似然引导候选筛选；结果不证明物理似然或真实 SAR 观测一致性，后者依赖合格表示/目标审计。 |
+| E8 论文与科研整合 | `RUNNING` | 研究记录、候选结果和数据路线已同步；候选负结果不支持扩写方法贡献，正式论文修改继续等待合格证据。 |
+
+**下一项实际任务：** 仅用 AllClear train/validation 元数据核清 34 个角色差异及 334/13 个缺少 `tx12` 序列的 ROI；随后完成本地身份交叉、SAR 产品/目标、时间配对与 footprint/配准审计。只有这些检查通过，才冻结新的 SAR 输出 development 协议。具体顺序见[下一步行动](NEXT_ACTIONS.md)。
+
 
 ## 2026-11-26 SARptical 空间 pilot 已完成：停止当前 Flow Bridge
 
