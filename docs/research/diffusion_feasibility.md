@@ -1,8 +1,8 @@
 # 本项目的扩散方法可行性
 
-## 2026-11-28 AllClear 元数据筛查不改变生成候选决策
+## 2026-11-28 既有 Mendeley 来源不解锁新生成训练
 
-AllClear 显式 train/validation ROI 清单有 19,013/997 个互斥 ID；对应 tx12 JSON 覆盖其中 18,679/984 个 ROI，target S2 时间到最近 S1 时间戳约 65% 在 72 小时内。共享元数据表多出 34 个 train 角色行，且该数据没有 clean SAR target。该结果只识别后续可能的数据来源，不提供扩散训练证据，也不解锁第三个 Task B 候选。先核实角色来源、时间配对与 SAR 任务目标，再另立冻结协议。详见[来源路线报告](PHASE_E_BROAD_SAR_DATA_ROUTE_REVIEW_20261128.md)。
+Díaz-Paz 等 Sentinel-1 多时相融合数据已用于 Phase E Task B；既有 GT25 VV 归档提供表示域 pseudo-reference，但同源单景 SAR 与 GT25 缺少直接配对键，单景包未用于训练。GT25 的多时相融合、配准误差、时间稳定和 8-bit 缩放限制物理解释，不能称 clean truth 或真实配对输入。官方 files API 匿名请求 401 不改变既有归档事实。本轮两个新候选训练名额已用完；需要不同来源和新协议才考虑后续生成实验。详见[广域数据路线](PHASE_E_BROAD_SAR_DATA_ROUTE_REVIEW_20261128.md)。
 
 ## 2026-11-28 GT25 表示域 Task B 两项生成候选均停止
 

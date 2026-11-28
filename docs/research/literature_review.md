@@ -1,9 +1,16 @@
 # 初步文献综述
 
-## 2026-11-28 广域配对数据来源更新，不新增 SAR 恢复方法主张
+## 2026-11-28 数据资源更新，不新增 SAR 恢复方法主张
 
-本轮核验了 AllClear、GUSO、OSDataset2.0 和 Umbra 等来源，没有新增一项可直接作为 SAR 去斑/超分强基线的方法。AllClear 是以 Sentinel-2 云去除为主任务、Sentinel-1 为辅助的全球多时相数据；train/validation 元数据显式清单为 19,013/997 个 ROI，中心距离筛查未发现 5 km 内近邻；tx12 JSON 实际覆盖 18,679/984 个 ROI。共享角色表比显式 train 清单多 34 行，版本待核。目标 S2 时间戳到最近 S1 的 48h 内比例约 48%，72h 内约 65%。该筛查不读取影像，不能证明 footprint 隔离、clean SAR 质量或反向 optical-guided SAR restoration 有效。GUSO 和 OSDataset2.0 面向 SAR–Optical 配准，QXS-SAROPT 面向 SAR–optical fusion/匹配；这些资源收窄“没有配对跨模态资源”的说法，但配准、分类或翻译配对不等于 SAR clean-reference。来源限制和访问成本见[广域数据路线报告](PHASE_E_BROAD_SAR_DATA_ROUTE_REVIEW_20261128.md)。相关工作矩阵增补 AllClear 数据集条目；本地假设和阶段门槛不变。
+AllClear train/validation JSON 覆盖审计显示 34 个额外 train 角色记录没有对应任务实例，清单内 334/13 个 ROI 也没有所查 train/validation 序列；其原任务仍是 Optical 云去除，不能作为 SAR restoration target。本轮复核发现，Díaz-Paz 等数据论文《Labeled dataset of Sentinel-1 SAR imagery Despeckled with multitemporal fusions》对应的数据已经用于 Phase E Task B：既有 GT25 VV 参考被用于表示域合成 pilot，而同源单景 SAR 包因缺直接配对键而排除。此来源不是新 cohort，也不能提供真实单景 SAR 配对、clean SAR 或 SR 基准。来源见[论文](https://pmc.ncbi.nlm.nih.gov/articles/PMC13333279/)和[Mendeley Data](https://data.mendeley.com/datasets/6nzd6x25vw/1)；该数据集条目已存在于相关工作矩阵，本轮未新增矩阵行。AllClear 交叉筛查见[报告](../../experiments/data_audits/allclear_train_val_eligibility_crosscheck_20261128_v2/筛查报告.md)。
 
+## DG-SARFM / SAR-NDIP：SAR 去噪引导预训练与数据资产审查（2026-11-28）
+
+Xu 等的 *Denoising-guided SAR foundation model* 已由出版社列为 *ISPRS Journal of Photogrammetry and Remote Sensing* 论文，DOI `10.1016/j.isprsjprs.2026.10.019`；作者仓库记载在线首发日期 2026-10-24、卷期为 2027 年。出版社摘要说明 DG-SARFM 结合 denoising-guided masked reconstruction 与 hierarchical contrastive learning，以 SAR 图像及去噪图像作表征预训练配对，并报告分类、目标检测、实例分割下游实验。该工作是 SAR 去噪引导表征学习先例，不是联合去斑与超分图像输出，也不检验 Optical 对 SAR 恢复的增益或 SAR 观测一致性。[出版社摘要](https://www.sciencedirect.com/science/article/pii/S0924271626005186)；[作者仓库](https://github.com/CaesarYD/DG-SARFM)。
+
+作者仓库 README 称 SAR-NDIP 有 1,024,177 组 noisy/denoised 图块，来自 Sandia MiniSAR、HRSID、MSAR、SARBuD、SAR-AIRcraft、OGSOD、ATRNet-STAR 与 FAIR-CSAR；对 denoised 侧应用 FANS，尺寸为 128×128 或 256×256。作者还列出一个 389,062 图块的缩减预训练集。上述均是作者报告，未从包内独立复算。FANS 输出是算法伪目标，不是独立 clean SAR 真值；大规模 patch 数也不说明独立场景组数。
+
+该资源目前仅列为 SAR-only 表征/去噪预训练候选。作者仓库代码许可证为 MIT，但说明第三方数据仍依各自条款；README 未列 SAR-NDIP 专属许可、压缩包大小、逐样本 source/scene manifest 或固定 split。与本地既有 SAR 数据的重叠也未审。出版社全文入口在本次检索环境返回 HTTP 403；作者公开分享页的目录元数据接口返回 `errno=-12`，未取得文件清单/体量且未继续尝试。因此本文记录限于出版社摘要和作者仓库 README；未下载数据、代码或 checkpoint，不作数据可复现或独立来源主张。资格审计见[广域数据路线复核](PHASE_E_BROAD_SAR_DATA_ROUTE_REVIEW_20261128.md)和[相关工作矩阵](related_work_matrix.csv)。
 
 ## 2026-11-26 SARptical pilot 不增加文献主张
 

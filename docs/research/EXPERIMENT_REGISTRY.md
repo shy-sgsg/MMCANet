@@ -1,5 +1,28 @@
 # 实验登记
 
+## 2026-11-28 AllClear train/validation 样本可执行性复核（非模型实验）
+
+- **输入与范围：** 官方元数据归档 SHA-256 `7e941a8670b5cb9d7ac8d395521e1c7160838e5705b9751805b126ebcd701a63`；只读取显式 train/validation 清单、共享 ROI 角色字段和五份对应任务 JSON。未打开 test 专属清单/JSON，未保存 test ID/坐标，未读取 SAR/Optical 影像载荷。
+- **结果：** 显式清单为 19,013/997 个互斥 ROI。共享表多出 34 个 train 角色 ROI；34 个都不在任何已检查 train JSON。train/validation 清单中还有 334/13 个 ROI 没出现在任何相应已检查 JSON。五份 JSON 均没有超出对应显式清单的 ROI。可执行队列计数为 18,679/984；逐 ROI 未覆盖原因未知。
+- **解释与决定：** 精确数据版本/剔除历史不能由覆盖统计确定。AllClear 是 S2 云去除输出、S1 辅助任务且缺 clean SAR target；不按此来源启动 SAR restoration。只保留用于元数据候选比较，不下载影像。
+- **产物：** [报告](../../experiments/data_audits/allclear_train_val_eligibility_crosscheck_20261128_v2/筛查报告.md)、[聚合结果](../../experiments/data_audits/allclear_train_val_eligibility_crosscheck_20261128_v2/筛查结果.json)、[脚本](../../experiments/data_audits/allclear_train_val_eligibility_crosscheck_20261128_v2/audit_train_val_eligibility.py)。`py_compile` 与官方归档复算通过；脚本遇到已存在输出路径会拒绝覆盖。清理临时 AllClear 元数据归档与缓存合计 317,537,303 字节。
+
+## 2026-11-28 Mendeley 来源身份复核（已用于 Task B；非新增数据）
+
+- **来源：** Díaz-Paz 等，*Labeled dataset of Sentinel-1 SAR imagery Despeckled with multitemporal fusions*, Data in Brief 67 (2026), DOI `10.1016/j.dib.2026.112999`；[论文全文](https://pmc.ncbi.nlm.nih.gov/articles/PMC13333279/)，[官方 Mendeley Data 记录](https://data.mendeley.com/datasets/6nzd6x25vw/1)，记录标注 CC BY 4.0。
+- **既有使用：** Phase E Task B 已使用 Mendeley 融合归档中的 GT25 VV 伪参考。元数据筛查得到 467 个精确匹配候选，34 个缺元数据文件排除；冻结 split 为 train/development/confirmation 327/70/70，只读取前两类 397 张影像。confirmation 仅保留成员元数据。既有 `fusion.rar` 位于外置持久卷，大小 1,827,618,397 字节；数据并非本轮新发现或新下载。
+- **真实配对审计：** 同来源单景 SAR 包与 GT25 文件没有同地点、同轨道、同极化直接键，因此单景包未用于训练。当前 Task B 输入是由 GT25 构造的固定表示域合成退化，不能称为真实单景 SAR 输入与多时相目标的配对验证。
+- **限制：** GT25 是时间融合伪参考，不等于 clean SAR，仍受时间变化、配准误差和均值平滑影响；也不提供 HR SR 目标。官网 Files 页面无可见文件行，未认证 files API 返回 HTTP 401，仅限制匿名文件清单访问，不改变既有归档和运行。无 confirmation/test/Optical 载荷访问。
+- **决定：** 不把该来源重复计为新 cohort；后续 E5 寻找不同 SAR 来源并先审来源组与观测/目标资格。本轮没有基于此来源启动新训练。
+
+## 2026-11-28 DG-SARFM / SAR-NDIP 一手来源筛查（仅论文摘要与作者仓库）
+
+- **来源：** Xu 等，*Denoising-guided SAR foundation model*, DOI `10.1016/j.isprsjprs.2026.10.019`；[出版社页面](https://www.sciencedirect.com/science/article/pii/S0924271626005186)，[作者官方仓库](https://github.com/CaesarYD/DG-SARFM)。出版社列出 2027 年第 243 卷，作者仓库记载在线日期为 2026-10-24。
+- **作者报告：** DG-SARFM 用去噪引导掩码重建及层级对比学习做 SAR 表征预训练；SAR-NDIP 有 1,024,177 组 noisy/denoised patch，来自八个公开 SAR 数据集，并用 FANS 生成去噪目标。仓库列出 128×128 与 256×256 patch，数据/权重包通过百度网盘分享。
+- **审计边界：** 只读取出版社检索到的页面/摘要和作者仓库 README；出版社全文在本次检索环境返回 403；作者公开分享页可打开，但目录元数据接口返回 `errno=-12`，未取得文件清单和体量，未继续尝试。未打开或下载数据包、源数据、代码或 checkpoint；未访问 confirmation/test/Optical 载荷。
+- **资格状态：** 作者仓库列有 MIT 代码许可证，并说明源数据仍受各自条款约束；没有据此推定 SAR-NDIP 数据本身受 MIT 许可。没有核实数据包大小、逐样本 source/scene manifest、固定 split、重复样本处理产物、源许可证汇总或本地数据 overlap。FANS 目标是伪参考；论文摘要所述下游是分类/检测/分割，不是联合去斑/超分。
+- **决定：** 暂记为 SAR-only 预训练候选；不当作新 development cohort、clean SAR 真值或 Optical/SR 证据。后续先查授权、文件清单及来源分组；当前 GPU 候选名额已满，不训练。
+
 ## 2026-11-28 Phase E Task B 全球 Sentinel-1 表示域生成候选（完成；两项停止）
 
 - **run id：** `phase_e_taskb_global_pilot_20261128_v1`；外置持久卷根目录：`/run/media/shy/C61C9A341C9A200B/Codex_JDSR_runs/phase_e_global_taskb_pilot_20261126_v3/`。

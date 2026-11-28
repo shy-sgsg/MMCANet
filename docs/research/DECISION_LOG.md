@@ -22,6 +22,20 @@
 - **方法边界：** 原数据任务是 S2 云去除、S1 辅助模态，且没有 clean SAR target；元数据通过中心距离筛查不构成 Optical 对 SAR 恢复的效用证据，不改变 C2 `UNJUDGED` 或 C3-B 关闭状态。证据见[筛查结果](../../experiments/data_audits/allclear_train_val_metadata_20261128_v1/筛查结果.json)及[路线报告](PHASE_E_BROAD_SAR_DATA_ROUTE_REVIEW_20261128.md)。
 
 
+## D-2026-11-28-004 — 修正 Mendeley 数据来源身份并继续独立来源筛查
+
+- **事实：** AllClear 五份 train/validation JSON 中没有 34 个共享表额外 train 角色 ROI；另有 334/13 个显式 train/validation ROI 未出现在任何所查对应 JSON，逐项原因未知。Díaz-Paz 等 2026 年 Mendeley 数据已用于 Phase E Task B：元数据筛查得到 467 个 GT25 VV 精确匹配候选，34 个缺元数据样本排除；冻结 split 为 327/70/70，只使用 train/development 397 张载荷，confirmation 仅留成员元数据。既有单景 SAR 包因与 GT25 无同地点/轨道/极化直接配对键而排除。
+- **决定：** AllClear 仅按显式角色清单与对应 JSON 交集保留候选队列，因任务输出不匹配不用于 SAR restoration。Mendeley 来源不登记为新候选或独立 cohort；既有 Task B 结果仅解释为 GT25 表示域合成代理。E5 转向与该来源不同的 SAR 数据源及独立来源组核验。
+- **边界：** 已有 Mendeley `fusion.rar` 在外置持久卷，大小 1,827,618,397 字节；本轮没有重新下载。官方 files API 无认证返回 HTTP 401 是文件清单访问限制，不是既有数据不可用的证据。confirmation/test/Optical 载荷未访问；C2 v2 `UNJUDGED`、C3-B 关闭。证据见[AllClear 交叉筛查](../../experiments/data_audits/allclear_train_val_eligibility_crosscheck_20261128_v2/筛查报告.md)、[Task B 冻结协议](PHASE_E_TASK_B_GLOBAL_SENTINEL1_PILOT_PROTOCOL_20261126_V3.md)和[数据路线复核](PHASE_E_BROAD_SAR_DATA_ROUTE_REVIEW_20261128.md)。
+
+
+## D-2026-11-28-005 — 将 SAR-NDIP 仅列为待资格审计的预训练候选
+
+- **事实：** 出版社摘要与作者官方仓库确认 DG-SARFM 是 SAR 去噪引导表征预训练方法；作者 README 报告 SAR-NDIP 含 1,024,177 组来自八个公开 SAR 数据集的 noisy/FANS-denoised 图块，并通过百度网盘提供数据/权重包。仓库说明源数据保留各自许可。
+- **观察边界：** README 未提供 SAR-NDIP 专属数据许可、压缩包大小、逐样本 source/scene mapping 或固定 split；出版社全文入口在本次检索环境返回 403，作者公开分享页的目录元数据接口返回 `errno=-12`，未获得清单。本文献/仓库筛查未下载数据、代码或模型，也未访问本地或保护集载荷。
+- **决定：** 该资源只作为可能的 SAR-only 表征预训练候选，不作为 clean SAR 参考、独立 development cohort、Optical/SR 配对或观测一致性证据。先核上游许可、文件规模、样本 provenance、split 与本地重复；若材料不可得，转向其它来源，不因此停止 E5。当前两个 GPU 模型候选名额已用完，不启动新训练。
+- **证据：** [出版社摘要](https://www.sciencedirect.com/science/article/pii/S0924271626005186)、[作者官方仓库](https://github.com/CaesarYD/DG-SARFM)、[来源路线审查](PHASE_E_BROAD_SAR_DATA_ROUTE_REVIEW_20261128.md)。C2 v2 仍 `UNJUDGED`，C3-B 关闭。
+
 ## D-2026-11-26-001 — 停止当前 SARptical 双三次锚定 Flow Bridge
 
 - **触发。** 用户接受 SARptical 单城区有限 SAR-only 空间 pilot；本条记录冻结设计下的完整训练、development 评价与 Research Decision Review。

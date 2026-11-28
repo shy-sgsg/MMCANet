@@ -1,10 +1,18 @@
 # 总研究计划
 
+## 2026-11-28 AllClear 样本 JSON 覆盖复核与既有 Mendeley 来源纠正
+
+AllClear 的 train/validation 显式清单分别为 19,013/997 个互斥 ROI；全部五份相应任务 JSON 中，额外 34 个 train 角色 ROI 均无样本实例，另有 334/13 个清单 ROI 未被任何所查 JSON 覆盖。候选可执行队列按显式清单与 JSON 交集计为 18,679/984；具体缺失原因不推断。此结果只解决样本可执行性计数，不改变 AllClear 的 S2 输出任务与 SAR restoration 目标不匹配。
+
+2026 年 Sentinel-1 多时相融合参考不是新候选：Phase E Task B 已筛得 467 个 GT25 VV 元数据匹配候选（34 个缺官方元数据的文件排除）；冻结 split 为 train/development/confirmation 327/70/70，实际只读取 train/development 397 张影像。既有单景 SAR 包与 GT25 无同地点、轨道、极化直接配对键而被排除；两项模型实验使用的是 GT25 表示域合成输入。因此结果不构成真实单景 SAR 配对实验，也不提供独立新来源 cohort。多时相参考仍非 clean SAR，且无 SR 目标。官方 files API 的匿名 401 只限制新的文件清单查询，本轮不重新下载数据。
+
+另一个候选是作者公开的 DG-SARFM/SAR-NDIP：README 报告 1,024,177 组 FANS noisy/denoised patch、来自八个公开 SAR 数据集。它可能支持 SAR-only 表征预训练，但不能回答 optical 增益或 SR；逐样本场景来源、split、源许可、压缩包大小和与本地数据重叠尚未核实。出版社全文访问返回 403；作者公开分享目录元数据接口返回 `errno=-12`，未取得包体量或文件清单；本轮只查摘要与作者 README，未下载数据/代码。下一步先核其授权和可分组 manifest，同时继续寻找独立 restoration 来源；不在现有 cohort 上增加生成候选。详见[AllClear train/validation 交叉筛查](../../experiments/data_audits/allclear_train_val_eligibility_crosscheck_20261128_v2/筛查报告.md)、[既有 Task B 冻结协议](PHASE_E_TASK_B_GLOBAL_SENTINEL1_PILOT_PROTOCOL_20261126_V3.md)及[广域来源路线复核](PHASE_E_BROAD_SAR_DATA_ROUTE_REVIEW_20261128.md)。C2 v2 继续 `UNJUDGED`，C3-B 继续关闭。
+
 ## 2026-11-28 Task B 生成候选决策与广域数据路线
 
 Phase E Task B 两项预登记候选均已跑完并停止当前配置：候选 A 中心残差 DDIM 相对 EDSR 组等权 ΔPSNR −19.2125 dB；候选 B 矩匹配似然引导 DDIM ΔPSNR −17.4368 dB。两者都在同一 70 个已用于选择的 development 组上未通过 gate，不能推广到真实 SAR 或全部生成方法；候选数已达本轮上限，禁止在该 cohort 上事后调参。完整报告见[结果与 Research Decision Review](PHASE_E_TASKB_GLOBAL_PILOT_RESULTS_20261128.md)。
 
-AllClear 官方 train/validation ROI 地理中心元数据筛查已完成：显式清单 19,013/997 个 ID 互斥且都有地理记录，validation 最近 train 中心距离最小 11.120 km；对应 tx12 JSON 仅覆盖清单内 18,679/984 个 ROI。共享 ROI 表另有 34 个 train 行不在显式清单或 JSON 中，版本来源仍待核。按 target S2 到最近 S1 时间戳，约 48% 在 48 小时内、约 65% 在 72 小时内。此候选仍须核实本地身份交叉、footprint、SAR 表示域和配对目标；原任务是 S2 云去除，没有 clean SAR target。Umbra 目前只有有限多时相 SAR 粗筛，不能支持 Optical 增量；GUSO 因约 413 GB、request-gated 与书面许可要求暂不拉取。confirmation/test/Optical 影像继续封存；C2 v2 `UNJUDGED`，C3-B 关闭。
+AllClear 官方 train/validation ROI 地理中心元数据筛查已完成：显式清单 19,013/997 个 ID 互斥且都有地理记录，validation 最近 train 中心距离最小 11.120 km；对应 tx12 JSON 仅覆盖清单内 18,679/984 个 ROI。共享表额外 34 个 train 角色 ROI 均不在已检查的五份 train/validation 样本 JSON 中；清单内另有 334/13 个 ROI 未被任何对应已检查 JSON 覆盖，精确原因未知。候选样本须取显式角色清单与对应任务 JSON 的交集。按 target S2 到最近 S1 时间戳，约 48% 在 48 小时内、约 65% 在 72 小时内。此候选仍须核实本地身份交叉、footprint、SAR 表示域和配对目标；原任务是 S2 云去除，没有 clean SAR target。Umbra 目前只有有限多时相 SAR 粗筛，不能支持 Optical 增量；GUSO 因约 413 GB、request-gated 与书面许可要求暂不拉取。confirmation/test/Optical 影像继续封存；C2 v2 `UNJUDGED`，C3-B 关闭。
 
 
 ## 2026-11-26 SARptical 空间 pilot 结果与路线决策

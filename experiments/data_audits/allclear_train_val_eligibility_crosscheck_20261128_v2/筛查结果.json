@@ -1,0 +1,86 @@
+{
+  "audit_id": "allclear_train_val_eligibility_crosscheck_20261128_v2",
+  "source_url": "https://allclear.cs.cornell.edu/dataset/allclear/metadata.tar.gz",
+  "source_archive_sha256": "7e941a8670b5cb9d7ac8d395521e1c7160838e5705b9751805b126ebcd701a63",
+  "access_scope": "仅读取显式 train/validation 清单、共享 ROI 表中的 train/validation 角色与五份 train/validation 数据集 JSON；未打开 test 专属清单或 JSON，未读取任何影像载荷。",
+  "protected_access_flags": {
+    "confirmation_payload_accessed": false,
+    "test_payload_accessed": false,
+    "test_metrics_accessed": false,
+    "optical_payload_accessed": false
+  },
+  "read_members": {
+    "metadata/rois/train_rois_19k.txt": "2025-05-03T21:43:52+00:00",
+    "metadata/rois/val_rois_1k.txt": "2025-05-03T21:43:52+00:00",
+    "metadata/rois/rois_metadata.csv": "2025-05-03T21:43:52+00:00",
+    "metadata/datasets/train_tx12_s2-s1_100pct.json": "2025-05-03T21:43:33+00:00",
+    "metadata/datasets/train_tx3_s2-s1_100pct.json": "2025-05-03T21:43:34+00:00",
+    "metadata/datasets/train_tx3_s2-s1-landsat_100pct.json": "2025-05-03T21:43:38+00:00",
+    "metadata/datasets/val_tx12_s2-s1_100pct.json": "2025-05-03T21:43:38+00:00",
+    "metadata/datasets/val_tx3_s2-s1-landsat_100pct.json": "2025-05-03T21:43:38+00:00"
+  },
+  "explicit_roster_counts": {
+    "train": 19013,
+    "validation": 997,
+    "overlap": 0
+  },
+  "shared_table_counts": {
+    "train_role_rows": 19047,
+    "validation_role_rows": 997,
+    "train_rows_outside_explicit_roster": 34,
+    "distinct_train_roi_ids_outside_explicit_roster": 34,
+    "duplicate_extra_train_rows": 0,
+    "extra_train_ids_in_train_tx12_or_tx3_json": 0
+  },
+  "dataset_json_coverage": {
+    "train_tx12_s2_s1": {
+      "instances": 109840,
+      "unique_roi_ids": 18679,
+      "listed_roi_ids": 19013,
+      "listed_roi_ids_without_instances": 334,
+      "dataset_roi_ids_outside_explicit_list": 0,
+      "dataset_roi_ids_in_extra_train_table_rows": 0
+    },
+    "train_tx3_s2_s1": {
+      "instances": 278613,
+      "unique_roi_ids": 18679,
+      "listed_roi_ids": 19013,
+      "listed_roi_ids_without_instances": 334,
+      "dataset_roi_ids_outside_explicit_list": 0,
+      "dataset_roi_ids_in_extra_train_table_rows": 0
+    },
+    "train_tx3_s2_s1_landsat": {
+      "instances": 278613,
+      "unique_roi_ids": 18679,
+      "listed_roi_ids": 19013,
+      "listed_roi_ids_without_instances": 334,
+      "dataset_roi_ids_outside_explicit_list": 0,
+      "dataset_roi_ids_in_extra_train_table_rows": 0
+    },
+    "validation_tx12_s2_s1": {
+      "instances": 5633,
+      "unique_roi_ids": 984,
+      "listed_roi_ids": 997,
+      "listed_roi_ids_without_instances": 13,
+      "dataset_roi_ids_outside_explicit_list": 0,
+      "dataset_roi_ids_in_extra_train_table_rows": 0
+    },
+    "validation_tx3_s2_s1_landsat": {
+      "instances": 14212,
+      "unique_roi_ids": 984,
+      "listed_roi_ids": 997,
+      "listed_roi_ids_without_instances": 13,
+      "dataset_roi_ids_outside_explicit_list": 0,
+      "dataset_roi_ids_in_extra_train_table_rows": 0
+    }
+  },
+  "crosscheck": {
+    "train_rois_missing_tx12_but_present_in_any_train_tx3_json": 0,
+    "validation_rois_missing_tx12_but_present_in_validation_tx3_json": 0,
+    "train_rois_without_any_checked_train_sequence": 334,
+    "validation_rois_without_any_checked_validation_sequence": 13,
+    "roi_ids_or_coordinates_saved": false
+  },
+  "interpretation": "34 条额外 train 角色地理记录是 34 个不同 ROI，且未出现在任何已检查的 train tx12/tx3 样本 JSON；它们不属于可执行的已发布训练样本。334/13 个没有 tx12 序列的 train/validation ROI 也没有出现在本归档列出的其他对应 tx3 JSON。该结果支持使用显式最终角色清单与实际样本 JSON 定义候选 cohort；不推断额外 ROI 的逐项剔除原因。",
+  "task_boundary": "本审计只核查样本角色与任务 JSON 覆盖，不证明 SAR/Optical 像素配准、时间稳定性、SAR 目标质量或 Optical 对 SAR 恢复的增益。"
+}

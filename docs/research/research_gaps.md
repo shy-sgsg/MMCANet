@@ -1,6 +1,6 @@
-## 2026-11-28 生成候选停止；新 development 来源协议仍缺
+## 2026-11-28 生成候选停止；新 SAR 参考数据仍待资格审计
 
-两项表示域 Task B 生成方法都未达到冻结门槛，当前配置已停止。下一步需要新 development cohort，而不是在已复用的 70 个组上继续调参。AllClear train/validation 显式 ROI 清单为 19,013/997 且中心距离粗筛未见 5 km 内近邻，但共享表多 34 个 train 角色行，尚未解决版本一致性；同时原任务输出 Optical、缺 clean SAR target。还需核清 ROI/数据 JSON 版本、footprint、与本地旧集交叉、S1/S2 时间差和 SAR 表示，才能决定是否新建 SAR-only 任务。Umbra 只有少量未配准的同平台重访候选；GUSO 体量和二次开发许可不适合直接拉取。详见[广域数据路线](PHASE_E_BROAD_SAR_DATA_ROUTE_REVIEW_20261128.md)。
+两项表示域 Task B 生成方法都未达到冻结门槛；已复用的 70 个 development 组不再加候选或调参。AllClear 的角色差异已通过任务 JSON 交叉：额外 34 个 train 行没有样本，另有 334/13 个清单 ROI 未出现在已查 JSON；逐项原因未知。该数据仍输出 Optical 且无 clean SAR target。既有 Mendeley GT25 来源已进入 Task B，但真实单景 SAR 包缺少直接配对键而未使用；该代理不构成新 cohort 或真实 SAR 输入/目标实验。另发现 SAR-NDIP/DG-SARFM 的 FANS 去噪预训练资源，但其源数据许可、逐样本 provenance、固定 split、数据规模和本地交叉未核；其 noisy/denoised patch 也不能构成 SAR–Optical 配对或 SR 目标。当前缺口是先审该资源能否合法、可分组地支持 SAR-only 预训练，同时继续寻找不同的合格 restoration development 来源。多时相均值不能写作 clean truth。详见[广域数据路线](PHASE_E_BROAD_SAR_DATA_ROUTE_REVIEW_20261128.md)。
 
 ## 2026-11-26 有限空间 pilot 已结束；跨城区证据与局部高回波支持仍缺
 

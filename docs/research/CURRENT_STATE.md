@@ -1,20 +1,20 @@
 # 当前状态——权威快照（2026-11-28）
 
-## 2026-11-28 AllClear train/validation ROI 元数据筛查完成；版本差异待核
+## 2026-11-28 AllClear 样本队列、Mendeley 来源纠正与 SAR-NDIP 初筛
 
-- **观察：** AllClear 官方显式 train/validation 清单为 19,013/997 个 ROI，互斥且全部匹配地理表；validation 到最近 train 中心距离最小/中位数为 11.120/15.729 km，997 个中心均超过 5 km。`tx12` JSON 只覆盖清单内的 18,679/984 个 ROI（另有 334/13 个清单 ROI 无 tx12 实例），未出现显式清单外 ID。中心距离筛查不证明完整影像 footprint 隔离。
-- **时间配对：** train/validation 的 `tx12` JSON 含 109,840/5,633 个序列实例。按 target S2 时间到最近 S1 时间戳，48 小时内比例为 48.8%/48.3%，72 小时内为 65.3%/65.4%；时间邻近不证明像素配准或地表稳定。
-- **发现的版本冲突：** 同归档 `rois_metadata.csv` 标记 train 的行数为 19,047，比显式 train 清单多 34 行；validation 两边均为 997。显式清单数与作者论文最终统计一致；额外 34 行不在 tx12 JSON cohort，但来源/版本仍待核。可限定使用显式清单与对应 JSON，不纳入额外行。
-- **边界：** 只读取 train/validation ROI 坐标；test 专属清单/JSON 未打开，shared CSV 的 test 行未用于统计或保存坐标；任何 SAR/Optical 影像载荷均未读取。AllClear 原任务是 S2 云去除、S1 辅助模态，且没有 clean SAR target；不构成 SAR restoration 或 Optical 增益证据。数据集为 CC BY-NC 4.0。
-- **来源与产物：** 官方元数据归档 SHA-256 `7e941a8670b5cb9d7ac8d395521e1c7160838e5705b9751805b126ebcd701a63`；临时 317,384,463 字节归档已在分析后清理。复算见[筛查结果](../../experiments/data_audits/allclear_train_val_metadata_20261128_v1/筛查结果.json)和[脚本](../../experiments/data_audits/allclear_train_val_metadata_20261128_v1/audit_allclear_train_val_metadata.py)。
-- **下一步：** 核实 34 个共享表 train 角色差异；再审本地身份交叉、SAR 产品/时序目标、footprint/像素配准与最小下载体积；通过后才提出新的独立开发协议。C2 v2 仍为 `UNJUDGED`，C3-B 关闭。
+- **AllClear 样本覆盖：** 官方 train/validation 清单为 19,013/997 个互斥 ROI。五份相应 JSON 中，34 个共享表额外 train 角色 ROI 均未出现；显式清单内另有 334/13 个 train/validation ROI 未出现在任何所查对应 JSON。候选可执行队列为 18,679/984 个，逐项缺失原因未知。详见[筛查报告](../../experiments/data_audits/allclear_train_val_eligibility_crosscheck_20261128_v2/筛查报告.md)。
+- **磁盘清理：** 清除本轮临时 AllClear 元数据归档、复算缓存、网页缓存与 `.pyc`，共释放 317,537,303 字节；未删除源数据、历史实验或 checkpoint。清理后 `/tmp` 可用约 7.2 GiB，实验外置卷可用约 80 GiB。
+- **Mendeley 来源身份：** 2026 年 Díaz-Paz 等数据已用于 Phase E Task B，不是新候选。元数据筛查得到 467 个 GT25 VV 精确匹配候选，另排除 34 个缺元数据文件；冻结 split 为 train/development/confirmation 327/70/70。只读取 train/development 影像载荷（397 张），confirmation 仅保留成员元数据。已有单景 SAR 包与 GT25 参考没有同地点、同轨道、同极化配对键，故未纳入训练；当前结果是 GT25 上的表示域合成代理，不是真实单景 SAR 配对实验。
+- **归档与边界：** 外置持久卷保留的 `fusion.rar` 为 1,827,618,397 字节，既有 Task B 输入清单只允许 train/development。confirmation 图像、历史 test 和 Optical 载荷均未读取。无认证 files API 请求返回 401 只说明该文件清单接口不可匿名访问，不代表数据未下载或既有结果不可用；本轮没有重新下载数据。
+- **状态与下一步：** 本来源不能提供独立的新来源组或真实单景配对 cohort。E5 转向筛查不同的、可核验的 SAR 来源；不重复访问该 Mendeley 文件接口、不在当前 development 上增加候选。C2 v2 仍为 `UNJUDGED`，C3-B 关闭。
+- **另一 SAR-only 候选：** 作者仓库公开 DG-SARFM/SAR-NDIP，报告 1,024,177 组 FANS noisy/denoised patch、八个 SAR 来源。它更接近表征预训练而非 JDSR：不含 Optical/SR 目标，且数据包大小、逐样本来源、固定 split、各源许可及本地 overlap 未核。出版社全文本次返回 403；作者公开分享目录元数据接口返回 `errno=-12`，未取得文件清单/体量，之后未继续尝试；只查摘要/作者 README，未下载数据或代码。先做来源与许可资格审计，不能把 patch 数当独立来源组。详情见[来源路线复核](PHASE_E_BROAD_SAR_DATA_ROUTE_REVIEW_20261128.md)与[相关工作矩阵](related_work_matrix.csv)。
 
 ## 2026-11-28 Phase E 两项生成候选停止；转向广域配对来源核验
 
 - **模型决定：** Mendeley GT25 VV 多时相伪参考上的 Task B 表示域合成 pilot 已完成。中心残差 DDIM 与单位系数矩匹配似然引导 DDIM 均未通过冻结 gate；候选 A 相对 EDSR ΔPSNR −19.2125 dB，候选 B −17.4368 dB。两项均为同 70 个 development 来源组上的单 seed 探索，不代表真实 SAR 恢复、物理似然或 independent generalization。两个候选名额已用完，不继续同协议训练/调参。详细指标、成本和 decision review 见[Phase E 结果](PHASE_E_TASKB_GLOBAL_PILOT_RESULTS_20261128.md)。
 - **权限与运行：** train/development 为 327/70 张、327/70 个粗空间组；confirmation payload、历史 test 和 Optical payload 均未读取。RTX 3050 Laptop GPU 运行完成且无 OOM；训练、checkpoint、逐图结果、四组样本、source-group 统计与资源记录保留在外置持久卷。索引见[Phase E 归档](../../experiments/phase_e_taskb_model_results_20261128_v1/归档索引.json)。
-- **更广数据：** Umbra 公开前缀元数据筛查得到 101 个唯一 STAC 条目、42 个 bbox 粗分组；仅 10 组有同平台/极化/looks 重复采集候选（11 对），尚无对齐、稳定性或定标证据，不足以当作训练 split。AllClear train/validation 中心点距离筛查通过粗筛，但发现共享表比显式 train 清单多 34 个角色行，且没有 clean SAR target；暂不冻结协议。GUSO 覆盖虽广，但 request-gated、约 413 GB，且需要学术用途/二次开发书面许可，目前不进入数据拉取路线。完整来源比较见[广域数据路线复核](PHASE_E_BROAD_SAR_DATA_ROUTE_REVIEW_20261128.md)。
-- **阶段状态：** SARptical 柏林空间 pilot 保持已完成/当前 Flow Bridge STOP；C2 v2 仍为 `UNJUDGED`，C3-B 继续关闭。AllClear 的数据集主任务方向与本项目相反（S2 目标、S1 辅助），只有完成 train/validation ROI 距离、本地重叠和数据域审计后，才考虑另立 SAR 输出恢复协议。
+- **更广数据：** Umbra 公开前缀元数据有 101 个唯一 STAC 条目、42 个 bbox 粗组件；10 个组件内有 11 对重访候选，尚无对齐、稳定性或定标证据。AllClear 的 34 个额外 train 行和 334/13 个无 JSON 样本 ROI 已通过任务 JSON 覆盖核验；它仍无 clean SAR target 且原任务输出 S2。既有 Mendeley GT25 来源已用于 Task B 表示域代理；真实单景 SAR 因缺直接配对键被排除，不能当作新独立 cohort。GUSO 仍受约 413 GB 体量与书面许可条件限制。来源比较见[广域数据路线复核](PHASE_E_BROAD_SAR_DATA_ROUTE_REVIEW_20261128.md)。
+- **阶段状态：** SARptical 柏林空间 pilot 保持已完成/当前 Flow Bridge STOP；C2 v2 仍为 `UNJUDGED`，C3-B 继续关闭。E5 继续筛查不同的 SAR 来源及可建立的独立 development 来源组；AllClear 仅保留为任务不匹配的元数据候选，不用于 SAR 输出训练。
 
 ## Phase E 工作包状态（2026-11-28）
 
@@ -25,12 +25,12 @@
 | E2 已发表强基线适配 | `DONE` | EDSR/SwinIR 确定性基线参与两个候选的同开发集比较；结论限于单 seed 表示域 Pilot，不等同于完整论文复现。 |
 | E3 新生成式方法 | `RUNNING` | 本轮中心残差 DDIM 与似然引导 DDIM 均未过冻结 gate，两个具体候选已 `STOPPED_BY_EVIDENCE`；本轮名额已用完，不继续同协议训练或调参，后续需依据新机制与合格数据另立方案。 |
 | E4 GPU Pilot 与模型实验 | `DONE` | 两项候选训练/推理/评价及资源记录完成；confirmation、历史 test 与 Optical 载荷未访问。 |
-| E5 新数据与独立协议 | `RUNNING` | Umbra/AllClear 元数据筛查完成；AllClear 的 34 个 train 角色差异、旧集身份交叉、footprint 与 SAR 任务资格待核。 |
-| E6 Optical 信息利用 | `HARD_BLOCKED` | C2 v2 仍 `UNJUDGED`，C3-B 未授权且缺新的合格 development 协议；未读取 Optical 载荷。 |
+| E5 新数据与独立协议 | `RUNNING` | Mendeley 已用于 Task B，不能作为新 cohort；AllClear 队列已核但任务不匹配。SAR-NDIP 暂为 FANS 伪目标预训练候选，源许可、样本 provenance、split 和本地 overlap 未核；继续筛查独立 restoration 来源。 |
+| E6 Optical 信息利用 | `HARD_BLOCKED` | C2 v2 仍 `UNJUDGED`，C3-B 未授权且缺独立、正确配对的 development 协议；条件方案已记入[下一步行动](NEXT_ACTIONS.md)，未读取 Optical 载荷。 |
 | E7 SAR 观测一致性与可靠性 | `RUNNING` | 已完成表示域似然引导候选筛选；结果不证明物理似然或真实 SAR 观测一致性，后者依赖合格表示/目标审计。 |
 | E8 论文与科研整合 | `RUNNING` | 研究记录、候选结果和数据路线已同步；候选负结果不支持扩写方法贡献，正式论文修改继续等待合格证据。 |
 
-**下一项实际任务：** 仅用 AllClear train/validation 元数据核清 34 个角色差异及 334/13 个缺少 `tx12` 序列的 ROI；随后完成本地身份交叉、SAR 产品/目标、时间配对与 footprint/配准审计。只有这些检查通过，才冻结新的 SAR 输出 development 协议。具体顺序见[下一步行动](NEXT_ACTIONS.md)。
+**下一项实际任务：** 不再把 Mendeley 来源当作新 cohort；先核 SAR-NDIP 的上游许可、样本来源和 split，再继续筛查独立 restoration 来源并对 train/development 元数据做身份交叉、来源组及 footprint 审计。AllClear 的 34 与 334/13 覆盖差异已经在任务 JSON 层核清，不再作为主要阻塞；它仍因 S2 输出任务不匹配而不进入 SAR restoration 训练。执行顺序见[下一步行动](NEXT_ACTIONS.md)。
 
 
 ## 2026-11-26 SARptical 空间 pilot 已完成：停止当前 Flow Bridge

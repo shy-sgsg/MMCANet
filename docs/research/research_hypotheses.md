@@ -1,8 +1,8 @@
 # 研究假设
 
-## 2026-11-28 AllClear 元数据筛查不更新 H1–H6
+## 2026-11-28 数据可执行性审计不更新 H1–H6
 
-AllClear train/validation ROI 元数据呈现较远的中心点近邻，但共享角色表比显式 train 清单多 34 行；tx12 JSON 覆盖 18,679/984 个清单内 ROI，target S2 到最近 S1 时间戳只有约 65% 在 72 小时内。数据集原任务为 Optical 云去除且没有 clean SAR target。全程未读 Optical 或 SAR 影像，因此该筛查不支持或反证 H1–H6，不改变 C2 `UNJUDGED`、C3-B 关闭或任何阶段 gate。详见[筛查结果](../../experiments/data_audits/allclear_train_val_metadata_20261128_v1/筛查结果.json)。
+AllClear 交叉筛查表明额外 34 个 train 角色 ROI 不在所查训练 JSON，334/13 个清单 ROI 未进入所查对应 JSON；该结果只澄清公开元数据中的样本队列。Díaz-Paz 等 Sentinel-1 多时相来源已用于 Task B 的 GT25 表示域代理；其单景 SAR 包因缺直接配对键而排除。本轮对来源身份的纠正确认并未新增实验，也未访问新的图像载荷。DG-SARFM/SAR-NDIP 的公开摘要与 README 提供了新的 SAR 去噪表征预训练先例，但没有验证本项目的联合 SR、Optical 增量或观测一致性；数据包也未做资格审计。以上证据均未测试匹配 Optical 对 SAR 输出的增益、生成方法效用或 SAR 观测一致性，不支持或反证 H1–H6，不改变 C2 `UNJUDGED`、C3-B 关闭或任何 gate。见[AllClear 筛查报告](../../experiments/data_audits/allclear_train_val_eligibility_crosscheck_20261128_v2/筛查报告.md)和[来源路线报告](PHASE_E_BROAD_SAR_DATA_ROUTE_REVIEW_20261128.md)。
 
 ## 2026-11-28 Phase E 表示域生成候选失败不更新 H1–H6
 

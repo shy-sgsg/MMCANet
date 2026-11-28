@@ -3,9 +3,11 @@
 ## 2026-11-28 Phase E 生成失败与广域来源风险
 
 - **当前生成负结果：** 两项 Task B 生成候选在同一 70 组表示域 synthetic proxy 上远低于 EDSR。候选 A 的样本残差方差过大、两端饱和；候选 B 的矩匹配高斯似然不是精确 Gamma 加权和密度，单位系数引导未恢复结构并增加重投影 MAE。两者使用已选择过的 development，不能提供独立泛化结论；失败原因未被完全定位，不据此泛化否定生成模型。
-- **Mendeley pseudo-reference：** GT25 是多时相融合参考；无法确认单景 SAR 与其真实配对。时间变化、配准误差、均值平滑及 8-bit 表示域限制结果的物理解释。
+- **Mendeley pseudo-reference：** Phase E 已使用该来源的 GT25 VV，但同源单景 SAR 包没有同地点/轨道/极化直接配对键，因此被排除。现有模型结果是 GT25 上的合成表示域代理；时间变化、配准误差、均值平滑及 8-bit 表示域限制其物理解释。
 - **Umbra source grouping：** STAC bbox 经纬度平面重叠组件只是粗筛，不是米制距离、场景 ID 或独立来源组。10 个组件内的 11 对重访尚无栅格共配准、地表稳定、独立噪声、定标证据；公开对象清单有约 1.35 TB 数据资产，本轮仅约 1 MB 元数据。
-- **AllClear：** train/validation 显式清单为 19,013/997 个互斥 ROI；对应 tx12 JSON 仅覆盖清单内 18,679/984 个 ROI（另有 334/13 个没有该序列样本），未出现清单外 ID。共享表多出 34 个 train 角色行，来源未核；候选 split 仅可限定为明确清单与对应 JSON。最近中心距离 11.120 km 以上不能替代 footprint 审计。目标 S2 到最近 S1 时间戳仅约 48% 在 48h 内、约 65% 在 72h 内；这限制严格时间配对。原任务是 Optical 云去除，S1 为裁剪/归一化 GRD、S2 为 L1C TOA，且无 clean SAR target。许可为 CC BY-NC 4.0；默认下载器会拉取所有角色的 ROI 影像，不运行。
+- **AllClear：** 五份 train/validation 任务 JSON 中没有显式清单外 ROI；额外 34 个 train 角色 ROI 均无 JSON 实例，清单内 334/13 个 train/validation ROI 也无任何所查对应 JSON 实例，逐项原因未知。中心距离不替代 footprint 审计；S2 输出云去除与无 clean SAR target 仍导致任务不匹配。CC BY-NC 4.0，默认下载器会获取所有角色影像，未运行。
+- **Mendeley 来源身份：** 这不是待下载的新候选；GT25 融合归档已用于既有 Task B，`fusion.rar` 保存在外置卷。官方 files API 匿名 401 仅限制新查文件清单。当前主要数据风险是其单景 SAR 包没有可核验的直接配对关系，已有 GT25 代理不可解释为真实输入/目标配对、clean SAR 或 joint SR ground truth。
+- **SAR-NDIP / DG-SARFM：** 作者称百万级 noisy/FANS-denoised patch 来自八个公开 SAR 数据集；现有 README 未提供逐样本场景清单、固定 split、包体量或 SAR-NDIP 数据许可汇总。上游许可证和与本地历史数据的重叠不明；patch 数不等于独立来源组。FANS 结果是 pseudo-target，可能带平滑偏差，且不提供 Optical/SR 监督。
 - **GUSO/OSDataset/QXS：** GUSO 下载约 413 GB 且二次开发要书面许可；OSDataset2.0 国别数与 patch 数不等于 restoration 独立源组；QXS 只覆盖少量城市且完整许可不清。不得按 patch 数宣称来源多样性。
 - **资源与证据：** 12 小时探索账本剩余约 9.28 小时，但本轮两候选名额已耗尽；预算不能替代新 protocol。checkpoint/预测未入 Git，需保留外置卷路径和归档索引。完整边界见[Phase E 结果](PHASE_E_TASKB_GLOBAL_PILOT_RESULTS_20261128.md)与[数据路线复核](PHASE_E_BROAD_SAR_DATA_ROUTE_REVIEW_20261128.md)。
 

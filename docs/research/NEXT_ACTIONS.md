@@ -2,13 +2,22 @@
 
 ## 2026-11-28 Phase E 候选停止后的下一步
 
-1. **核清 AllClear 角色差异：** `rois_metadata.csv` 比显式 train ROI 清单多 34 个 train 角色行；它们未进入显式清单及对应 tx12 JSON。确认该差异对应的公开数据版本，并核查 334/13 个没有 tx12 序列的 train/validation ROI 原因；只访问 train/validation 元数据，不打开 test 专属文件。
-2. **继续做数据资格审计：** 以显式 train/validation 清单与 tx12 JSON 为候选边界，核查与项目已用数据的身份交叉、S1/S2 采集时间、配准与空间 footprint、S1 表示/退化以及目标是否能支持 SAR restoration；估算具体子集占用。当前 target S2 到最近 S1 的时间戳中位数约 52.8 小时，约 65% 在 72 小时内；AllClear 原基准没有 clean SAR target。
-3. **协议前置条件：** 只有来源角色版本一致、可形成新的互斥来源组、许可证满足用途，且任务目标有可解释评价参照后，才冻结新的 train/development 协议与模型比较、资源和停止规则。当前不生成正式 split、不训练、不读载荷。
-4. **Umbra 后续路线：** 仅 10 个 bbox 粗组件含 11 对同平台/极化/looks 重访；若继续，先核产品域、像素配准、场景变化和实际可用组数，不把 bbox 粗分组当 split，也不据此推断 Optical 增益。
-5. **停止项：** 不在已重复使用的 Phase E 70 组上继续训练或调参；不再尝试相同 Task B 第三候选。C2 v2 仍 `UNJUDGED`，C3-B 未解锁，需新的合格 development 数据和独立 Optical 效用协议。
-6. **本轮归档：** 两候选完整运行材料与 Umbra/AllClear 元数据筛查及数据路线决策已归档；大 checkpoint、生成样本与元数据临时包不入 Git。见[Phase E 模型结果](PHASE_E_TASKB_GLOBAL_PILOT_RESULTS_20261128.md)、[广域来源路线](PHASE_E_BROAD_SAR_DATA_ROUTE_REVIEW_20261128.md)和[AllClear 筛查结果](../../experiments/data_audits/allclear_train_val_metadata_20261128_v1/筛查结果.json)。
+1. **SAR-NDIP 资格审计：** 作者仓库提供百度网盘数据/权重包，但未列包体量、数据专属许可、逐样本来源 manifest 或固定 split；本轮公开分享目录元数据接口返回 `errno=-12`，未取得清单，停止继续尝试该接口。只有获得作者数据包 manifest 和八个上游许可映射后，才核场景分组与本地 overlap；未通过前不下载、不训练。该资源只可能支持 SAR-only 预训练，不能回答 Optical 或 SR。材料不可得时记录缺口并继续其它一手来源；不重复尝试已用于 Task B 的 Mendeley files API。
+2. **审查新来源的目标形成：** 对不同来源核实输入与参考 acquisition 成员关系、配准基准、归一化/量化域、时序稳定风险和空间来源组；据此判断是否适用于去斑或受控 SR。多时相均值不称 clean truth。
+3. **本地身份与空间独立性：** 只使用项目 train/development 的可核验元数据，建立该来源与历史训练样本的身份/footprint crosswalk；确认缓冲后可用来源组数量。若隔离 worktree 没有数据 payload，优先用只读索引/manifest，不复制或覆盖主工作区数据。
+4. **AllClear 处置：** 仅把显式 train/validation 清单与对应任务 JSON 的交集（18,679/984 个 ROI）视为该审计下的可执行候选；34 个额外 train 角色行及 334/13 个无 JSON 样本的 ROI 不纳入。由于原任务是 S2 输出且没有 clean SAR target，不把 AllClear 作为当前 SAR restoration 训练源。
+5. **协议闸门：** 只有来源组、成员关系、目标域、许可和可解释参照均通过，才冻结新的 train/development、匹配基线、目标、预算和停止条件。确认前不下载大载荷、不生成 split、不训练；confirmation/test/Optical 边界不变。
+6. **已停止项：** Phase E 两个新模型名额已用完；不在现有 70 个 development 组上增加第三候选或调参。C2 v2 仍 `UNJUDGED`，C3-B 关闭。Umbra 的 SAR 重访配准/稳定性审计可独立推进，不作为 Optical 增益证据。
+7. **归档：** Phase E 生成结果与成本见[模型结果](PHASE_E_TASKB_GLOBAL_PILOT_RESULTS_20261128.md)；本轮 AllClear 可执行性证据见[筛查报告](../../experiments/data_audits/allclear_train_val_eligibility_crosscheck_20261128_v2/筛查报告.md)，新来源比较见[广域路线](PHASE_E_BROAD_SAR_DATA_ROUTE_REVIEW_20261128.md)。checkpoint/预测仍只保存在外置实验卷，不进入 Git。
 
+
+### C3-B 准入依赖与条件方案
+
+C3-B 当前未获正式训练授权，且 C2 v2 仍为 `UNJUDGED`。C3-A 的两项 Task B 生成配置均未过 gate；这支持停止当前配置，但不判断 Optical 对 SAR 恢复是否有增益。
+
+启动 C3-B 正式训练前，先取得一套未用于历史训练/模型选择的 train/development cohort，并提供可核验的 SAR–Optical 配对、采集时间、配准质量、来源场景组、空间足迹及许可清单；所有候选都必须排除 confirmation/test。现有候选不满足：Mendeley 的单景 SAR 包与 GT25 无直接配对键，SAR-NDIP 是 SAR-only FANS 伪目标且无 source manifest，AllClear 的目标为 S2 云去除且无 clean SAR target，Umbra 不含 Optical。
+
+数据通过后，另行冻结同输入/同 evaluator 的 SAR-only 任务基线、匹配 Optical 条件模型与 Optical 置换控制，预声明来源组等权的增益与失败判据、成本上限和输出清单；获批前不训练、不读 Optical 载荷。若无法取得满足上述条件的数据，C3-B 保持关闭，并将最小外部解锁项限定为官方数据访问/manifest 与其角色及许可说明。
 
 ## 2026-11-26 Phase D SARptical pilot 收尾后的行动
 
